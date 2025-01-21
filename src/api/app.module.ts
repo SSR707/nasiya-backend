@@ -3,10 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AdminModule } from './admin/admin.module';
+import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get<string>('PG_HOST'),
@@ -18,7 +21,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         autoLoadEntities: true,
         synchronize: true,
       }),
-      inject: [ConfigService],
     }),
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, '..', '..', '..', 'base'),
@@ -27,6 +29,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AdminModule,
+    CustomJwtModule
   ],
 })
 export class AppModule {}

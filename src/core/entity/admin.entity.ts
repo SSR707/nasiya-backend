@@ -5,13 +5,14 @@ import { Column, Entity } from 'typeorm';
 @Entity('admins')
 export class AdminEntity extends BaseEntity {
   @Column({ type: 'varchar', name: 'fullname' })
+  fullname: string;
   @Column({ type: 'varchar', name: 'email', nullable: true, unique: true })
   email: string;
   @Column({ type: 'varchar', name: 'username', unique: true })
   username: string;
   @Column({ type: 'varchar', name: 'hashed_password' })
   hashed_password: string;
-  @Column({ type: 'smallint', name: 'pass_code' })
+  @Column({ type: 'smallint', name: 'pass_code', nullable: true })
   pass_code: number;
   @Column({
     type: 'varchar',
@@ -21,6 +22,6 @@ export class AdminEntity extends BaseEntity {
   phone_number: string;
   @Column({ type: 'enum', enum: RoleAdmin, default: RoleAdmin.ADMIN })
   role: string;
-  @Column({ type: 'text', name: 'refresh_token' })
+  @Column({ type: 'text', name: 'refresh_token', nullable: true })
   refresh_token: string;
 }
