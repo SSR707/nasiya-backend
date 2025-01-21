@@ -1,0 +1,36 @@
+services:
+  nasiya-app:
+    build: .
+    ports:
+      - '5000:3000'
+    volumes:
+      - .:/nasiya-project
+      - /nasiya-project/node_modules
+    command: pnpm run dev
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres
+    ports:
+      - '5435:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=nasiya_db
+    restart: unless-stopped
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+volumes:
+  postgres-data:
