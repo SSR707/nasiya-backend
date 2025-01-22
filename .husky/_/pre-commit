@@ -1,8 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname "$0")/h"
-#hoooks
-# Run linting
 npm run lint
-
-# Run code formatting
 npm run format
