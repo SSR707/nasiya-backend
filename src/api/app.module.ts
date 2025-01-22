@@ -5,8 +5,16 @@ import { resolve } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './admin/admin.module';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 1000 * 60,
+        limit: 15,
+      },
+    ]),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,7 +38,13 @@ import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.mo
       isGlobal: true,
     }),
     AdminModule,
-    CustomJwtModule
+    CustomJwtModule,
   ],
+  providers:[
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ]
 })
 export class AppModule {}

@@ -36,23 +36,23 @@ export class CustomJwtService {
     }
   }
 
-  async verifyRefreshToken(refresh_token: any){
+  async verifyRefreshToken(refresh_token: any) {
     try {
       const data = await this.jwtService.verify(refresh_token, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
-      return data
+      return data;
     } catch (error) {
       throw new BadRequestException(`Error on refresh token: ${error}`);
     }
   }
 
-  async verifyAccessToken(access_token: any){
+  async verifyAccessToken(access_token: any) {
     try {
       const data = await this.jwtService.verify(access_token, {
-        secret:this.configService.get<string>('JWT_ACCESS_SECRET'),
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
       });
-      return data
+      return data;
     } catch (error) {
       throw new BadRequestException(`Error on refresh token: ${error}`);
     }

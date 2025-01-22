@@ -47,9 +47,8 @@ export class CreateAdminDto {
   @IsNotEmpty()
   hashed_password: string;
 
-
   @IsOptional()
-  pass_code?:number
+  pass_code?: number;
 
   @ApiProperty({
     type: String,

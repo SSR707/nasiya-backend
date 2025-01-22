@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([AdminEntity]) ,CustomJwtModule],
+  imports: [TypeOrmModule.forFeature([AdminEntity]), CustomJwtModule],
   controllers: [AdminController],
   providers: [AdminService],
 })

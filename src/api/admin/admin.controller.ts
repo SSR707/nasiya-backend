@@ -39,7 +39,7 @@ export class AdminController {
     description: 'Super admin created',
     schema: {
       example: {
-        status_code: 201,
+        status_code: HttpStatus.CREATED,
         message: 'success',
       },
     },
@@ -49,7 +49,7 @@ export class AdminController {
     description: 'Failed creating super admin',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on creating super admin',
       },
     },
@@ -67,7 +67,7 @@ export class AdminController {
     description: 'Admin signed in successfully',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
         data: {
           accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjRkMGJ',
@@ -83,7 +83,7 @@ export class AdminController {
     description: 'Failed signing admin',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Invalid username or password',
       },
     },
@@ -102,7 +102,7 @@ export class AdminController {
     description: 'Get new access token success',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
         data: {
           token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjRkMGJ',
@@ -116,7 +116,7 @@ export class AdminController {
     description: 'Fail new access token',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on refresh token',
       },
     },
@@ -132,7 +132,7 @@ export class AdminController {
     description: 'Admin logged out success',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
       },
     },
@@ -142,7 +142,7 @@ export class AdminController {
     description: 'Fail on logging out admin',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on logout',
       },
     },
@@ -165,7 +165,7 @@ export class AdminController {
     description: 'All admins fetched successfully',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
         data: [
           {
@@ -186,7 +186,7 @@ export class AdminController {
     description: 'Failed fetching admins',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on fetching admins',
       },
     },
@@ -213,7 +213,7 @@ export class AdminController {
     description: 'Admin fetched by id successfully',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
         data: {
           id: 'b2d4aa27-0768-4456-947f-f8930c294394',
@@ -232,7 +232,7 @@ export class AdminController {
     description: 'Failed fetching admin by ID',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on fetching admin by ID',
       },
     },
@@ -259,7 +259,7 @@ export class AdminController {
     description: 'Profile of admin edited',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
         data: {},
       },
@@ -270,7 +270,7 @@ export class AdminController {
     description: 'Failed edit profile of admin',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on update profile of admin',
       },
     },
@@ -300,7 +300,7 @@ export class AdminController {
     description: 'Admin by ID deleted successfully',
     schema: {
       example: {
-        status_code: 200,
+        status_code: HttpStatus.OK,
         message: 'success',
         data: {},
       },
@@ -311,7 +311,7 @@ export class AdminController {
     description: 'Failed delete admin by ID',
     schema: {
       example: {
-        status_code: 400,
+        status_code: HttpStatus.BAD_REQUEST,
         message: 'Error on deleting admin by ID',
       },
     },
