@@ -5,7 +5,7 @@
 //   UnauthorizedException,
 // } from '@nestjs/common';
 // import { JwtService } from '@nestjs/jwt';
-// import { config } from '../config';
+// import { config } from '../../config/index';
 
 // export const UserID = createParamDecorator(
 //   async (data: unknown, context: ExecutionContext) => {
