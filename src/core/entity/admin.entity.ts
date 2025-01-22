@@ -21,7 +21,7 @@ export class AdminEntity extends BaseEntity {
   })
   phone_number: string;
   @Column({ type: 'enum', enum: RoleAdmin, default: RoleAdmin.ADMIN })
-  role: string;
+  role: RoleAdmin;
   @Column({ type: 'text', name: 'refresh_token', nullable: true })
   refresh_token: string;
 }

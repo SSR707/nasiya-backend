@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -61,9 +62,11 @@ export class CreateAdminDto {
   @ApiProperty({
     type: String,
     description: 'Role of admin',
-    example: 'MANEGER',
+    example: 'manager',
     enum: RoleAdmin,
     default: RoleAdmin.MANAGER,
   })
-  role: string;
+  @IsEnum(RoleAdmin)
+  @IsOptional()
+  role: RoleAdmin;
 }

@@ -17,7 +17,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AdminRepository } from 'src/core/repository/admin.repository';
 import { CustomJwtService } from 'src/infrastructure/lib/custom-jwt/custom-jwt.service';
 import { ConfigService } from '@nestjs/config';
-
+import { Response } from 'express';
 @Injectable()
 export class AdminService extends BaseService<
   CreateAdminDto,
@@ -59,7 +59,6 @@ export class AdminService extends BaseService<
       const superAdmin = await this.getRepository.create({
         ...createAdminDto,
         hashed_password: password,
-        role: RoleAdmin.SUPERADMIN,
       });
       await this.getRepository.save(superAdmin);
     } catch (error) {
@@ -83,6 +82,8 @@ export class AdminService extends BaseService<
     }
     const accessToken = await this.jwt.generateAccessToken(user);
     const refreshToken = await this.jwt.generateRefreshToken(user);
+    await this.getRepository.update(user.id, { refresh_token: refreshToken });
+    this.writeToCookie(refreshToken, res);
     return {
       status_code: HttpStatus.OK,
       message: 'success',
@@ -102,7 +103,7 @@ export class AdminService extends BaseService<
   async refresh_token(refresh_token: string) {
     const data = await this.jwt.verifyRefreshToken(refresh_token);
     const user = await this.findOneById(data?.id);
-    const accessToken = await this.jwt.generateAccessToken(user);
+    const accessToken = await this.jwt.generateAccessToken(user.data);
     return {
       status_code: HttpStatus.OK,
       message: 'success',
@@ -111,12 +112,12 @@ export class AdminService extends BaseService<
         expire: this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'),
       },
     };
-    return;
   }
 
   async logout(refresh_token: string, res: Response) {
     const data = await this.jwt.verifyRefreshToken(refresh_token);
     await this.findOneById(data?.id);
+    res.clearCookie('refresh_token_admin');
     return {
       status_code: HttpStatus.OK,
       message: 'success',
@@ -198,5 +199,16 @@ export class AdminService extends BaseService<
       status_code: 200,
       message: 'success',
     };
+  }
+
+  private async writeToCookie(refresh_token: string, res: Response) {
+    try {
+      res.cookie('refresh_token_admin', refresh_token, {
+        maxAge: 15 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+    } catch (error) {
+      throw new BadRequestException(`Error on write to cookie: ${error}`);
+    }
   }
 }

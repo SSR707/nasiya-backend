@@ -46,4 +46,15 @@ export class CustomJwtService {
       throw new BadRequestException(`Error on refresh token: ${error}`);
     }
   }
+
+  async verifyAccessToken(access_token: any){
+    try {
+      const data = await this.jwtService.verify(access_token, {
+        secret:this.configService.get<string>('JWT_ACCESS_SECRET'),
+      });
+      return data
+    } catch (error) {
+      throw new BadRequestException(`Error on refresh token: ${error}`);
+    }
+  }
 }

@@ -23,6 +23,9 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { SelfGuard } from 'src/common/guard/self.guard';
+import { SuperAdminGuard } from 'src/common/guard/super-admin.guard';
+import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
+import { Response } from 'express';
 
 @Controller('admin')
 export class AdminController {
@@ -144,7 +147,7 @@ export class AdminController {
       },
     },
   })
-  // @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   @Post('logout')
   @ApiBearerAuth()
   logout(
@@ -188,8 +191,8 @@ export class AdminController {
       },
     },
   })
-  // @UseGuards(SuperAdminGuard)
-  // @UseGuards(JwtGuard)
+  @UseGuards(SuperAdminGuard)
+  @UseGuards(JwtGuard)
   @Get()
   @ApiBearerAuth()
   getAllAdmin() {
@@ -234,8 +237,8 @@ export class AdminController {
       },
     },
   })
-  // @UseGuards(SelfGuard)
-  // @UseGuards(JwtGuard)
+  @UseGuards(SelfGuard)
+  @UseGuards(JwtGuard)
   @Get(':id')
   @ApiBearerAuth()
   getAdminById(@Param('id', ParseUUIDPipe) id: string) {
@@ -272,8 +275,8 @@ export class AdminController {
       },
     },
   })
-  // @UseGuards(SelfGuard)
-  // @UseGuards(JwtGuard)
+  @UseGuards(SelfGuard)
+  @UseGuards(JwtGuard)
   @Patch(':id')
   @ApiBearerAuth()
   editProfile(
@@ -313,8 +316,8 @@ export class AdminController {
       },
     },
   })
-  // @UseGuards(SuperAdminGuard)
-  // @UseGuards(JwtGuard)
+  @UseGuards(SuperAdminGuard)
+  @UseGuards(JwtGuard)
   @Delete(':id')
   @ApiBearerAuth()
   deleteAdmin(@Param('id', ParseUUIDPipe) id: string) {
