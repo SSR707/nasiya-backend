@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { config } from '../config';
 import { AdminModule } from './admin/admin.module';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { DebtModule } from './debt/debt.module';
 @Module({
   imports: [
     ThrottlerModule.forRoot([
@@ -32,6 +33,7 @@ import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.mo
     }),
     AdminModule,
     CustomJwtModule,
+    DebtModule,
   ],
   providers: [
     {
