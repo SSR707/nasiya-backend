@@ -22,21 +22,22 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
-import { SelfGuard } from 'src/common/guard/self.guard';
-import { SuperAdminGuard } from 'src/common/guard/super-admin.guard';
+// import { SelfGuard } from 'src/common/guard/self.guard';
+// import { SuperAdminGuard } from 'src/common/guard/super-admin.guard';
 import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
 import { Response } from 'express';
+// import { CreateStoreDto } from './dto/create-store.dto';
 
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @ApiOperation({
-    summary: 'Create superAdmin and admin ',
+    summary: 'Create Admin ',
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Super admin created',
+    description: 'Admin created',
     schema: {
       example: {
         status_code: HttpStatus.CREATED,
@@ -46,25 +47,55 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Failed creating super admin',
+    description: 'Failed creating Admin',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
-        message: 'Error on creating super admin',
+        message: 'Error on creating super Admin',
       },
     },
   })
   @Post('createAdmin')
   createSuperAdminAndAdmin(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.createSuperAdmin(createAdminDto);
+    return this.adminService.createAdmin(createAdminDto);
   }
 
+  // !----------------------------------------------------------
+  // @ApiOperation({
+  //   summary: 'Create Store ',
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.CREATED,
+  //   description: 'Store created',
+  //   schema: {
+  //     example: {
+  //       status_code: HttpStatus.CREATED,
+  //       message: 'success',
+  //     },
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.BAD_REQUEST,
+  //   description: 'Failed creating Store',
+  //   schema: {
+  //     example: {
+  //       status_code: HttpStatus.BAD_REQUEST,
+  //       message: 'Error on creating Store',
+  //     },
+  //   },
+  // })
+  // @Post('createStore')
+  // createStore(@Body() createStoreDto: CreateStoreDto) {
+  //   return this.adminService.createStore(createStoreDto);
+  // }
+  // !----------------------------------------------------------
+
   @ApiOperation({
-    summary: 'Signin admin',
+    summary: 'Signin Sorte',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Admin signed in successfully',
+    description: 'Store in successfully',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -80,7 +111,7 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Failed signing admin',
+    description: 'Failed signing Store',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
@@ -96,7 +127,7 @@ export class AdminController {
     return this.adminService.signin(signinDto, res);
   }
 
-  @ApiOperation({ summary: 'New access token for admin' })
+  @ApiOperation({ summary: 'New access token for Store' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get new access token success',
@@ -122,14 +153,14 @@ export class AdminController {
     },
   })
   @Post('refresh-token')
-  refresh_token(@CookieGetter('refresh_token_admin') refresh_token: string) {
+  refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
     return this.adminService.refresh_token(refresh_token);
   }
 
-  @ApiOperation({ summary: 'Logout admin' })
+  @ApiOperation({ summary: 'Logout store' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Admin logged out success',
+    description: 'Store logged out success',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -139,7 +170,7 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Fail on logging out admin',
+    description: 'Fail on logging out store',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
@@ -151,7 +182,7 @@ export class AdminController {
   @Post('logout')
   @ApiBearerAuth()
   logout(
-    @CookieGetter('refresh_token_admin') refresh_token: string,
+    @CookieGetter('refresh_token_store') refresh_token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.adminService.logout(refresh_token, res);
@@ -191,7 +222,7 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(SuperAdminGuard)
+  // @UseGuards(SuperAdminGuard)
   @UseGuards(JwtGuard)
   @Get()
   @ApiBearerAuth()
@@ -237,7 +268,7 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(SelfGuard)
+  // @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Get(':id')
   @ApiBearerAuth()
@@ -275,7 +306,7 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(SelfGuard)
+  // @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Patch(':id')
   @ApiBearerAuth()
@@ -316,7 +347,7 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(SuperAdminGuard)
+  // @UseGuards(SuperAdminGuard)
   @UseGuards(JwtGuard)
   @Delete(':id')
   @ApiBearerAuth()
