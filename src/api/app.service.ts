@@ -3,12 +3,14 @@ import { AppModule } from './app.module';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import * as cookieParser from 'cookie-parser';
 export default class Application {
   public static async main(): Promise<void> {
     const app = await NestFactory.create(AppModule);
     app.enableCors({
       origin: '*',
     });
+    app.use(cookieParser());
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
