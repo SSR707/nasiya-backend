@@ -3,7 +3,7 @@ import { Pager } from './Pager';
 import {
   IFindOptions,
   IResponsePagination,
-} from 'src/infrastructure/lib/baseService/interface';
+} from '../../../infrastructure/lib/baseService/interface';
 
 export class RepositoryPager {
   public static readonly DEFAULT_PAGE = 1;

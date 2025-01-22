@@ -6,7 +6,7 @@
 // } from '@nestjs/common';
 // import { JwtService } from '@nestjs/jwt';
 // import { Observable } from 'rxjs';
-// import { config } from 'src/config';
+// import { config } from '../config';
 
 // @Injectable()
 // export class JwtGuard implements CanActivate {

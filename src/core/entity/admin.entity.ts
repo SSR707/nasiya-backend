@@ -1,5 +1,5 @@
-import { BaseEntity } from 'src/common/database/BaseEntity';
-import { RoleAdmin } from 'src/common/enum';
+import { BaseEntity } from '../../common/database/BaseEntity';
+import { RoleAdmin } from '../../common/enum';
 import { Column, Entity } from 'typeorm';
 
 @Entity('admins')

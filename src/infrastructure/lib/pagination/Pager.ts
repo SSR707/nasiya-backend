@@ -1,4 +1,4 @@
-import { IResponsePagination } from 'src/infrastructure/lib/baseService/interface';
+import { IResponsePagination } from '../../../infrastructure/lib/baseService/interface';
 
 export class Pager<T> {
   public static of<T>(
