@@ -8,7 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './admin/admin.module';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
 import { StoreModule } from './store/store.module';
+import { DebtModule } from './debt/debt.module';
+import { DebtorModule } from './debtors/debtor.module';
 import { config } from '../config/index';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,6 +37,8 @@ import { config } from '../config/index';
     AdminModule,
     CustomJwtModule,
     StoreModule,
+    DebtModule,
+    DebtorModule,
   ],
   providers: [
     {
