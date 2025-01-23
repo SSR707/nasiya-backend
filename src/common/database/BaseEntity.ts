@@ -18,4 +18,10 @@ export class BaseEntity {
     default: Date.now(),
   })
   updated_at: number;
+  @Column({
+    name: 'is_deleted',
+    type: 'boolean',
+    default: false,
+  })
+  is_deleted: boolean;
 }
