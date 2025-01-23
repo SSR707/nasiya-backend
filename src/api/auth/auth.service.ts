@@ -4,7 +4,7 @@ import { DeepPartial } from 'typeorm';
 import { StoreEntity } from 'src/core/entity/store.entity';
 import { StoreRepository } from 'src/core/repository/store.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SigninDto } from './dto/signin-store.dto';
+import { SigninStoreDto } from './dto/signin-store.dto';
 import { CustomJwtService } from 'src/infrastructure/lib/custom-jwt/custom-jwt.service';
 import { ConfigService } from '@nestjs/config';
 import { BcryptEncryption } from 'src/infrastructure/lib/bcrypt';
@@ -24,7 +24,7 @@ export class AuthService extends BaseService<
     super(repository);
   }
 
-  async signin(signinDto: SigninDto, res: Response) {
+  async signin(signinDto: SigninStoreDto, res: Response) {
     const { login, password } = signinDto;
     const user = await this.getRepository.findOne({ where: { login } });
     if (!user) {
@@ -37,8 +37,9 @@ export class AuthService extends BaseService<
     if (!is_match_pass) {
       throw new BadRequestException('Username or password invalid');
     }
-    const accessToken = await this.jwt.generateAccessToken(user);
-    const refreshToken = await this.jwt.generateRefreshToken(user);
+    const payload = { sub: user.username, id: user.id };
+    const accessToken = await this.jwt.generateAccessToken(payload);
+    const refreshToken = await this.jwt.generateRefreshToken(payload);
     this.writeToCookie(refreshToken, res);
     return {
       status_code: HttpStatus.OK,

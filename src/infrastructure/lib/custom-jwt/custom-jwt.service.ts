@@ -8,8 +8,7 @@ export class CustomJwtService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  async generateRefreshToken(user: any): Promise<string> {
-    const payload = { sub: user.username, id: user.id };
+  async generateRefreshToken(payload: any): Promise<string> {
     try {
       const refreshToken = this.jwtService.sign(payload, {
         secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
@@ -21,8 +20,7 @@ export class CustomJwtService {
     }
   }
 
-  async generateAccessToken(user: any): Promise<string> {
-    const payload = { sub: user.username, id: user.id };
+  async generateAccessToken(payload: any): Promise<string> {
 
     try {
       const accessToken = this.jwtService.sign(payload, {

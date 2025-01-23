@@ -11,9 +11,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
-import { SigninDto } from './dto/signin-store.dto';
+import { SigninStoreDto } from './dto/signin-store.dto';
 import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
 import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
 
@@ -52,7 +57,7 @@ export class AuthController {
   })
   @Post('signin')
   signin(
-    @Body() signinDto: SigninDto,
+    @Body() signinDto: SigninStoreDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.signin(signinDto, res);
@@ -83,7 +88,9 @@ export class AuthController {
       },
     },
   })
+  @UseGuards(JwtGuard)
   @Post('refresh-token')
+  @ApiBearerAuth()
   refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
     return this.authService.refresh_token(refresh_token);
   }
