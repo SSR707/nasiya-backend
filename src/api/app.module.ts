@@ -5,11 +5,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
-import { config } from '../config';
 import { AdminModule } from './admin/admin.module';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { StoreModule } from './store/store.module';
+import { DebtModule } from './debt/debt.module';
+import { DebtorModule } from './debtors/debtor.module';
+import { config } from '../config/index';
+
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     ThrottlerModule.forRoot([
       {
         ttl: 1000 * 60,
@@ -27,11 +34,11 @@ import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.mo
       rootPath: resolve(__dirname, '..', '..', '..', 'base'),
       serveRoot: '/base',
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     AdminModule,
     CustomJwtModule,
+    StoreModule,
+    DebtModule,
+    DebtorModule,
   ],
   providers: [
     {
