@@ -16,7 +16,7 @@ export class CreateStoreDto {
   })
   @IsString()
   @IsNotEmpty()
-  username: string;
+  login: string;
 
   @ApiProperty({
     type: String,

@@ -16,7 +16,7 @@ export class StoreService extends BaseService<
     super(repository);
   }
   create(createStoreDto: CreateStoreDto) {
-    return this.getRepository.create({ ...createStoreDto });
+    return this.getRepository.create({ createStoreDto });
   }
 
   async findAll() {
