@@ -4,7 +4,7 @@ import { Debtor } from './debtor.entity';
 
 @Entity('store')
 export class StoreEntity extends BaseEntity {
-  @Column({ type: 'varchar', name: 'fullname' })
+  @Column({ type: 'varchar', name: 'login' })
   login: string;
 
   @Column({ type: 'varchar', name: 'hashed_password' })
