@@ -33,7 +33,7 @@ export class DebtService extends BaseService<
     return this.getRepository.findOneById(id);
   }
 
-  async update(id: string, updateDebtDto: UpdateDebtDto) {
+  async updateProfile(id: string, updateDebtDto: UpdateDebtDto) {
     const data = await this.getRepository.update(id, updateDebtDto);
     return {
       status_code: 200,

@@ -29,7 +29,6 @@ import { CreateStoreDto } from '../store/dto/create-store.dto';
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
-
   //Create Admin
   @ApiOperation({
     summary: 'Create Admin ',

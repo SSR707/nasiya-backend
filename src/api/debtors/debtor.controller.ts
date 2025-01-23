@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { DebtorService } from './debtor.service';
 import { CreateDebtorDto, UpdateDebtorDto } from './dto';
 import { JwtGuard } from '../../common/guard/jwt-auth.guard';
@@ -12,7 +21,10 @@ export class DebtorController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new debtor' })
-  @ApiResponse({ status: 201, description: 'The debtor has been successfully created.' })
+  @ApiResponse({
+    status: 201,
+    description: 'The debtor has been successfully created.',
+  })
   create(@Body() createDebtorDto: CreateDebtorDto) {
     return this.debtorService.create(createDebtorDto);
   }
@@ -32,7 +44,7 @@ export class DebtorController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a debtor' })
   update(@Param('id') id: string, @Body() updateDebtorDto: UpdateDebtorDto) {
-    return this.debtorService.update(id, updateDebtorDto);
+    return this.debtorService.updateProfile(id, updateDebtorDto);
   }
 
   @Delete(':id')
