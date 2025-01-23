@@ -4,9 +4,14 @@ import { AdminController } from './admin.controller';
 import { AdminEntity } from 'src/core/entity/admin.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { StoreModule } from '../store/store.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AdminEntity]), CustomJwtModule],
+  imports: [
+    TypeOrmModule.forFeature([AdminEntity]),
+    CustomJwtModule,
+    StoreModule,
+  ],
   controllers: [AdminController],
   providers: [AdminService],
 })

@@ -9,7 +9,7 @@ export class SigninDto {
   })
   @IsString()
   @IsNotEmpty()
-  username: string;
+  login: string;
 
   @ApiProperty({
     type: String,

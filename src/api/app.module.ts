@@ -11,6 +11,7 @@ import { StoreModule } from './store/store.module';
 import { DebtModule } from './debt/debt.module';
 import { DebtorModule } from './debtors/debtor.module';
 import { config } from '../config/index';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { config } from '../config/index';
     StoreModule,
     DebtModule,
     DebtorModule,
+    AuthModule,
   ],
   providers: [
     {

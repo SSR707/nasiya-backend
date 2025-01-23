@@ -10,7 +10,7 @@ export class StoreEntity extends BaseEntity {
   @Column({ type: 'varchar', name: 'hashed_password' })
   hashed_password: string;
 
-  @Column({ type: 'decimal', name: 'wallet' })
+  @Column({ type: 'decimal',precision: 10, scale: 2, name: 'wallet' })
   wallet: number;
 
   @Column({ type: 'varchar', name: 'image' })
