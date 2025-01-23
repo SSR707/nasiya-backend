@@ -1,22 +1,21 @@
-import { DebtPeriod } from '../../common/enum';
+import { Entity, Column, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/database/BaseEntity';
-import { Column, Entity, ManyToOne } from 'typeorm';
-import { Debtor } from './debtor.entity';
+import { DebtorEntity } from './debtor.entity';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
-  @ManyToOne(() => Debtor, (debtor) => debtor.debts, { eager: true })
-  debtor: Debtor;
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
 
-  @Column({ type: 'timestamp', name: 'debt_date' })
+  @Column()
+  debtor_id: string;
+
+  @Column({ type: 'timestamp' })
   debt_date: Date;
 
-  @Column({ type: 'enum', enum: DebtPeriod, name: 'debt_period' })
-  debt_period: DebtPeriod;
-
-  @Column({ type: 'decimal', name: 'debt_sum' })
-  debt_sum: number;
-
-  @Column({ type: 'varchar', name: 'description' })
+  @Column({ type: 'text', nullable: true })
   description: string;
+
+  @ManyToOne(() => DebtorEntity, debtor => debtor.debts)
+  debtor: DebtorEntity;
 }
