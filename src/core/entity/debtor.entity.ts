@@ -1,6 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+} from 'typeorm';
 import { StoreEntity } from './store.entity';
 import { DebtEntity } from './debt.entity';
+import { AdminEntity } from './admin.entity';
 
 @Entity('debtors')
 export class Debtor {
@@ -22,11 +29,14 @@ export class Debtor {
   @Column('text')
   note: string;
 
-  @ManyToOne(() => StoreEntity, store => store.debtors)
+  @ManyToOne(() => StoreEntity, (store) => store.debtors)
   store: StoreEntity;
 
-  @OneToMany(() => DebtEntity, debt => debt.debtor)
+  @OneToMany(() => DebtEntity, (debt) => debt.debtor)
   debts: DebtEntity[];
+
+  @ManyToOne(() => StoreEntity, (store) => store.debtors)
+  stores: StoreEntity[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
