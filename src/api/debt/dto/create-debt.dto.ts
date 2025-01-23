@@ -25,7 +25,7 @@ export class CreateDebtDto {
     example: new Date(),
   })
   @IsNotEmpty()
-  @IsDate()
+  // @IsDate()
   debt_date: Date;
 
   @ApiProperty({
@@ -37,9 +37,9 @@ export class CreateDebtDto {
   @IsEnum(DebtPeriod)
   debt_period: DebtPeriod;
 
-  @ApiProperty({type: Number, description: 'Debt sum', example: 1000})
+  @ApiProperty({ type: Number, description: 'Debt sum', example: 1000 })
   @IsNotEmpty()
-  @IsDecimal()
+  // @IsDecimal()
   debt_sum: number;
 
   @ApiProperty({
