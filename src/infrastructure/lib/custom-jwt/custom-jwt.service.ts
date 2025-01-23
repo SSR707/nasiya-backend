@@ -8,13 +8,11 @@ export class CustomJwtService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  async generateRefreshToken(user: any): Promise<string> {
-    const payload = { sub: user.username, role: user.role, id: user.id };
-
+  async generateRefreshToken(payload: any): Promise<string> {
     try {
       const refreshToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+        secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_TIME'),
       });
       return refreshToken;
     } catch (error) {
@@ -22,13 +20,12 @@ export class CustomJwtService {
     }
   }
 
-  async generateAccessToken(user: any): Promise<string> {
-    const payload = { sub: user.username, role: user.role, id: user.id };
+  async generateAccessToken(payload: any): Promise<string> {
 
     try {
       const accessToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'),
+        secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_TIME'),
       });
       return accessToken;
     } catch (error) {
@@ -39,7 +36,7 @@ export class CustomJwtService {
   async verifyRefreshToken(refresh_token: any) {
     try {
       const data = await this.jwtService.verify(refresh_token, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
       });
       return data;
     } catch (error) {
@@ -50,7 +47,7 @@ export class CustomJwtService {
   async verifyAccessToken(access_token: any) {
     try {
       const data = await this.jwtService.verify(access_token, {
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
       });
       return data;
     } catch (error) {

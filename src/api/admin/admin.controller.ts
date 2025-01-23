@@ -14,29 +14,32 @@ import {
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { SigninDto } from './dto/signin-admin.dto';
-import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { SelfGuard } from 'src/common/guard/self.guard';
-import { SuperAdminGuard } from 'src/common/guard/super-admin.guard';
 import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
 import { Response } from 'express';
-
+import { CreateStoreDto } from '../store/dto/create-store.dto';
+import { SigninAdminDto } from './dto/signin-admin.dto';
+import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
+import { AdminGuard } from 'src/common/guard/admin.guard';
+import { SelfGuard } from 'src/common/guard/self.guard';
+@ApiTags('Admin Api')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  //Create Admin
   @ApiOperation({
-    summary: 'Create superAdmin and admin ',
+    summary: 'Create Admin ',
   })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Super admin created',
+    description: 'Admin created',
     schema: {
       example: {
         status_code: HttpStatus.CREATED,
@@ -46,25 +49,54 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Failed creating super admin',
+    description: 'Failed creating Admin',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
-        message: 'Error on creating super admin',
+        message: 'Error on creating super Admin',
       },
     },
   })
   @Post('createAdmin')
   createSuperAdminAndAdmin(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.createSuperAdmin(createAdminDto);
+    return this.adminService.createAdmin(createAdminDto);
+  }
+
+  // Create Store
+  @ApiOperation({
+    summary: 'Create Store ',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Store created',
+    schema: {
+      example: {
+        status_code: HttpStatus.CREATED,
+        message: 'success',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed creating Store',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Error on creating Store',
+      },
+    },
+  })
+  @Post('createStore')
+  createStore(@Body() createStoreDto: CreateStoreDto) {
+    return this.adminService.createStore(createStoreDto);
   }
 
   @ApiOperation({
-    summary: 'Signin admin',
+    summary: 'Signin Amin',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Admin signed in successfully',
+    description: 'Admin in successfully',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -80,7 +112,7 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Failed signing admin',
+    description: 'Failed signing Admin',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
@@ -90,13 +122,13 @@ export class AdminController {
   })
   @Post('signin')
   signin(
-    @Body() signinDto: SigninDto,
+    @Body() signinDto: SigninAdminDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.adminService.signin(signinDto, res);
   }
 
-  @ApiOperation({ summary: 'New access token for admin' })
+  @ApiOperation({ summary: 'New access token for Admin' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get new access token success',
@@ -121,15 +153,17 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(JwtGuard)
   @Post('refresh-token')
-  refresh_token(@CookieGetter('refresh_token_admin') refresh_token: string) {
+  @ApiBearerAuth()
+  refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
     return this.adminService.refresh_token(refresh_token);
   }
 
-  @ApiOperation({ summary: 'Logout admin' })
+  @ApiOperation({ summary: 'Logout Admmin' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Admin logged out success',
+    description: 'Store logged out success',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -139,7 +173,7 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Fail on logging out admin',
+    description: 'Fail on logging out Admin',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
@@ -151,12 +185,13 @@ export class AdminController {
   @Post('logout')
   @ApiBearerAuth()
   logout(
-    @CookieGetter('refresh_token_admin') refresh_token: string,
+    @CookieGetter('refresh_token_store') refresh_token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.adminService.logout(refresh_token, res);
   }
 
+  //Get All admin
   @ApiOperation({
     summary: 'Get all admins',
   })
@@ -191,7 +226,7 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(SuperAdminGuard)
+  @UseGuards(AdminGuard)
   @UseGuards(JwtGuard)
   @Get()
   @ApiBearerAuth()
@@ -199,6 +234,7 @@ export class AdminController {
     return this.adminService.getAllAdmin();
   }
 
+  //Get Admin ByID
   @ApiOperation({
     summary: 'Get admin by ID',
   })
@@ -245,6 +281,7 @@ export class AdminController {
     return this.adminService.getAdminById(id);
   }
 
+  //Admin Edit Profile
   @ApiOperation({
     summary: 'Edit profile of admin',
   })
@@ -286,6 +323,7 @@ export class AdminController {
     return this.adminService.editProfile(id, updateAdminDto);
   }
 
+  //Delete Admin ByID
   @ApiOperation({
     summary: 'Delete admin by ID',
   })
@@ -316,7 +354,7 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(SuperAdminGuard)
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Delete(':id')
   @ApiBearerAuth()

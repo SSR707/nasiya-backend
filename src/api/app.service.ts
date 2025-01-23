@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
-import { config } from '../config';
+import { config } from '../config/index';
 export default class Application {
   public static async main(): Promise<void> {
     const app = await NestFactory.create(AppModule);
