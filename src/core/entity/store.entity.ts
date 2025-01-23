@@ -4,13 +4,13 @@ import { DebtorEntity } from './debtor.entity';
 
 @Entity('stores')
 export class StoreEntity extends BaseEntity {
-  @Column()
+  @Column({ type: 'varchar', name: 'login' })
   login: string;
 
   @Column()
   hashed_password: string;
-
-  @Column('decimal', { precision: 10, scale: 2, default: 0 })
+  
+  @Column({ type: 'decimal',precision: 10, scale: 2, name: 'wallet',default: 0  })
   wallet: number;
 
   @Column({ nullable: true })

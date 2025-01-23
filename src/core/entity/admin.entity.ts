@@ -1,3 +1,4 @@
+import { RoleAdmin } from 'src/common/enum';
 import { BaseEntity } from '../../common/database/BaseEntity';
 import { Column, Entity } from 'typeorm';
 
@@ -16,4 +17,11 @@ export class AdminEntity extends BaseEntity {
     nullable: true,
   })
   phone_number: string;
+
+  @Column({
+    type: 'enum',
+    enum: RoleAdmin,
+    default: RoleAdmin.ADMIN,
+  })
+  role: RoleAdmin;
 }

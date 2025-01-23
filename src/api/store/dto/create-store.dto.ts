@@ -11,12 +11,12 @@ import {
 export class CreateStoreDto {
   @ApiProperty({
     type: String,
-    description: 'Username of store',
+    description: 'Login of store',
     example: 'ALI001',
   })
   @IsString()
   @IsNotEmpty()
-  username: string;
+  login: string;
 
   @ApiProperty({
     type: String,

@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { SigninDto } from './dto/signin-admin.dto';
 import { AdminEntity } from 'src/core/entity/admin.entity';
 import { DeepPartial } from 'typeorm';
 import { BaseService } from 'src/infrastructure/lib/baseService';
@@ -16,8 +15,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AdminRepository } from 'src/core/repository/admin.repository';
 import { CustomJwtService } from 'src/infrastructure/lib/custom-jwt/custom-jwt.service';
 import { ConfigService } from '@nestjs/config';
+import { CreateStoreDto } from '../store/dto/create-store.dto';
+import { StoreService } from '../store/store.service';
+import { SigninAdminDto } from './dto/signin-admin.dto';
 import { Response } from 'express';
-// import { CreateStoreDto } from './dto/create-store.dto';
 @Injectable()
 export class AdminService extends BaseService<
   CreateAdminDto,
@@ -25,6 +26,7 @@ export class AdminService extends BaseService<
 > {
   constructor(
     @InjectRepository(AdminEntity) repository: AdminRepository,
+    private readonly storeService: StoreService,
     private jwt: CustomJwtService,
     private readonly configService: ConfigService,
   ) {
@@ -59,42 +61,26 @@ export class AdminService extends BaseService<
     return { status_code: HttpStatus.CREATED, message: 'success' };
   }
 
-  // async createStore(createStoreDto: CreateStoreDto) {
-  //   const { username, hashed_password } = createStoreDto;
-  //   const exist_username = await this.getRepository.findOne({
-  //     where: { username },
-  //   });
-  //   if (exist_username) {
-  //     throw new ConflictException(`Username already exist`);
-  //   }
-  //   const password = await BcryptEncryption.encrypt(hashed_password);
-  //   try {
-  //     const Admin = await this.getRepository.create({
-  //       ...createStoreDto,
-  //       hashed_password: password,
-  //     });
-  //     await this.getRepository.save(Admin);
-  //   } catch (error) {
-  //     throw new BadRequestException(`Error on creating super admin: ${error}`);
-  //   }
-  //   return { status_code: HttpStatus.CREATED, message: 'success' };
-  // }
+  async createStore(createStoreDto: CreateStoreDto) {
+    return this.storeService.create(createStoreDto);
+  }
 
-  async signin(signinDto: SigninDto, res: Response) {
+  async signin(signinDto: SigninAdminDto, res: Response) {
     const { username, password } = signinDto;
-    const user = await this.getRepository.findOne({ where: { username } });
-    if (!user) {
+    const admin = await this.getRepository.findOne({ where: { username } });
+    if (!admin) {
       throw new BadRequestException('Username or password invalid');
     }
     const is_match_pass = await BcryptEncryption.compare(
       password,
-      user.hashed_password,
+      admin.hashed_password,
     );
     if (!is_match_pass) {
       throw new BadRequestException('Username or password invalid');
     }
-    const accessToken = await this.jwt.generateAccessToken(user);
-    const refreshToken = await this.jwt.generateRefreshToken(user);
+    const payload = { sub: admin.username, id: admin.id, role: admin.role };
+    const accessToken = await this.jwt.generateAccessToken(payload);
+    const refreshToken = await this.jwt.generateRefreshToken(payload);
     this.writeToCookie(refreshToken, res);
     return {
       status_code: HttpStatus.OK,
@@ -133,7 +119,6 @@ export class AdminService extends BaseService<
       message: 'success',
     };
   }
-
   async getAllAdmin() {
     return this.findAll();
   }
@@ -154,7 +139,7 @@ export class AdminService extends BaseService<
     }
   }
   async editProfile(id: string, updateAdminDto: UpdateAdminDto) {
-    let { username, phone_number, hashed_password } = updateAdminDto;
+    let { username, phone_number, hashed_password, role } = updateAdminDto;
     const admin = await this.getRepository.findOne({
       where: { id },
     });
