@@ -7,7 +7,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { DebtPeriod } from 'src/common/enum';
+import { DebtPeriod } from 'src/common/enum/index';
 
 export class CreateDebtDto {
   @ApiProperty({

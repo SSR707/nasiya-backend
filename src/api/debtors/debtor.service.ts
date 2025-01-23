@@ -10,6 +10,8 @@ import { DebtorPhoneEntity } from '../../core/entity/debtor-phone.entity';
 import { IFindOptions } from '../../infrastructure/lib/baseService/interface';
 import { FileService } from '../../infrastructure/lib/file/file.service';
 import { DebtEntity } from 'src/core/entity/debt.entity';
+import { CreateDebtorImageDto } from './dto/create-debtor-image.dto';
+import { CreateDebtorPhoneDto } from './dto/create-debtor-phone.dto';
 
 @Injectable()
 export class DebtorService extends BaseService<CreateDebtorDto, DeepPartial<DebtorEntity>> {
@@ -58,10 +60,10 @@ export class DebtorService extends BaseService<CreateDebtorDto, DeepPartial<Debt
     }
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, relations: string[] = []): Promise<any> {
     try {
       const debtor = await this.findOneById(id, {
-        relations: ['debts', 'store', 'images', 'phoneNumbers'],
+        relations: relations
       });
 
       if (!debtor) {
@@ -74,6 +76,24 @@ export class DebtorService extends BaseService<CreateDebtorDto, DeepPartial<Debt
         throw error;
       }
       throw new BadRequestException(`Error fetching debtor: ${error.message}`);
+    }
+  }
+
+  async findAll(options?: IFindOptions, relations: string[] = []): Promise<any> {
+    try {
+      const debtors = await this.findAll({
+        ...options,
+        relations: relations
+      });
+
+      return {
+        status_code: 200,
+        message: 'Debtors retrieved successfully',
+        data: debtors.data,
+        total: debtors.data.length
+      };
+    } catch (error) {
+      throw new BadRequestException(`Error fetching debtors: ${error.message}`);
     }
   }
 
@@ -115,11 +135,11 @@ export class DebtorService extends BaseService<CreateDebtorDto, DeepPartial<Debt
     }
   }
 
-  async findAllActive(options?: IFindOptions<DebtorEntity>) {
+  async findAllActive(options?: IFindOptions, relations: string[] = []): Promise<any> {
     try {
       const debtors = await this.findAll({
         ...options,
-        relations: ['debts', 'store'],
+        relations: relations,
         order: {
           created_at: 'DESC'
         }
@@ -217,107 +237,118 @@ export class DebtorService extends BaseService<CreateDebtorDto, DeepPartial<Debt
     }
   }
 
-  async addDebtorImage(id: string, file: Express.Multer.File) {
-    const debtor = await this.findOne(id);
-
-    try {
-      const imageUrl = await this.fileService.createFile(file);
-      
-      const debtorImage = this.debtorImageRepository.create({
-        image: imageUrl,
-        debtor_id: id
-      });
-
-      await this.debtorImageRepository.save(debtorImage);
-
-      return {
-        status_code: 201,
-        message: 'Image added successfully',
-        data: debtorImage
-      };
-    } catch (error) {
-      throw new BadRequestException(`Failed to add image: ${error.message}`);
-    }
-  }
-
-  async removeDebtorImage(imageId: string) {
-    const image = await this.debtorImageRepository.findOne({
-      where: { id: imageId }
+  async addDebtorImage(createDebtorImageDto: CreateDebtorImageDto) {
+    const debtor = await this.findOne(createDebtorImageDto.debtor_id);
+    
+    const newImage = this.debtorImageRepository.create({
+      ...createDebtorImageDto,
+      debtor: debtor.data
     });
 
+    await this.debtorImageRepository.save(newImage);
+
+    return {
+      status_code: 201,
+      message: 'Debtor image added successfully',
+      data: newImage
+    };
+  }
+
+  async removeDebtorImage(id: string) {
+    const image = await this.debtorImageRepository.findOne({ where: { id } });
     if (!image) {
-      throw new NotFoundException('Image not found');
+      throw new NotFoundException('Debtor image not found');
     }
 
+    await this.debtorImageRepository.softDelete(id);
+
+    return {
+      status_code: 200,
+      message: 'Debtor image removed successfully'
+    };
+  }
+
+  async uploadDebtorImage(id: string, file: Express.Multer.File) {
+    const debtor = await this.findOne(id);
+    
     try {
-      if (await this.fileService.existFile(image.image)) {
-        await this.fileService.deleteFile(image.image);
-      }
-
-      await this.debtorImageRepository.delete(imageId);
-
-      return {
-        status_code: 200,
-        message: 'Image removed successfully'
+      const uploadedFile = await this.fileService.uploadFile(file, 'debtors');
+      
+      const createImageDto: CreateDebtorImageDto = {
+        debtor_id: id,
+        image: uploadedFile.path
       };
+
+      return this.addDebtorImage(createImageDto);
     } catch (error) {
-      throw new BadRequestException(`Failed to remove image: ${error.message}`);
+      throw new BadRequestException(`Failed to upload image: ${error.message}`);
     }
   }
 
-  async addDebtorPhone(id: string, phone_number: string) {
-    const debtor = await this.findOne(id);
-
-    if (!this.isValidPhoneNumber(phone_number)) {
-      throw new BadRequestException('Invalid phone number format');
-    }
-
+  async addDebtorPhone(createDebtorPhoneDto: CreateDebtorPhoneDto) {
+    const debtor = await this.findOne(createDebtorPhoneDto.debtor_id);
+    
     // Check if phone number already exists
     const existingPhone = await this.debtorPhoneRepository.findOne({
-      where: { phone_number }
+      where: { phone_number: createDebtorPhoneDto.phone_number }
     });
 
     if (existingPhone) {
-      throw new BadRequestException('Phone number already registered');
+      throw new BadRequestException('Phone number already exists');
     }
 
-    try {
-      const debtorPhone = this.debtorPhoneRepository.create({
-        phone_number,
-        debtor_id: id
-      });
-
-      await this.debtorPhoneRepository.save(debtorPhone);
-
-      return {
-        status_code: 201,
-        message: 'Phone number added successfully',
-        data: debtorPhone
-      };
-    } catch (error) {
-      throw new BadRequestException(`Failed to add phone number: ${error.message}`);
-    }
-  }
-
-  async removeDebtorPhone(phoneId: string) {
-    const phone = await this.debtorPhoneRepository.findOne({
-      where: { id: phoneId }
+    const newPhone = this.debtorPhoneRepository.create({
+      ...createDebtorPhoneDto,
+      debtor: debtor.data
     });
 
+    await this.debtorPhoneRepository.save(newPhone);
+
+    return {
+      status_code: 201,
+      message: 'Debtor phone number added successfully',
+      data: newPhone
+    };
+  }
+
+  async removeDebtorPhone(id: string) {
+    const phone = await this.debtorPhoneRepository.findOne({ where: { id } });
     if (!phone) {
-      throw new NotFoundException('Phone number not found');
+      throw new NotFoundException('Debtor phone number not found');
     }
 
-    try {
-      await this.debtorPhoneRepository.delete(phoneId);
+    await this.debtorPhoneRepository.softDelete(id);
 
-      return {
-        status_code: 200,
-        message: 'Phone number removed successfully'
-      };
-    } catch (error) {
-      throw new BadRequestException(`Failed to remove phone number: ${error.message}`);
-    }
+    return {
+      status_code: 200,
+      message: 'Debtor phone number removed successfully'
+    };
+  }
+
+  async getDebtorImages(id: string) {
+    const debtor = await this.findOne(id);
+    const images = await this.debtorImageRepository.find({
+      where: { debtor_id: id }
+    });
+
+    return {
+      status_code: 200,
+      message: 'Debtor images retrieved successfully',
+      data: images
+    };
+  }
+
+  async getDebtorPhones(id: string) {
+    const debtor = await this.findOne(id);
+    const phones = await this.debtorPhoneRepository.find({
+      where: { debtor_id: id }
+    });
+
+    return {
+      status_code: 200,
+      message: 'Debtor phone numbers retrieved successfully',
+      data: phones
+    };
   }
 
   async deleteSoft(id: string) {
