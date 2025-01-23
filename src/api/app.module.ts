@@ -12,6 +12,7 @@ import { DebtModule } from './debt/debt.module';
 import { DebtorModule } from './debtors/debtor.module';
 import { config } from '../config/index';
 import { AuthModule } from './auth/auth.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AuthModule } from './auth/auth.module';
     DebtModule,
     DebtorModule,
     AuthModule,
+    LikesModule,
   ],
   providers: [
     {

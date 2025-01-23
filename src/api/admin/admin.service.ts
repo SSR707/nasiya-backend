@@ -62,7 +62,7 @@ export class AdminService extends BaseService<
   }
 
   async createStore(createStoreDto: CreateStoreDto) {
-    return this.storeService.create(createStoreDto);
+    return this.storeService.storeCreate(createStoreDto);
   }
 
   async signin(signinDto: SigninAdminDto, res: Response) {

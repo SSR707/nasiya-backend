@@ -4,10 +4,12 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 import { StoreEntity } from './store.entity';
 import { DebtEntity } from './debt.entity';
 import { AdminEntity } from './admin.entity';
+import { LikesEntity } from './like.entity';
 
 @Entity('debtors')
 export class Debtor {
@@ -34,6 +36,9 @@ export class Debtor {
 
   @OneToMany(() => DebtEntity, (debt) => debt.debtor)
   debts: DebtEntity[];
+
+  @OneToOne(() => LikesEntity, (like) => like.debtor)
+  likes: LikesEntity;
 
   @ManyToOne(() => StoreEntity, (store) => store.debtors)
   stores: StoreEntity[];
