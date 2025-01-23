@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsStrongPassword } from 'class-validator';
 import { IsPhoneNumber } from 'src/common/decorator/is-phone-number';
+import { RoleAdmin } from 'src/common/enum';
 
 export class CreateAdminDto {
   @ApiProperty({
@@ -28,4 +29,15 @@ export class CreateAdminDto {
   })
   @IsPhoneNumber()
   phone_number?: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'ROLE of admin',
+    example: 'ADMIN',
+    enum: RoleAdmin,
+    default: RoleAdmin,
+  })
+  @IsEnum(RoleAdmin)
+  @IsOptional()
+  role: RoleAdmin;
 }

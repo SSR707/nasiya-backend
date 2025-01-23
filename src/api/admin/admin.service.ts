@@ -17,7 +17,8 @@ import { CustomJwtService } from 'src/infrastructure/lib/custom-jwt/custom-jwt.s
 import { ConfigService } from '@nestjs/config';
 import { CreateStoreDto } from '../store/dto/create-store.dto';
 import { StoreService } from '../store/store.service';
-// import { CreateStoreDto } from './dto/create-store.dto';
+import { SigninAdminDto } from './dto/signin-admin.dto';
+import { Response } from 'express';
 @Injectable()
 export class AdminService extends BaseService<
   CreateAdminDto,
@@ -26,6 +27,8 @@ export class AdminService extends BaseService<
   constructor(
     @InjectRepository(AdminEntity) repository: AdminRepository,
     private readonly storeService: StoreService,
+    private jwt: CustomJwtService,
+    private readonly configService: ConfigService,
   ) {
     super(repository);
   }
@@ -62,6 +65,60 @@ export class AdminService extends BaseService<
     return this.storeService.create(createStoreDto);
   }
 
+  async signin(signinDto: SigninAdminDto, res: Response) {
+    const { username, password } = signinDto;
+    const admin = await this.getRepository.findOne({ where: { username } });
+    if (!admin) {
+      throw new BadRequestException('Username or password invalid');
+    }
+    const is_match_pass = await BcryptEncryption.compare(
+      password,
+      admin.hashed_password,
+    );
+    if (!is_match_pass) {
+      throw new BadRequestException('Username or password invalid');
+    }
+    const payload = { sub: admin.username, id: admin.id, role: admin.role };
+    const accessToken = await this.jwt.generateAccessToken(payload);
+    const refreshToken = await this.jwt.generateRefreshToken(payload);
+    this.writeToCookie(refreshToken, res);
+    return {
+      status_code: HttpStatus.OK,
+      message: 'success',
+      data: {
+        accessToken,
+        access_token_expire:
+          this.configService.get<string>('REFRESH_TOKEN_KEY'),
+        refreshToken,
+        refresh_token_expire:
+          this.configService.get<string>('REFRESH_TOKEN_TIME'),
+      },
+    };
+  }
+
+  async refresh_token(refresh_token: string) {
+    const data = await this.jwt.verifyRefreshToken(refresh_token);
+    const user = await this.findOneById(data?.id);
+    const accessToken = await this.jwt.generateAccessToken(user.data);
+    return {
+      status_code: HttpStatus.OK,
+      message: 'success',
+      data: {
+        token: accessToken,
+        expire: this.configService.get<string>('ACCESS_TOKEN_TIME'),
+      },
+    };
+  }
+
+  async logout(refresh_token: string, res: Response) {
+    const data = await this.jwt.verifyRefreshToken(refresh_token);
+    await this.findOneById(data?.id);
+    res.clearCookie('refresh_token_store');
+    return {
+      status_code: HttpStatus.OK,
+      message: 'success',
+    };
+  }
   async getAllAdmin() {
     return this.findAll();
   }
@@ -82,7 +139,7 @@ export class AdminService extends BaseService<
     }
   }
   async editProfile(id: string, updateAdminDto: UpdateAdminDto) {
-    let { username, phone_number, hashed_password } = updateAdminDto;
+    let { username, phone_number, hashed_password, role } = updateAdminDto;
     const admin = await this.getRepository.findOne({
       where: { id },
     });
@@ -129,5 +186,16 @@ export class AdminService extends BaseService<
       status_code: 200,
       message: 'success',
     };
+  }
+
+  private async writeToCookie(refresh_token: string, res: Response) {
+    try {
+      res.cookie('refresh_token_store', refresh_token, {
+        maxAge: 15 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
+    } catch (error) {
+      throw new BadRequestException(`Error on write to cookie: ${error}`);
+    }
   }
 }
