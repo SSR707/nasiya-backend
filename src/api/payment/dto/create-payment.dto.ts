@@ -1,28 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreatePaymentDto {
-  @ApiProperty({
-    description: 'Description of the payment',
-    example: 'Payment for order #1234',
-  })
-  @IsNotEmpty()
-  @IsString()
-  readonly description: string;
+  @ApiProperty({ example: 'CASH', description: 'Payment type (CASH, CARD, BANK_TRANSFER)' })
+  type: 'CASH' | 'CARD' | 'BANK_TRANSFER';
 
-  @ApiProperty({
-    description: 'Amount to be paid',
-    example: 150.75,
-  })
-  @IsNotEmpty()
-  @IsNumber()
-  readonly amount: number;
+  @ApiProperty({ example: 100, description: 'Payment amount' })
+  amount: number;
 
-  @ApiProperty({
-    description: 'Payment method',
-    example: 'CARD',
-  })
-  @IsNotEmpty()
-  @IsString()
-  readonly method: string;
+  @ApiProperty({ example: '2023-01-01', description: 'Payment date (YYYY-MM-DD)' })
+  date: string;
+
+  @ApiProperty({ example: '1', description: 'Debt ID related to the payment' })
+  debt_id: string;
 }

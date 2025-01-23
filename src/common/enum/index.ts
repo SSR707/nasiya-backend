@@ -1,5 +1,2 @@
-export enum RoleAdmin {
-  MANAGER = 'manager',
-  ADMIN = 'admin',
-  SUPERADMIN = 'superadmin',
-}
+export * from './payment'
+export * from './role'
