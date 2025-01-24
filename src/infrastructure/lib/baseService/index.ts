@@ -73,7 +73,7 @@ export class BaseService<CreateDto, Entity> {
     };
   }
 
-  async update(id: string, dto: Partial<CreateDto>) {
+  async updateProfile(id: string, dto: Partial<CreateDto>) {
     await this.findOneById(id);
     await this.repository.update(id, {
       ...dto,

@@ -32,7 +32,6 @@ import { SelfGuard } from 'src/common/guard/self.guard';
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
-
   //Create Admin
   @ApiOperation({
     summary: 'Create Admin ',

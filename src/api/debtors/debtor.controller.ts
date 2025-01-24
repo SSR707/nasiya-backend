@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { DebtorService } from './debtor.service';
 import { CreateDebtorDto, UpdateDebtorDto } from './dto';
 import { JwtGuard } from '../../common/guard/jwt-auth.guard';
@@ -17,6 +26,11 @@ export class DebtorController {
   constructor(private readonly debtorService: DebtorService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a new debtor' })
+  @ApiResponse({
+    status: 201,
+    description: 'The debtor has been successfully created.',
+  })
   @ApiOperation({ summary: 'Create a new debtor', description: 'Creates a new debtor record in the system' })
   @ApiResponse({ status: 201, description: 'The debtor has been successfully created.', type: DebtorEntity })
   @ApiResponse({ status: 400, description: 'Bad Request - Invalid input data.' })
@@ -73,7 +87,7 @@ export class DebtorController {
   @ApiResponse({ status: 401, description: 'Unauthorized - JWT token is missing or invalid' })
   @ApiResponse({ status: 404, description: 'Debtor with the specified ID was not found' })
   update(@Param('id') id: string, @Body() updateDebtorDto: UpdateDebtorDto) {
-    return this.debtorService.update(id, updateDebtorDto);
+    return this.debtorService.updateProfile(id, updateDebtorDto);
   }
 
   @Delete(':id')

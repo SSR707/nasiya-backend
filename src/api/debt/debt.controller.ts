@@ -168,7 +168,7 @@ export class DebtController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDebtDto: UpdateDebtDto,
   ) {
-    return this.debtService.update(id, updateDebtDto);
+    return this.debtService.updateProfile(id, updateDebtDto);
   }
 
   @ApiOperation({
