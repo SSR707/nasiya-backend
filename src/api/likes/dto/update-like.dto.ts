@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreateLikeDto } from './create-like.dto';
+import { CreateLikeDto } from './';
 
 export class UpdateLikeDto extends PartialType(CreateLikeDto) {}

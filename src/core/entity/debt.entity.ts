@@ -1,6 +1,7 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common/database/BaseEntity';
 import { DebtorEntity } from './debtor.entity';
+import { PaymentEntity } from './payment.entity';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
@@ -16,6 +17,9 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @ManyToOne(() => DebtorEntity, debtor => debtor.debts)
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts)
   debtor: DebtorEntity;
+
+  @OneToMany(() => PaymentEntity, (debtor) => debtor.debt)
+  payments: PaymentEntity[];
 }

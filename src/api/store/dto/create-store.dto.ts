@@ -1,14 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
-  IsDecimal,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
-import { IsPhoneNumber } from 'src/common/decorator/is-phone-number';
+import { IsPhoneNumber } from '../../../common';
 
 export class CreateStoreDto {
   @ApiProperty({

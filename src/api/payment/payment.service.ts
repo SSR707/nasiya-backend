@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { Payment } from '../../core/entity/payment.entity';
-import { Between, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BaseService } from '../../infrastructure/lib/baseService/index';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { PaymentRepository } from 'src/core/repository/payment.repository';
+import { Between } from 'typeorm';
+import { CreatePaymentDto } from './dto';
+import { PaymentRepository, PaymentEntity } from '../../core';
+import { BaseService } from '../../infrastructure';
 
 @Injectable()
-export class PaymentService extends BaseService<CreatePaymentDto, Payment> {
+export class PaymentService extends BaseService<
+  CreatePaymentDto,
+  PaymentEntity
+> {
   constructor(
-    @InjectRepository(Payment) private readonly paymentRepository: PaymentRepository,
+    @InjectRepository(PaymentEntity)
+    private readonly paymentRepository: PaymentRepository,
   ) {
-    super(paymentRepository)
+    super(paymentRepository);
   }
 
   async findPaymentsByType(type: 'CASH' | 'CARD' | 'BANK_TRANSFER') {
@@ -39,20 +42,20 @@ export class PaymentService extends BaseService<CreatePaymentDto, Payment> {
   async findPaymentsBetweenDates(startDate: string, endDate: string) {
     const data = await this.paymentRepository.find({
       where: {
-        date: Between(new Date(startDate), new Date(endDate))
-      }
-    })
+        date: Between(new Date(startDate), new Date(endDate)),
+      },
+    });
 
     return {
       status_code: 200,
-      message: "success",
-      data
-    }
+      message: 'success',
+      data,
+    };
   }
 
   async deletePaymentsByDebtId(debtId: string) {
     const result = await this.paymentRepository.delete({ debt_id: debtId });
-  
+
     return {
       status_code: 200,
       message: 'success',
@@ -60,7 +63,10 @@ export class PaymentService extends BaseService<CreatePaymentDto, Payment> {
     };
   }
 
-  async updatePaymentType(id: string, newType: 'CASH' | 'CARD' | 'BANK_TRANSFER') {
+  async updatePaymentType(
+    id: string,
+    newType: 'CASH' | 'CARD' | 'BANK_TRANSFER',
+  ) {
     const payment = await this.paymentRepository.findOneBy({ id });
     if (!payment) {
       return {
@@ -68,10 +74,10 @@ export class PaymentService extends BaseService<CreatePaymentDto, Payment> {
         message: 'Payment not found',
       };
     }
-  
+
     payment.type = newType;
     await this.paymentRepository.save(payment);
-  
+
     return {
       status_code: 200,
       message: 'success',

@@ -1,16 +1,11 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   HttpStatus,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -18,9 +13,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { SigninStoreDto } from './dto/signin-store.dto';
-import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
-import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
+import { AuthService } from './auth.service';
+import { SigninStoreDto } from './dto';
+import { JwtGuard, CookieGetter } from '../../common';
 
 @ApiTags('Auth Api')
 @Controller('auth')

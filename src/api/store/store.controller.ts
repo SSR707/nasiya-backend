@@ -8,12 +8,14 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
-import { StoreService } from './store.service';
-import { UpdateStoreDto } from './dto/update-store.dto';
-import { ResetPasswordStoreDto } from './dto/reset-passcode.dto';
-import { UserID } from 'src/common/decorator/user-id.decorator';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AddPasscodeStoreDto } from './dto/add-passcode.dto';
+import { StoreService } from './store.service';
+import {
+  AddPasscodeStoreDto,
+  ResetPasscodeStoreDto,
+  UpdateStoreDto,
+} from './dto';
+import { UserID } from '../../common';
 
 @ApiTags('Store Api')
 @Controller('store')
@@ -126,7 +128,7 @@ export class StoreController {
   @Get('reset-password')
   resetPass(
     @UserID() store_id: string,
-    @Body() resetPasswordStoreDto: ResetPasswordStoreDto,
+    @Body() resetPasswordStoreDto: ResetPasscodeStoreDto,
   ) {
     return this.storeService.resetPasscode(resetPasswordStoreDto, store_id);
   }

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-export class ResetPasswordStoreDto {
+export class ResetPasscodeStoreDto {
   @ApiProperty({
     type: String,
     description: 'Old Passcode of store',

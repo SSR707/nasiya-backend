@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { resolve } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { config } from '../config';
 import { ConfigModule } from '@nestjs/config';
-import { AdminModule } from './admin/admin.module';
-import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
-import { PaymentModule } from './payment/payment.module';
-import { StoreModule } from './store/store.module';
-import { DebtModule } from './debt/debt.module';
-import { DebtorModule } from './debtors/debtor.module';
-import { AuthModule } from './auth/auth.module';
-import { LikesModule } from './likes/likes.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { resolve } from 'path';
+import { config } from '../config';
+import { AdminModule } from './admin/admin.module';
+import { StoreModule } from './store/store.module';
+import { PaymentModule } from './payment/payment.module';
+import { DebtorModule } from './debtors/debtor.module';
+import { DebtModule } from './debt/debt.module';
+import { AuthModule } from './auth/auth.module';
+import { LikesModule } from './likes/likes.module';
+import { CustomJwtModule } from '../infrastructure';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
