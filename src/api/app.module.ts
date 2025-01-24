@@ -11,6 +11,7 @@ import { StoreModule } from './store/store.module';
 import { DebtModule } from './debt/debt.module';
 import { DebtorModule } from './debtors/debtor.module';
 import { AuthModule } from './auth/auth.module';
+import { LikesModule } from './likes/likes.module';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 @Module({
@@ -36,6 +37,7 @@ import { APP_GUARD } from '@nestjs/core';
     DebtModule,
     DebtorModule,
     AuthModule,
+    LikesModule,
   ],
   providers: [
     {
