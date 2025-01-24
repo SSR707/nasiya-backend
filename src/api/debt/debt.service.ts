@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDebtDto } from './dto/create-debt.dto';
-import { DebtEntity } from 'src/core/entity/debt.entity';
-import { DeepPartial } from 'typeorm';
-import { BaseService } from 'src/infrastructure/lib/baseService';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DebtRepository } from 'src/core/repository/debt.repository';
+import { DeepPartial } from 'typeorm';
+import { BaseService } from '../../infrastructure/lib/baseService';
+import { DebtEntity, DebtRepository } from '../../core';
+import { CreateDebtDto, UpdateDebtDto } from './dto';
 
 @Injectable()
 export class DebtService extends BaseService<

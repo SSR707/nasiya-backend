@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto';
+import { PaymentType } from '../../common';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -69,9 +70,7 @@ export class PaymentController {
     name: 'type',
     description: 'Payment type (CASH, CARD, BANK_TRANSFER)',
   })
-  async getPaymentByType(
-    @Param('type') type: 'CASH' | 'CARD' | 'BANK_TRANSFER',
-  ) {
+  async getPaymentByType(@Param('type') type: PaymentType) {
     return await this.paymentService.findPaymentsByType(type);
   }
 
@@ -137,7 +136,7 @@ export class PaymentController {
   })
   async updatePaymentType(
     @Param('id') id: string,
-    @Query('newType') newType: 'CASH' | 'CARD' | 'BANK_TRANSFER',
+    @Query('newType') newType: PaymentType,
   ) {
     return await this.paymentService.updatePaymentType(id, newType);
   }

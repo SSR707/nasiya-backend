@@ -10,11 +10,10 @@ import {
   ParseUUIDPipe,
   UseGuards,
 } from '@nestjs/common';
-import { DebtService } from './debt.service';
-import { CreateDebtDto } from './dto/create-debt.dto';
-import { UpdateDebtDto } from './dto/update-debt.dto';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
+import { DebtService } from './debt.service';
+import { UpdateDebtDto, CreateDebtDto } from './dto';
+import { JwtGuard } from '../../common';
 
 @UseGuards(JwtGuard)
 @Controller('debt')
