@@ -12,8 +12,9 @@ import { PaymentModule } from './payment/payment.module';
 import { DebtorModule } from './debtors/debtor.module';
 import { DebtModule } from './debt/debt.module';
 import { AuthModule } from './auth/auth.module';
-import { LikesModule } from './likes/likes.module';
+import { LikesModule } from './likes/likes.module'
 import { CustomJwtModule } from '../infrastructure';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
