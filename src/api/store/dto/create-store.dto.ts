@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsDecimal,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsStrongPassword,
@@ -42,7 +43,7 @@ export class CreateStoreDto {
     description: 'Wallet of store ',
     example: 0,
   })
-  @IsDecimal()
+  @IsNumber()
   @IsOptional()
   wallet: number;
 
