@@ -28,7 +28,7 @@ export class AuthService extends BaseService<
     const { login, password } = signinDto;
     const user = await this.getRepository.findOne({ where: { login } });
     if (!user) {
-      throw new BadRequestException('Username or password invalid');
+      throw new BadRequestException('login  or password invalid');
     }
     const is_match_pass = await BcryptEncryption.compare(
       password,
