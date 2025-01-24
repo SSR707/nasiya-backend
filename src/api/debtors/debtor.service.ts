@@ -1,17 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository, Not } from 'typeorm';
-import { BaseService } from '../../infrastructure/lib/baseService';
-import { CreateDebtorDto } from './dto/create-debtor.dto';
-import { UpdateDebtorDto } from './dto';
-import { DebtorEntity } from '../../core/entity/debtor.entity';
-import { DebtorImageEntity } from '../../core/entity/debtor-image.entity';
-import { DebtorPhoneEntity } from '../../core/entity/debtor-phone.entity';
-import { IFindOptions } from '../../infrastructure/lib/baseService/interface';
-import { FileService } from '../../infrastructure/lib/file/file.service';
-import { DebtEntity } from 'src/core/entity/debt.entity';
-import { CreateDebtorImageDto } from './dto/create-debtor-image.dto';
-import { CreateDebtorPhoneDto } from './dto/create-debtor-phone.dto';
+import { UpdateDebtorDto, CreateDebtorDto } from './dto';
+import { DebtorImageEntity, DebtorPhoneEntity, DebtorEntity } from '../../core';
+import { FileService, BaseService, IFindOptions } from '../../infrastructure';
 
 @Injectable()
 export class DebtorService extends BaseService<CreateDebtorDto, DeepPartial<DebtorEntity>> {

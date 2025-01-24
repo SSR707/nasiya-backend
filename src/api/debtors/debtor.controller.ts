@@ -1,13 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
-import { DebtorService } from './debtor.service';
-import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
-import { JwtGuard } from '../../common/guard/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader, ApiParam, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
-import { DebtorEntity } from '../../core/entity/debtor.entity';
+
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  BadRequestException
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiHeader,
+  ApiParam,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { BadRequestException } from '@nestjs/common';
 import * as express from 'express';
+import { diskStorage } from 'multer';
+import { DebtorService } from './debtor.service';
+import { JwtGuard } from '../../common';
+import { DebtorEntity } from '../../core';
+import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
 
 @ApiTags('debtors')
 @ApiBearerAuth()

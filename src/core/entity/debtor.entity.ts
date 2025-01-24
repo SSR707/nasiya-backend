@@ -1,38 +1,42 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   OneToMany,
   ManyToOne,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
-import { StoreEntity } from './store.entity';
-import { DebtEntity } from './debt.entity';
-import { DebtorImageEntity } from './debtor-image.entity';
-import { DebtorPhoneEntity } from './debtor-phone.entity';
-import { BaseEntity } from 'src/common/database/BaseEntity';
-import { AdminEntity } from './admin.entity';
-import { LikesEntity } from './like.entity';
+import { BaseEntity } from '../../common';
+import {
+  DebtorImageEntity,
+  DebtorPhoneEntity,
+  DebtEntity,
+  StoreEntity,
+  LikesEntity,
+} from './';
 
 @Entity('debtors')
 export class DebtorEntity extends BaseEntity {
-
-  @Column()
+  @Column({ type: 'varchar', name: 'fullname' })
   full_name: string;
 
-  @Column()
+  @Column({ type: 'varchar', name: 'phone_number' })
   phone_number: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', name: 'image', nullable: true })
   image: string;
 
-  @Column('text')
+  @Column({ type: 'text', name: 'address' })
   address: string;
 
-  @Column('text', { nullable: true })
+  @Column({ type: 'text', name: 'note', nullable: true })
   note: string;
 
+  @Column({ type: 'uuid', name: 'store_id' })
+  store_id: string;
+
   @ManyToOne(() => StoreEntity, (store) => store.debtors)
+  @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
 
   @OneToMany(() => DebtEntity, (debt) => debt.debtor)
@@ -40,22 +44,10 @@ export class DebtorEntity extends BaseEntity {
 
   @OneToOne(() => LikesEntity, (like) => like.debtor)
   likes: LikesEntity;
-  
-  @OneToMany(() => DebtorImageEntity, image => image.debtor)
+
+  @OneToMany(() => DebtorImageEntity, (image) => image.debtor)
   images: DebtorImageEntity[];
 
-  @ManyToOne(() => StoreEntity, (store) => store.debtors)
-  store: StoreEntity;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
-
-  @OneToMany(() => DebtorPhoneEntity, phone => phone.debtor)
+  @OneToMany(() => DebtorPhoneEntity, (phone) => phone.debtor)
   phoneNumbers: DebtorPhoneEntity[];
-
-
-
 }

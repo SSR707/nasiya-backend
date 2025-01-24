@@ -1,5 +1,5 @@
 export enum PaymentType {
-    CASH = 'CASH',
-    CARD = 'CARD',
-    ONLINE = 'ONLINE',
-}  
+  ONE_MONTH = 'one_month',
+  MULTI_MONTH = 'multi_month',
+  ANY_PAYMENT = 'any_payment',
+}

@@ -1,13 +1,15 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateLikeDto } from './dto/create-like.dto';
-import { UpdateLikeDto } from './dto/update-like.dto';
-import { LikesEntity } from 'src/core/entity/like.entity';
-import { DeepPartial, Repository } from 'typeorm';
-import { BaseService } from 'src/infrastructure/lib/baseService';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LikesRepository } from 'src/core/repository/likes.repository';
-import { Debtor } from 'src/core/entity/debtor.entity';
-import { StoreEntity } from 'src/core/entity/store.entity';
+import { DeepPartial, Repository } from 'typeorm';
+import { UpdateLikeDto, CreateLikeDto } from './dto';
+import { BaseService } from '../../infrastructure';
+import {
+  StoreEntity,
+  DebtorEntity,
+  LikesRepository,
+  LikesEntity,
+} from '../../core';
+
 
 @Injectable()
 export class LikesService extends BaseService<
@@ -16,8 +18,8 @@ export class LikesService extends BaseService<
 > {
   constructor(
     @InjectRepository(LikesEntity) repository: LikesRepository,
-    @InjectRepository(Debtor)
-    private debtorRepository: Repository<Debtor>,
+    @InjectRepository(DebtorEntity)
+    private debtorRepository: Repository<DebtorEntity>,
     @InjectRepository(StoreEntity)
     private storeRepository: Repository<StoreEntity>,
   ) {

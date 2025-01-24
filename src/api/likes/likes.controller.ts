@@ -8,11 +8,8 @@ import {
   Delete,
   ParseUUIDPipe,
   HttpStatus,
-  UseGuards,
 } from '@nestjs/common';
-import { LikesService } from './likes.service';
-import { CreateLikeDto } from './dto/create-like.dto';
-import { UpdateLikeDto } from './dto/update-like.dto';
+
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,7 +17,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
+import { LikesService } from './likes.service';
+import { UpdateLikeDto, CreateLikeDto } from './dto';
 
 // @UseGuards(JwtGuard)
 @ApiTags('Like Api')
