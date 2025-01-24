@@ -7,12 +7,13 @@ import {
 } from 'typeorm';
 import { StoreEntity } from './store.entity';
 import { DebtEntity } from './debt.entity';
+import { DebtorImageEntity } from './debtor-image.entity';
+import { DebtorPhoneEntity } from './debtor-phone.entity';
+import { BaseEntity } from 'src/common/database/BaseEntity';
 import { AdminEntity } from './admin.entity';
 
 @Entity('debtors')
-export class Debtor {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export class DebtorEntity extends BaseEntity {
 
   @Column()
   full_name: string;
@@ -20,13 +21,13 @@ export class Debtor {
   @Column()
   phone_number: string;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
 
   @Column('text')
   address: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   note: string;
 
   @ManyToOne(() => StoreEntity, (store) => store.debtors)
@@ -34,7 +35,10 @@ export class Debtor {
 
   @OneToMany(() => DebtEntity, (debt) => debt.debtor)
   debts: DebtEntity[];
-
+  
+  @OneToMany(() => DebtorImageEntity, image => image.debtor)
+  images: DebtorImageEntity[];
+  
   @ManyToOne(() => StoreEntity, (store) => store.debtors)
   stores: StoreEntity[];
 
@@ -44,6 +48,6 @@ export class Debtor {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 
-  @Column({ default: false })
-  is_deleted: boolean;
+  @OneToMany(() => DebtorPhoneEntity, phone => phone.debtor)
+  phoneNumbers: DebtorPhoneEntity[];
 }

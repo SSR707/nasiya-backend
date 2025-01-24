@@ -1,22 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { RoleAdmin } from 'src/common/enum';
 
-export class SigninStoreDto {
+export class SigninAdminDto {
   @ApiProperty({
     type: String,
     description: 'Username of admin',
-    example: 'Store001',
+    example: 'Admin001',
   })
   @IsString()
   @IsNotEmpty()
-  login: string;
+  username: string;
 
   @ApiProperty({
     type: String,
     description: 'Password of admin',
-    example: 'Store123',
+    example: 'Admin123',
   })
   @IsString()
   @IsNotEmpty()
   password: string;
+
 }

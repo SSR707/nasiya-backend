@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDebtDto } from './dto/create-debt.dto';
-import { UpdateDebtDto } from './dto/update-debt.dto';
 import { DebtEntity } from 'src/core/entity/debt.entity';
 import { DeepPartial } from 'typeorm';
 import { BaseService } from 'src/infrastructure/lib/baseService';

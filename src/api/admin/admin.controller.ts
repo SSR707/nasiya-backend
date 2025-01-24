@@ -24,7 +24,10 @@ import {
 import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
 import { Response } from 'express';
 import { CreateStoreDto } from '../store/dto/create-store.dto';
-
+import { SigninAdminDto } from './dto/signin-admin.dto';
+import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
+import { AdminGuard } from 'src/common/guard/admin.guard';
+import { SelfGuard } from 'src/common/guard/self.guard';
 @ApiTags('Admin Api')
 @Controller('admin')
 export class AdminController {
@@ -87,6 +90,106 @@ export class AdminController {
     return this.adminService.createStore(createStoreDto);
   }
 
+  @ApiOperation({
+    summary: 'Signin Amin',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Admin in successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjRkMGJ',
+          access_token_expire: '24h',
+          refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjRkMGJ',
+          refresh_token_expire: '15d',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed signing Admin',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Invalid username or password',
+      },
+    },
+  })
+  @Post('signin')
+  signin(
+    @Body() signinDto: SigninAdminDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.adminService.signin(signinDto, res);
+  }
+
+  @ApiOperation({ summary: 'New access token for Admin' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get new access token success',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9eyJpZCI6IjRkMGJ',
+          expire: '24h',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Fail new access token',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Error on refresh token',
+      },
+    },
+  })
+  @UseGuards(JwtGuard)
+  @Post('refresh-token')
+  @ApiBearerAuth()
+  refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
+    return this.adminService.refresh_token(refresh_token);
+  }
+
+  @ApiOperation({ summary: 'Logout Admmin' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Store logged out success',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Fail on logging out Admin',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Error on logout',
+      },
+    },
+  })
+  @UseGuards(JwtGuard)
+  @Post('logout')
+  @ApiBearerAuth()
+  logout(
+    @CookieGetter('refresh_token_store') refresh_token: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.adminService.logout(refresh_token, res);
+  }
+
   //Get All admin
   @ApiOperation({
     summary: 'Get all admins',
@@ -122,6 +225,7 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(AdminGuard)
   @UseGuards(JwtGuard)
   @Get()
   @ApiBearerAuth()
@@ -168,6 +272,7 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Get(':id')
   @ApiBearerAuth()
@@ -206,6 +311,7 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Patch(':id')
   @ApiBearerAuth()
@@ -247,6 +353,7 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(SelfGuard)
   @UseGuards(JwtGuard)
   @Delete(':id')
   @ApiBearerAuth()

@@ -16,6 +16,7 @@ import { UpdateDebtDto } from './dto/update-debt.dto';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
 
+@UseGuards(JwtGuard)
 @Controller('debt')
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
@@ -43,7 +44,6 @@ export class DebtController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Post()
   create(@Body() createDebtDto: CreateDebtDto) {
     return this.debtService.create(createDebtDto);
@@ -84,10 +84,8 @@ export class DebtController {
       },
     },
   })
-  // @UseGuards(JwtGuard)
   @Get()
   findAll() {
-    console.log('ok');
     return this.debtService.findAll();
   }
 
@@ -130,10 +128,9 @@ export class DebtController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.debtService.findOne(id);
+    return this.debtService.findOneById(id);
   }
 
   @ApiOperation({
@@ -166,7 +163,6 @@ export class DebtController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Patch(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -205,9 +201,8 @@ export class DebtController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.debtService.remove(id);
+    return this.debtService.delete(id);
   }
 }
