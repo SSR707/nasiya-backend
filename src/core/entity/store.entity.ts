@@ -1,28 +1,55 @@
+import { Entity, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common/database/BaseEntity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { Debtor } from './debtor.entity';
 import { LikesEntity } from './like.entity';
+import { DebtorEntity } from './debtor.entity';
 
-@Entity('store')
+@Entity('stores')
 export class StoreEntity extends BaseEntity {
+  @Column({ type: 'varchar', name: 'fullname', nullable: true })
+  fullname: string;
+
   @Column({ type: 'varchar', name: 'login' })
   login: string;
 
-  @Column({ type: 'varchar', name: 'hashed_password' })
+  @Column()
   hashed_password: string;
-
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'wallet' })
+  
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    name: 'wallet',
+    default: 0.0,
+  })
+  
+  @Column({ type: 'decimal',precision: 10, scale: 2, name: 'wallet',default: 0  })
   wallet: number;
 
-  @Column({ type: 'varchar', name: 'image' })
+  @Column({ nullable: true })
   image: string;
 
-  @Column({ type: 'boolean', name: 'is_active' })
-  is_active: boolean;
+  @Column({ type: 'varchar', name: 'email', unique: true, nullable: true })
+  email: string;
 
-  @OneToMany(() => Debtor, (debtor) => debtor.store)
-  debtors: Debtor[];
+  @Column({
+    type: 'varchar',
+    name: 'phone_number',
+    unique: true,
+    nullable: true,
+  })
+  phone_number: string;
+
+  @Column({ type: 'varchar', name: 'passcode' })
+  passcode: string;
+
+  @Column({ type: 'boolean', name: 'is_active',default: false })
+  is_active: boolean;
 
   @OneToOne(() => LikesEntity, (like) => like.store)
   likes: LikesEntity;
+
+  @OneToMany(() => DebtorEntity, debtor => debtor.store)
+  debtors: DebtorEntity[];
 }

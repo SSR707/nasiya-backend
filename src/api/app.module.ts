@@ -2,29 +2,20 @@ import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { config } from '../config';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './admin/admin.module';
 import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { PaymentModule } from './payment/payment.module';
 import { StoreModule } from './store/store.module';
 import { DebtModule } from './debt/debt.module';
 import { DebtorModule } from './debtors/debtor.module';
-import { config } from '../config/index';
 import { AuthModule } from './auth/auth.module';
 import { LikesModule } from './likes/likes.module';
-
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 1000 * 60,
-        limit: 15,
-      },
-    ]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: config.DB_URL,
@@ -36,8 +27,12 @@ import { LikesModule } from './likes/likes.module';
       rootPath: resolve(__dirname, '..', '..', '..', 'base'),
       serveRoot: '/base',
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     AdminModule,
     CustomJwtModule,
+    PaymentModule,
     StoreModule,
     DebtModule,
     DebtorModule,
