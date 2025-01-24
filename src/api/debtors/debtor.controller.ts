@@ -1,4 +1,3 @@
-
 import {
   Controller,
   Get,
@@ -8,7 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
-  BadRequestException
+  BadRequestException,
+  Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,9 +19,11 @@ import {
   ApiBearerAuth,
   ApiHeader,
   ApiParam,
+  ApiQuery,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as express from 'express';
 import { diskStorage } from 'multer';
 import { DebtorService } from './debtor.service';
 import { JwtGuard } from '../../common';
@@ -43,10 +47,23 @@ export class DebtorController {
     status: 201,
     description: 'The debtor has been successfully created.',
   })
-  @ApiOperation({ summary: 'Create a new debtor', description: 'Creates a new debtor record in the system' })
-  @ApiResponse({ status: 201, description: 'The debtor has been successfully created.', type: DebtorEntity })
-  @ApiResponse({ status: 400, description: 'Bad Request - Invalid input data.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - JWT token is missing or invalid' })
+  @ApiOperation({
+    summary: 'Create a new debtor',
+    description: 'Creates a new debtor record in the system',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The debtor has been successfully created.',
+    type: DebtorEntity,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request - Invalid input data.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - JWT token is missing or invalid',
+  })
   create(@Body() createDebtorDto: CreateDebtorDto) {
     return this.debtorService.create(createDebtorDto);
   }
@@ -57,16 +74,16 @@ export class DebtorController {
     name: 'include',
     required: false,
     type: String,
-    description: 'Comma-separated relations to include (e.g., "images,phones")'
+    description: 'Comma-separated relations to include (e.g., "images,phones")',
   })
   async findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
-    @Query('include') include?: string
+    @Query('include') include?: string,
   ) {
     const options = {
       skip: page ? (page - 1) * (limit || 10) : 0,
-      take: limit || 10
+      take: limit || 10,
     };
     const relations = include?.split(',').filter(Boolean) || [];
     return this.debtorService.findAll(options, relations);
@@ -78,17 +95,17 @@ export class DebtorController {
     name: 'include',
     required: false,
     type: String,
-    description: 'Comma-separated relations to include (e.g., "images,phones")'
+    description: 'Comma-separated relations to include (e.g., "images,phones")',
   })
   async findAllActive(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
-    @Query('include') include?: string
+    @Query('include') include?: string,
   ) {
     const options = {
       skip: page ? (page - 1) * (limit || 10) : 0,
       take: limit || 10,
-      where: { status: true }
+      where: { status: true },
     };
     const relations = include?.split(',').filter(Boolean) || [];
     return this.debtorService.findAllActive(options, relations);
@@ -101,52 +118,87 @@ export class DebtorController {
     name: 'include',
     required: false,
     type: String,
-    description: 'Comma-separated relations to include (e.g., "images,phones")'
+    description: 'Comma-separated relations to include (e.g., "images,phones")',
   })
-  async findOne(
-    @Param('id') id: string,
-    @Query('include') include?: string
-  ) {
+  async findOne(@Param('id') id: string, @Query('include') include?: string) {
     const relations = include?.split(',').filter(Boolean) || [];
     return this.debtorService.findOne(id, relations);
   }
 
   @Get(':id/total-debt')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Get total debt for a debtor',
-    description: 'Calculates and returns the total debt amount for a specific debtor'
+    description:
+      'Calculates and returns the total debt amount for a specific debtor',
   })
-  @ApiParam({ name: 'id', description: 'The ID of the debtor', example: '123e4567-e89b-12d3-a456-426614174000' })
-  @ApiResponse({ status: 200, description: 'Total debt calculated successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - JWT token is missing or invalid' })
-  @ApiResponse({ status: 404, description: 'Debtor with the specified ID was not found' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the debtor',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Total debt calculated successfully',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - JWT token is missing or invalid',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Debtor with the specified ID was not found',
+  })
   getTotalDebt(@Param('id') id: string) {
     return this.debtorService.getTotalDebt(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Update a debtor',
-    description: 'Updates the information of an existing debtor'
+    description: 'Updates the information of an existing debtor',
   })
-  @ApiParam({ name: 'id', description: 'The ID of the debtor to update', example: '123e4567-e89b-12d3-a456-426614174000' })
-  @ApiResponse({ status: 200, description: 'Debtor updated successfully', type: DebtorEntity })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the debtor to update',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Debtor updated successfully',
+    type: DebtorEntity,
+  })
   @ApiResponse({ status: 400, description: 'Bad Request - Invalid input data' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - JWT token is missing or invalid' })
-  @ApiResponse({ status: 404, description: 'Debtor with the specified ID was not found' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - JWT token is missing or invalid',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Debtor with the specified ID was not found',
+  })
   update(@Param('id') id: string, @Body() updateDebtorDto: UpdateDebtorDto) {
     return this.debtorService.updateProfile(id, updateDebtorDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Delete a debtor',
-    description: 'Soft deletes a debtor from the system (marks as deleted)'
+    description: 'Soft deletes a debtor from the system (marks as deleted)',
   })
-  @ApiParam({ name: 'id', description: 'The ID of the debtor to delete', example: '123e4567-e89b-12d3-a456-426614174000' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the debtor to delete',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
   @ApiResponse({ status: 200, description: 'Debtor deleted successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - JWT token is missing or invalid' })
-  @ApiResponse({ status: 404, description: 'Debtor with the specified ID was not found' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - JWT token is missing or invalid',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Debtor with the specified ID was not found',
+  })
   remove(@Param('id') id: string) {
     return this.debtorService.deleteSoft(id);
   }
@@ -154,7 +206,7 @@ export class DebtorController {
   @Post(':id/images')
   @ApiOperation({
     summary: 'Upload debtor image',
-    description: 'Upload an image file for a specific debtor'
+    description: 'Upload an image file for a specific debtor',
   })
   @ApiParam({ name: 'id', description: 'Debtor ID' })
   @ApiConsumes('multipart/form-data')
@@ -165,29 +217,35 @@ export class DebtorController {
         file: {
           type: 'string',
           format: 'binary',
-          description: 'Image file to upload'
-        }
-      }
-    }
+          description: 'Image file to upload',
+        },
+      },
+    },
   })
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads/debtors',
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, `${uniqueSuffix}-${file.originalname}`);
-      }
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/debtors',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${uniqueSuffix}-${file.originalname}`);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+          return cb(
+            new BadRequestException('Only image files are allowed!'),
+            false,
+          );
+        }
+        cb(null, true);
+      },
     }),
-    fileFilter: (req, file, cb) => {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-        return cb(new BadRequestException('Only image files are allowed!'), false);
-      }
-      cb(null, true);
-    }
-  }))
+  )
   uploadImage(
     @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return this.debtorService.uploadDebtorImage(id, file);
   }
@@ -195,7 +253,7 @@ export class DebtorController {
   @Delete('images/:id')
   @ApiOperation({
     summary: 'Remove debtor image',
-    description: 'Remove an image from a debtor'
+    description: 'Remove an image from a debtor',
   })
   @ApiParam({ name: 'id', description: 'Image ID' })
   removeImage(@Param('id') id: string) {
@@ -205,7 +263,7 @@ export class DebtorController {
   @Get(':id/images')
   @ApiOperation({
     summary: 'Get debtor images',
-    description: 'Get all images for a specific debtor'
+    description: 'Get all images for a specific debtor',
   })
   @ApiParam({ name: 'id', description: 'Debtor ID' })
   getImages(@Param('id') id: string) {
@@ -215,12 +273,12 @@ export class DebtorController {
   @Post(':id/phones')
   @ApiOperation({
     summary: 'Add debtor phone number',
-    description: 'Add a new phone number for a specific debtor'
+    description: 'Add a new phone number for a specific debtor',
   })
   @ApiParam({ name: 'id', description: 'Debtor ID' })
   addPhone(
     @Param('id') id: string,
-    @Body() createDebtorPhoneDto: CreateDebtorPhoneDto
+    @Body() createDebtorPhoneDto: CreateDebtorPhoneDto,
   ) {
     return this.debtorService.addDebtorPhone(createDebtorPhoneDto);
   }
@@ -228,7 +286,7 @@ export class DebtorController {
   @Delete('phones/:id')
   @ApiOperation({
     summary: 'Remove debtor phone number',
-    description: 'Remove a phone number from a debtor'
+    description: 'Remove a phone number from a debtor',
   })
   @ApiParam({ name: 'id', description: 'Phone number ID' })
   removePhone(@Param('id') id: string) {
@@ -238,7 +296,7 @@ export class DebtorController {
   @Get(':id/phones')
   @ApiOperation({
     summary: 'Get debtor phone numbers',
-    description: 'Get all phone numbers for a specific debtor'
+    description: 'Get all phone numbers for a specific debtor',
   })
   @ApiParam({ name: 'id', description: 'Debtor ID' })
   getPhones(@Param('id') id: string) {

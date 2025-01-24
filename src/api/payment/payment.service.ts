@@ -4,6 +4,7 @@ import { Between } from 'typeorm';
 import { CreatePaymentDto } from './dto';
 import { PaymentRepository, PaymentEntity } from '../../core';
 import { BaseService } from '../../infrastructure';
+import { PaymentType } from '../../common';
 
 @Injectable()
 export class PaymentService extends BaseService<
@@ -17,7 +18,7 @@ export class PaymentService extends BaseService<
     super(paymentRepository);
   }
 
-  async findPaymentsByType(type: 'CASH' | 'CARD' | 'BANK_TRANSFER') {
+  async findPaymentsByType(type: PaymentType) {
     const data = await this.paymentRepository.find({
       where: { type },
     });
@@ -63,10 +64,7 @@ export class PaymentService extends BaseService<
     };
   }
 
-  async updatePaymentType(
-    id: string,
-    newType: 'CASH' | 'CARD' | 'BANK_TRANSFER',
-  ) {
+  async updatePaymentType(id: string, newType: PaymentType) {
     const payment = await this.paymentRepository.findOneBy({ id });
     if (!payment) {
       return {
