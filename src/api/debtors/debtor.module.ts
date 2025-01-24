@@ -10,7 +10,11 @@ import { CustomJwtModule } from '../../infrastructure/lib/custom-jwt/custom-jwt.
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DebtorEntity, DebtorImageEntity, DebtorPhoneEntity]),
+    TypeOrmModule.forFeature([
+      DebtorEntity,
+      DebtorImageEntity,
+      DebtorPhoneEntity
+    ]),
     FileModule,
     CustomJwtModule,
   ],

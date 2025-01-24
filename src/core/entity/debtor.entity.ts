@@ -45,7 +45,7 @@ export class DebtorEntity extends BaseEntity {
   images: DebtorImageEntity[];
 
   @ManyToOne(() => StoreEntity, (store) => store.debtors)
-  stores: StoreEntity[];
+  store: StoreEntity;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
@@ -55,4 +55,7 @@ export class DebtorEntity extends BaseEntity {
 
   @OneToMany(() => DebtorPhoneEntity, phone => phone.debtor)
   phoneNumbers: DebtorPhoneEntity[];
+
+
+
 }
