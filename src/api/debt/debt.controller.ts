@@ -10,11 +10,23 @@ import {
   ParseUUIDPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DebtService } from './debt.service';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateDebtDto, CreateDebtDto } from './dto';
 import { JwtGuard } from '../../common';
 
+@ApiBearerAuth()
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Bearer token for authentication',
+})
 @ApiTags('Debt API')
 @UseGuards(JwtGuard)
 @Controller('debt')
