@@ -150,7 +150,7 @@ export class AdminController {
   @UseGuards(JwtGuard)
   @Post('refresh-token')
   @ApiBearerAuth()
-  refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
+  refresh_token(@CookieGetter('refresh_token_admin') refresh_token: string) {
     return this.adminService.refresh_token(refresh_token);
   }
 
@@ -179,7 +179,7 @@ export class AdminController {
   @Post('logout')
   @ApiBearerAuth()
   logout(
-    @CookieGetter('refresh_token_store') refresh_token: string,
+    @CookieGetter('refresh_token_admin') refresh_token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.adminService.logout(refresh_token, res);
