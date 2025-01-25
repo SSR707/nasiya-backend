@@ -149,14 +149,10 @@ export class DebtorService extends BaseService<
     await queryRunner.startTransaction();
 
     try {
-      const updatedDebtor = await queryRunner.manager.update(
-        DebtorEntity,
-        id,
-        {
-          ...updateDebtorDto,
-          updated_at: Date.now(),
-        }
-      );
+      const updatedDebtor = await queryRunner.manager.update(DebtorEntity, id, {
+        ...updateDebtorDto,
+        updated_at: Date.now(),
+      });
 
       await queryRunner.commitTransaction();
 
@@ -267,12 +263,15 @@ export class DebtorService extends BaseService<
 
       try {
         // Upload image
-        const { path: imagePath } = await this.fileService.uploadFile(file, 'debtors');
+        const { path: imagePath } = await this.fileService.uploadFile(
+          file,
+          'debtors',
+        );
 
         // Update debtor with new image path
-        await queryRunner.manager.update(DebtorEntity, id, { 
+        await queryRunner.manager.update(DebtorEntity, id, {
           image: imagePath,
-          updated_at: Date.now()
+          updated_at: Date.now(),
         });
 
         await queryRunner.commitTransaction();
