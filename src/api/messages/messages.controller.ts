@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { UpdateMessageDto, CreateMessageDto } from './dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MessageStatus } from 'src/common';
-
+@ApiTags('Message API')
 @Controller('messages')
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
@@ -141,9 +141,7 @@ export class MessagesController {
       example: {
         status_code: HttpStatus.OK,
         message: 'success',
-        data: {
-          ...UpdateMessageDto,
-        },
+        data: {},
       },
     },
   })

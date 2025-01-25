@@ -10,7 +10,6 @@ import {
   LikesEntity,
 } from '../../core';
 
-
 @Injectable()
 export class LikesService extends BaseService<
   CreateLikeDto,

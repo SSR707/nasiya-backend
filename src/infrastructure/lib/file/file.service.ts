@@ -14,10 +14,13 @@ export class FileService {
     }
   }
 
-  async uploadFile(file: Express.Multer.File, subDirectory: string = ''): Promise<{ path: string }> {
+  async uploadFile(
+    file: Express.Multer.File,
+    subDirectory: string = '',
+  ): Promise<{ path: string }> {
     try {
       const targetDir = path.join(this.uploadDir, subDirectory);
-      
+
       // Create subdirectory if it doesn't exist
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
@@ -32,7 +35,7 @@ export class FileService {
       fs.writeFileSync(filePath, file.buffer);
 
       return {
-        path: filePath.replace(/\\/g, '/') // Normalize path for different OS
+        path: filePath.replace(/\\/g, '/'), // Normalize path for different OS
       };
     } catch (error) {
       throw new BadRequestException(`Failed to upload file: ${error.message}`);

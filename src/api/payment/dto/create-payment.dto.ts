@@ -4,7 +4,9 @@ import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 
 export class CreatePaymentDto {
   @ApiProperty({
-    type: 'enum',
+    type: PaymentType,
+    enum: PaymentType,
+    enumName: 'PaymentType',
     example: PaymentType.ONE_MONTH,
     description: 'Payment type',
   })

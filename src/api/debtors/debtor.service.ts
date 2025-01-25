@@ -262,9 +262,11 @@ export class DebtorService extends BaseService<
     try {
       const debtor = await this.findOne(id);
 
+
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
+
 
       try {
         // Upload image
