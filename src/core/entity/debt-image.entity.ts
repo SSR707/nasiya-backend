@@ -1,14 +1,16 @@
-import { BaseEntity, Column, Entity, ManyToOne } from 'typeorm';
-import { DebtEntity } from './debt.entity';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { DebtEntity } from './';
+import { BaseEntity } from '../../common';
 
-@Entity()
+@Entity('debt_image')
 export class DebtImageEntity extends BaseEntity {
-  @Column()
+  @Column({ type: 'varchar' })
   image: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   debt_id: string;
 
   @ManyToOne(() => DebtEntity, (debt) => debt.images)
+  @JoinColumn({ name: 'debt_id' })
   debt: DebtEntity;
 }

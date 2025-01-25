@@ -1,14 +1,13 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../common';
-import { DebtorEntity } from './';
-import { DebtImageEntity } from './';
+import { DebtImageEntity, DebtorEntity, PaymentEntity } from './';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
-  @Column()
+  @Column({ type: 'uuid' })
   debtor_id: string;
 
   @Column({ type: 'timestamp' })
@@ -17,10 +16,14 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @OneToMany(() => PaymentEntity, (payment) => payment.debt)
+  payments: PaymentEntity[];
+
   @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
+  @JoinColumn({ name: 'debtor_id' })
   debtor: DebtorEntity;
 
   @OneToMany(() => DebtImageEntity, (image) => image.debt, {
