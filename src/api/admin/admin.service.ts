@@ -143,7 +143,7 @@ export class AdminService extends BaseService<
       where: { id },
     });
     if (!admin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException(`Admin with id ${id} not found.`);
     }
     if (hashed_password) {
       hashed_password = await BcryptEncryption.encrypt(hashed_password);
@@ -189,7 +189,7 @@ export class AdminService extends BaseService<
 
   private async writeToCookie(refresh_token: string, res: Response) {
     try {
-      res.cookie('refresh_token_store', refresh_token, {
+      res.cookie('refresh_token_admin', refresh_token, {
         maxAge: 15 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
