@@ -18,7 +18,17 @@ export class MessagesService extends BaseService<
   }
 
   async getAllMessages() {
-    return await this.findAll({ relations: ['sampleMessage'] });
+    const data = await this.getRepository.find({
+      relations: ['sampleMessage'],
+    });
+    if (data.length === 0) {
+      throw new HttpException('not found', 404);
+    }
+    return {
+      status_code: 200,
+      message: 'Messages retrieved successfully',
+      data,
+    };
   }
 
   async getOneMessage(id: string) {
@@ -29,7 +39,7 @@ export class MessagesService extends BaseService<
   }
 
   async updateMessage(id: string, updateMessageDto: UpdateMessageDto) {
-    const message = await this.findOneBy({ where: { id } });
+    const message = await this.getRepository.findOneBy({ where: { id } });
     if (!message) {
       throw new HttpException(`Message with id ${id} not found.`, 404);
     }
@@ -42,14 +52,6 @@ export class MessagesService extends BaseService<
   }
 
   async deleteMessages(id: string) {
-    const message = await this.findOneBy({ where: { id } });
-    if (!message) {
-      throw new HttpException(`Message with id ${id} not found.`, 404);
-    }
-    await this.getRepository.delete(id);
-    return {
-      status_code: 200,
-      message: 'Message deleted successfully',
-    };
+    return await this.delete(id);
   }
 }

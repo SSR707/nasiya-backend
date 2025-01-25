@@ -1,2 +1,2 @@
-export * from './baseEntity';
+export * from './baseService';
 export * from './interface';
