@@ -10,8 +10,9 @@ import {
 } from '@nestjs/common';
 import { SampleMessageService } from './sample-message.service';
 import { UpdateSampleMessageDto, CreateSampleMessageDto } from './dto';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Sample Message API')
 @Controller('sample-message')
 export class SampleMessageController {
   constructor(private readonly sampleMessageService: SampleMessageService) {}

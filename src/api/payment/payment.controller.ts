@@ -23,7 +23,7 @@ import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto';
 import { PaymentType } from '../../common';
 
-@ApiTags('Payments')
+@ApiTags('Payments API')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
