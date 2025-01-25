@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Not } from 'typeorm';
+import { DeepPartial, Not, DataSource } from 'typeorm';
 import {
   UpdateDebtorDto,
   CreateDebtorDto,
@@ -34,6 +34,7 @@ export class DebtorService extends BaseService<
     @InjectRepository(DebtorPhoneEntity)
     private readonly debtorPhoneRepository: DebtorPhoneNumberRepository,
     private readonly fileService: FileService,
+    private readonly dataSource: DataSource,
   ) {
     super(debtorRepository);
   }
@@ -53,13 +54,19 @@ export class DebtorService extends BaseService<
       throw new BadRequestException('Phone number already registered');
     }
 
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
       const newDebtor = this.debtorRepository.create({
         ...createDebtorDto,
         updated_at: Date.now(),
       });
 
-      const savedDebtor = await this.debtorRepository.save(newDebtor);
+      const savedDebtor = await queryRunner.manager.save(newDebtor);
+
+      await queryRunner.commitTransaction();
 
       return {
         status_code: 201,
@@ -67,9 +74,12 @@ export class DebtorService extends BaseService<
         data: savedDebtor,
       };
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new BadRequestException(
         `Failed to create debtor: ${error.message}`,
       );
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -125,33 +135,43 @@ export class DebtorService extends BaseService<
       const phoneExists = await this.debtorRepository.findOne({
         where: {
           phone_number: updateDebtorDto.phone_number,
-          id: Not(id), // Using TypeORM's Not operator
+          id: Not(id),
         },
       });
 
       if (phoneExists) {
-        throw new BadRequestException(
-          'Phone number already registered to another debtor',
-        );
+        throw new BadRequestException('Phone number already registered');
       }
     }
 
-    try {
-      await this.debtorRepository.update(id, {
-        ...updateDebtorDto,
-        updated_at: Date.now(),
-      });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-      const updatedDebtor = await this.findOne(id);
+    try {
+      const updatedDebtor = await queryRunner.manager.update(
+        DebtorEntity,
+        id,
+        {
+          ...updateDebtorDto,
+          updated_at: Date.now(),
+        }
+      );
+
+      await queryRunner.commitTransaction();
+
       return {
         status_code: 200,
         message: 'Debtor updated successfully',
-        data: updatedDebtor.data,
+        data: updatedDebtor,
       };
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw new BadRequestException(
         `Failed to update debtor: ${error.message}`,
       );
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -242,17 +262,33 @@ export class DebtorService extends BaseService<
     try {
       const debtor = await this.findOne(id);
 
-      // Upload image
-      const { path: imagePath } = await this.fileService.uploadFile(file, 'debtors');
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
 
-      // Update debtor with new image path
-      await this.debtorRepository.update(id, { image: imagePath });
+      try {
+        // Upload image
+        const { path: imagePath } = await this.fileService.uploadFile(file, 'debtors');
 
-      return {
-        status_code: 200,
-        message: 'Image uploaded successfully',
-        data: { image_url: imagePath },
-      };
+        // Update debtor with new image path
+        await queryRunner.manager.update(DebtorEntity, id, { 
+          image: imagePath,
+          updated_at: Date.now()
+        });
+
+        await queryRunner.commitTransaction();
+
+        return {
+          status_code: 200,
+          message: 'Image uploaded successfully',
+          data: { image_url: imagePath },
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        await queryRunner.release();
+      }
     } catch (error) {
       throw new BadRequestException(`Failed to upload image: ${error.message}`);
     }
@@ -307,43 +343,87 @@ export class DebtorService extends BaseService<
   }
 
   async addDebtorPhone(createDebtorPhoneDto: CreateDebtorPhoneDto) {
-    const debtor = await this.findOne(createDebtorPhoneDto.debtor_id);
+    try {
+      // Validate phone number format
+      if (!this.isValidPhoneNumber(createDebtorPhoneDto.phone_number)) {
+        throw new BadRequestException('Invalid phone number format');
+      }
 
-    // Check if phone number already exists
-    const existingPhone = await this.debtorPhoneRepository.findOne({
-      where: { phone_number: createDebtorPhoneDto.phone_number },
-    });
+      // Check if phone number already exists
+      const existingPhone = await this.debtorPhoneRepository.findOne({
+        where: { phone_number: createDebtorPhoneDto.phone_number },
+      });
 
-    if (existingPhone) {
-      throw new BadRequestException('Phone number already exists');
+      if (existingPhone) {
+        throw new BadRequestException('Phone number already registered');
+      }
+
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        const newPhone = this.debtorPhoneRepository.create({
+          ...createDebtorPhoneDto,
+          updated_at: Date.now(),
+        });
+
+        const savedPhone = await queryRunner.manager.save(newPhone);
+
+        await queryRunner.commitTransaction();
+
+        return {
+          status_code: 201,
+          message: 'Phone number added successfully',
+          data: savedPhone,
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        await queryRunner.release();
+      }
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to add phone number: ${error.message}`,
+      );
     }
-
-    const newPhone = this.debtorPhoneRepository.create({
-      ...createDebtorPhoneDto,
-      debtor: debtor.data,
-    });
-
-    await this.debtorPhoneRepository.save(newPhone);
-
-    return {
-      status_code: 201,
-      message: 'Debtor phone number added successfully',
-      data: newPhone,
-    };
   }
 
   async removeDebtorPhone(id: string) {
-    const phone = await this.debtorPhoneRepository.findOne({ where: { id } });
-    if (!phone) {
-      throw new NotFoundException('Debtor phone number not found');
+    try {
+      const phone = await this.debtorPhoneRepository.findOne({
+        where: { id },
+      });
+
+      if (!phone) {
+        throw new NotFoundException('Phone number not found');
+      }
+
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        await queryRunner.manager.remove(DebtorPhoneEntity, phone);
+
+        await queryRunner.commitTransaction();
+
+        return {
+          status_code: 200,
+          message: 'Phone number removed successfully',
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        await queryRunner.release();
+      }
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to remove phone number: ${error.message}`,
+      );
     }
-
-    await this.debtorPhoneRepository.softDelete(id);
-
-    return {
-      status_code: 200,
-      message: 'Debtor phone number removed successfully',
-    };
   }
 
   async getDebtorImages(id: string) {
