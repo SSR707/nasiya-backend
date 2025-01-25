@@ -4,9 +4,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { config } from '../config';
+import { AllExceptionsFilter } from '../infrastructure';
 export default class Application {
   public static async main(): Promise<void> {
     const app = await NestFactory.create(AppModule);
+    app.useGlobalFilters(new AllExceptionsFilter());
     app.enableCors({
       origin: '*',
     });
