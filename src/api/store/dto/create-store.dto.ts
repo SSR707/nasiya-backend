@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -69,7 +70,7 @@ export class CreateStoreDto {
     description: 'Email of store ',
     example: 'example@gmail.com',
   })
-  @IsPhoneNumber()
+  @IsEmail()
   @IsOptional()
   email: string;
 
