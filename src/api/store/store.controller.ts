@@ -190,7 +190,10 @@ export class StoreController {
     },
   })
   @Post('create-passcode')
-  createPasscode(@UserID() id: string, addPasscode: AddPasscodeStoreDto) {
+  createPasscode(
+    @UserID() id: string,
+    @Body() addPasscode: AddPasscodeStoreDto,
+  ) {
     return this.storeService.addPasscode(id, addPasscode);
   }
 
