@@ -12,7 +12,7 @@ import { PaymentModule } from './payment/payment.module';
 import { DebtorModule } from './debtors/debtor.module';
 import { DebtModule } from './debt/debt.module';
 import { AuthModule } from './auth/auth.module';
-import { LikesModule } from './likes/likes.module'
+import { LikesModule } from './likes/likes.module';
 import { CustomJwtModule } from '../infrastructure';
 import { MessagesModule } from './messages/messages.module';
 import { SampleMessageModule } from './sample-message/sample-message.module';
@@ -26,11 +26,13 @@ import { SampleMessageModule } from './sample-message/sample-message.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    ThrottlerModule.forRoot([{
-      name: 'short',
-      ttl: 1000,
-      limit: 3,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+    ]),
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, '..', '..', '..', 'base'),
       serveRoot: '/base',

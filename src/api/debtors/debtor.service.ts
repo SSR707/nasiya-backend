@@ -243,7 +243,10 @@ export class DebtorService extends BaseService<
       const debtor = await this.findOne(id);
 
       // Upload image
-      const { path: imagePath } = await this.fileService.uploadFile(file, 'debtors');
+      const { path: imagePath } = await this.fileService.uploadFile(
+        file,
+        'debtors',
+      );
 
       // Update debtor with new image path
       await this.debtorRepository.update(id, { image: imagePath });

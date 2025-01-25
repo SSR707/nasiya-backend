@@ -141,9 +141,7 @@ export class MessagesController {
       example: {
         status_code: HttpStatus.OK,
         message: 'success',
-        data: {
-          ...UpdateMessageDto,
-        },
+        data: {},
       },
     },
   })

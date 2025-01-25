@@ -108,7 +108,7 @@ export class SampleMessageController {
       example: {
         status_code: HttpStatus.OK,
         message: 'success',
-        data: UpdateSampleMessageDto,
+        data: {},
       },
     },
   })
