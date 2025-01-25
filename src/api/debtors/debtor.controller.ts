@@ -105,7 +105,7 @@ export class DebtorController {
     const options = {
       skip: page ? (page - 1) * (limit || 10) : 0,
       take: limit || 10,
-      where: { status: true },
+      where: { is_active: true },
     };
     const relations = include?.split(',').filter(Boolean) || [];
     return this.debtorService.findAllActive(options, relations);
