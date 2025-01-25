@@ -1,17 +1,22 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
-import { BaseEntity } from '../../common/database/BaseEntity';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { BaseEntity, PaymentType } from '../../common';
+import { DebtEntity } from './debt.entity';
 
-@Entity({ name: 'payment' }) // Jadval nomini aniqlash
-export class Payment extends BaseEntity {
-  @Column({ type: 'uuid' })
+@Entity('payment')
+export class PaymentEntity extends BaseEntity {
+  @Column({ type: 'uuid', name: 'debt_id' })
   debt_id: string;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', name: 'sum' })
   sum: number;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'date', name: 'date' })
   date: Date;
 
-  @Column({ type: 'enum', enum: ['CASH', 'CARD', 'BANK_TRANSFER'] })
-  type: 'CASH' | 'CARD' | 'BANK_TRANSFER';
+  @Column({ type: 'enum', enum: PaymentType, default: PaymentType.ONE_MONTH })
+  type: PaymentType;
+
+  @ManyToOne(() => DebtEntity, (debt) => debt.payments)
+  @JoinColumn({ name: 'debt_id' })
+  debt: DebtEntity;
 }

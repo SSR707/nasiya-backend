@@ -1,13 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDate,
-  IsDecimal,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsString,
   IsUUID,
 } from 'class-validator';
-import { DebtPeriod } from 'src/common/enum';
+import { DebtPeriod } from '../../../common';
 
 export class CreateDebtDto {
   @ApiProperty({
@@ -25,7 +24,6 @@ export class CreateDebtDto {
     example: new Date(),
   })
   @IsNotEmpty()
-  // @IsDate()
   debt_date: Date;
 
   @ApiProperty({
@@ -39,7 +37,7 @@ export class CreateDebtDto {
 
   @ApiProperty({ type: Number, description: 'Debt sum', example: 1000 })
   @IsNotEmpty()
-  // @IsDecimal()
+  @IsNumber()
   debt_sum: number;
 
   @ApiProperty({

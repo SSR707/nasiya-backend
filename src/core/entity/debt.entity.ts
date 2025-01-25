@@ -1,7 +1,7 @@
 import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
-import { BaseEntity } from '../../common/database/BaseEntity';
-import { DebtorEntity } from './debtor.entity';
-import { DebtImageEntity } from './debt-image.entity';
+import { BaseEntity } from '../../common';
+import { DebtorEntity } from './';
+import { DebtImageEntity } from './';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {

@@ -11,9 +11,6 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -21,18 +18,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
 import { Response } from 'express';
-import { CreateStoreDto } from '../store/dto/create-store.dto';
-import { SigninAdminDto } from './dto/signin-admin.dto';
-import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
-import { AdminGuard } from 'src/common/guard/admin.guard';
-import { SelfGuard } from 'src/common/guard/self.guard';
+import { AdminService } from './admin.service';
+import { CreateStoreDto } from '../store/dto';
+import { CreateAdminDto, UpdateAdminDto, SigninAdminDto } from './dto';
+import { SelfGuard, AdminGuard, JwtGuard, CookieGetter } from '../../common';
 @ApiTags('Admin Api')
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
-
   //Create Admin
   @ApiOperation({
     summary: 'Create Admin ',
@@ -156,7 +150,7 @@ export class AdminController {
   @UseGuards(JwtGuard)
   @Post('refresh-token')
   @ApiBearerAuth()
-  refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
+  refresh_token(@CookieGetter('refresh_token_admin') refresh_token: string) {
     return this.adminService.refresh_token(refresh_token);
   }
 
@@ -185,7 +179,7 @@ export class AdminController {
   @Post('logout')
   @ApiBearerAuth()
   logout(
-    @CookieGetter('refresh_token_store') refresh_token: string,
+    @CookieGetter('refresh_token_admin') refresh_token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.adminService.logout(refresh_token, res);

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
-import { AdminEntity } from 'src/core/entity/admin.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { AdminEntity } from '../../core';
+import { CustomJwtModule } from '../../infrastructure';
 import { StoreModule } from '../store/store.module';
 
 @Module({

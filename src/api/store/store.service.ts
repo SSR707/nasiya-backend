@@ -1,14 +1,14 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { CreateStoreDto } from './dto/create-store.dto';
-import { UpdateStoreDto } from './dto/update-store.dto';
-import { BaseService } from 'src/infrastructure/lib/baseService';
-import { StoreEntity } from 'src/core/entity/store.entity';
-import { DeepPartial } from 'typeorm';
-import { StoreRepository } from 'src/core/repository/store.repository';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ResetPasswordStoreDto } from './dto/reset-password.dto';
-import { BcryptEncryption } from 'src/infrastructure/lib/bcrypt';
-import { isNotEmpty } from 'class-validator';
+import { DeepPartial } from 'typeorm';
+import {
+  ResetPasscodeStoreDto,
+  UpdateStoreDto,
+  AddPasscodeStoreDto,
+  CreateStoreDto,
+} from './dto';
+import { BcryptEncryption, BaseService } from '../../infrastructure';
+import { StoreRepository, StoreEntity } from '../../core';
 
 @Injectable()
 export class StoreService extends BaseService<
@@ -27,11 +27,11 @@ export class StoreService extends BaseService<
     );
     if (!getUser) {
       const storeData = await this.create({
-        hashed_password: hashPass,
         ...createStoreDto,
+        hashed_password: hashPass,
       });
       const { data } = storeData;
-      const { hashed_password, ...withoutPass } = data;
+      const { hashed_password, passcode, ...withoutPass } = data;
       return {
         status_code: 201,
         message: 'sucess',
@@ -40,11 +40,11 @@ export class StoreService extends BaseService<
     }
     throw new HttpException('Store already creaeted before', 400);
   }
-  async findAllPagination() {
-    const allStore = await this.findAllWithPagination();
+  async findAllData() {
+    const allStore = await this.findAll({ relations: ['debtors'] });
     const { data } = allStore;
     const updatedData = data.map((item) => {
-      const { hashed_password, ...withoutPass } = item;
+      const { hashed_password, passcode, ...withoutPass } = item;
       return withoutPass;
     });
     return {
@@ -63,24 +63,56 @@ export class StoreService extends BaseService<
         image: true,
         wallet: true,
         is_active: true,
+        created_at: true,
+        updated_at: true,
       },
     });
   }
-
-  async update(id: string, updateStoreDto: UpdateStoreDto) {
+  async getProfile(id: string) {
+    return await this.findOneBy({
+      where: { id },
+      select: {
+        image: true,
+        fullname: true,
+        phone_number: true,
+        email: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+  }
+  async updateProfile(id: string, updateStoreDto: UpdateStoreDto) {
     const existingEntity = await this.findOneById(id);
     if (!existingEntity) {
       throw new HttpException(`Store with ID ${id} not found`, 404);
     }
-    await this.getRepository.update(
-      { id },
-      { ...updateStoreDto, updated_at: new Date() },
-    );
-    const updatedEntity = await this.findOneById(id);
+    const dto = {
+      email: updateStoreDto.email,
+      fullname: updateStoreDto.fullname,
+      phone_number: updateStoreDto.phone_number,
+      image: updateStoreDto.image,
+    };
+    await this.updateProfile(id, {
+      ...dto,
+    });
+    const updatedEntity = await this.getProfile(id);
     return updatedEntity;
   }
-  async resetPassword(
-    resetPasswordStoreDto: ResetPasswordStoreDto,
+  async addPasscode(store_id: string, addPasscode: AddPasscodeStoreDto) {
+    const hash = await BcryptEncryption.encrypt(addPasscode.passcode);
+    const getUser = await this.findOneBy({ where: { id: store_id } });
+    const addPassCode = await this.getRepository.update(
+      { id: store_id },
+      { passcode: hash },
+    );
+    return {
+      status_code: 200,
+      message: 'OK',
+      data: addPassCode,
+    };
+  }
+  async resetPasscode(
+    resetPasscodeStoreDto: ResetPasscodeStoreDto,
     store_id: string,
   ) {
     const getStore = await this.getRepository.findOne({
@@ -88,22 +120,29 @@ export class StoreService extends BaseService<
         id: store_id,
       },
     });
-
-    if (resetPasswordStoreDto.oldPassword !== getStore.hashed_password) {
+    if (!getStore) {
+      throw new HttpException('Not found', 404);
+    }
+    const isChecked = await BcryptEncryption.compare(
+      resetPasscodeStoreDto.oldPasscode,
+      resetPasscodeStoreDto.passcode,
+    );
+    if (!isChecked) {
       throw new HttpException('Your entered wrong password', 400);
     } else {
       await this.getRepository.update(
         { id: store_id },
         {
-          hashed_passowrd: BcryptEncryption.encrypt(
-            resetPasswordStoreDto.hashed_password,
-          ),
+          passcode: BcryptEncryption.encrypt(resetPasscodeStoreDto.passcode),
         },
       );
+      return {
+        status_code: HttpStatus.OK,
+        message: 'Passcode updated',
+      };
     }
   }
-
-  remove(id: string) {
-    return this.getRepository.delete(id);
+  async remove(id: string) {
+    return await this.delete(id);
   }
 }

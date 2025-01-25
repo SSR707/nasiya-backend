@@ -1,3 +1,3 @@
 import { Repository } from 'typeorm';
-import { StoreEntity } from '../entity/store.entity';
+import { StoreEntity } from '../';
 export type StoreRepository = Repository<StoreEntity>;

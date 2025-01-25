@@ -11,8 +11,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DebtService } from './debt.service';
-import { CreateDebtDto } from './dto/create-debt.dto';
-import { UpdateDebtDto } from './dto/update-debt.dto';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -21,14 +19,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard } from 'src/common/guard/jwt-auth.guard';
+import { UpdateDebtDto, CreateDebtDto } from './dto';
+import { JwtGuard } from '../../common';
 
-@ApiTags('debt')
 @ApiBearerAuth()
 @ApiHeader({
   name: 'Authorization',
   description: 'Bearer token for authentication',
 })
+@ApiTags('Debt API')
 @UseGuards(JwtGuard)
 @Controller('debt')
 export class DebtController {
@@ -99,7 +98,7 @@ export class DebtController {
   })
   @Get()
   findAll() {
-    return this.debtService.findAll();
+    return this.debtService.getAllMessages();
   }
 
   @ApiOperation({
@@ -181,7 +180,7 @@ export class DebtController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDebtDto: UpdateDebtDto,
   ) {
-    return this.debtService.update(id, updateDebtDto);
+    return this.debtService.updateProfile(id, updateDebtDto);
   }
 
   @ApiOperation({

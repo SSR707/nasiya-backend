@@ -5,20 +5,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
-import { AdminEntity } from 'src/core/entity/admin.entity';
-import { DeepPartial } from 'typeorm';
-import { BaseService } from 'src/infrastructure/lib/baseService';
-import { BcryptEncryption } from 'src/infrastructure/lib/bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AdminRepository } from 'src/core/repository/admin.repository';
-import { CustomJwtService } from 'src/infrastructure/lib/custom-jwt/custom-jwt.service';
 import { ConfigService } from '@nestjs/config';
-import { CreateStoreDto } from '../store/dto/create-store.dto';
-import { StoreService } from '../store/store.service';
-import { SigninAdminDto } from './dto/signin-admin.dto';
 import { Response } from 'express';
+import { DeepPartial } from 'typeorm';
+import { SigninAdminDto, CreateAdminDto, UpdateAdminDto } from './dto';
+import { CreateStoreDto } from '../store/dto';
+import {
+  CustomJwtService,
+  BaseService,
+  BcryptEncryption,
+} from '../../infrastructure';
+import { AdminEntity, AdminRepository } from '../../core';
+import { StoreService } from '../store/store.service';
 @Injectable()
 export class AdminService extends BaseService<
   CreateAdminDto,
@@ -62,7 +61,7 @@ export class AdminService extends BaseService<
   }
 
   async createStore(createStoreDto: CreateStoreDto) {
-    return this.storeService.create(createStoreDto);
+    return this.storeService.storeCreate(createStoreDto);
   }
 
   async signin(signinDto: SigninAdminDto, res: Response) {
@@ -144,7 +143,7 @@ export class AdminService extends BaseService<
       where: { id },
     });
     if (!admin) {
-      throw new NotFoundException('Admin not found');
+      throw new NotFoundException(`Admin with id ${id} not found.`);
     }
     if (hashed_password) {
       hashed_password = await BcryptEncryption.encrypt(hashed_password);
@@ -190,7 +189,7 @@ export class AdminService extends BaseService<
 
   private async writeToCookie(refresh_token: string, res: Response) {
     try {
-      res.cookie('refresh_token_store', refresh_token, {
+      res.cookie('refresh_token_admin', refresh_token, {
         maxAge: 15 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });

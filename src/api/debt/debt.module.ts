@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DebtService } from './debt.service';
 import { DebtController } from './debt.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DebtEntity } from 'src/core/entity/debt.entity';
-import { CustomJwtModule } from 'src/infrastructure/lib/custom-jwt/custom-jwt.module';
+import { DebtEntity } from '../../core';
+import { CustomJwtModule } from '../../infrastructure';
 
 @Module({
   imports: [TypeOrmModule.forFeature([DebtEntity]), CustomJwtModule],
