@@ -18,7 +18,7 @@ export class DebtService extends BaseService<
     return this.getRepository.create(createDebtDto);
   }
 
-  async findAll() {
+  async getAllMessages() {
     const data = await this.getRepository.find();
     return {
       status_code: 200,

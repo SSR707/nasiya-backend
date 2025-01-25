@@ -86,7 +86,7 @@ export class DebtorController {
       take: limit || 10,
     };
     const relations = include?.split(',').filter(Boolean) || [];
-    return this.debtorService.findAll(options, relations);
+    return this.debtorService.getAllMessages(options, relations);
   }
 
   @Get('active/all')

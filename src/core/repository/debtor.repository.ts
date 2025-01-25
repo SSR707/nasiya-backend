@@ -1,3 +1,3 @@
 import { Repository } from 'typeorm';
-import { DebtorEntity } from '../entity';
+import { DebtorEntity } from '../';
 export type DebtorRepository = Repository<DebtorEntity>;

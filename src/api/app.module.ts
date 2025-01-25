@@ -14,6 +14,8 @@ import { DebtModule } from './debt/debt.module';
 import { AuthModule } from './auth/auth.module';
 import { LikesModule } from './likes/likes.module'
 import { CustomJwtModule } from '../infrastructure';
+import { MessagesModule } from './messages/messages.module';
+import { SampleMessageModule } from './sample-message/sample-message.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { CustomJwtModule } from '../infrastructure';
     DebtorModule,
     AuthModule,
     LikesModule,
+    MessagesModule,
+    SampleMessageModule,
   ],
   providers: [
     {
