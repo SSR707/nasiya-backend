@@ -93,11 +93,11 @@ export class DebtorService extends BaseService<
   }
 
   async getAllMessages(
-    options?: IFindOptions,
+    options?: IFindOptions<DebtorEntity>,
     relations: string[] = [],
   ): Promise<any> {
     try {
-      const debtors = await this.getAllMessages({
+      const debtors = await this.debtorRepository.find({
         ...options,
         relations: relations,
       });
@@ -105,8 +105,8 @@ export class DebtorService extends BaseService<
       return {
         status_code: 200,
         message: 'Debtors retrieved successfully',
-        data: debtors.data,
-        total: debtors.data.length,
+        data: debtors,
+        total: debtors.length,
       };
     } catch (error) {
       throw new BadRequestException(`Error fetching debtors: ${error.message}`);
@@ -156,23 +156,25 @@ export class DebtorService extends BaseService<
   }
 
   async findAllActive(
-    options?: IFindOptions,
+    options?: IFindOptions<DebtorEntity>,
     relations: string[] = [],
   ): Promise<any> {
     try {
-      const debtors = await this.getAllMessages({
+      const debtors = await this.debtorRepository.find({
         ...options,
         relations: relations,
+        where: { ...options?.where, is_active: true },
         order: {
           created_at: 'DESC',
+          ...options?.order,
         },
       });
 
       return {
         status_code: 200,
         message: 'Debtors retrieved successfully',
-        data: debtors.data,
-        total: debtors.data.length,
+        data: debtors,
+        total: debtors.length,
       };
     } catch (error) {
       throw new BadRequestException(`Error fetching debtors: ${error.message}`);
@@ -237,30 +239,19 @@ export class DebtorService extends BaseService<
   }
 
   async uploadImage(id: string, file: Express.Multer.File) {
-    const debtor = await this.findOne(id);
-
     try {
-      // Delete old image if exists
-      if (
-        debtor.data.image &&
-        (await this.fileService.existFile(debtor.data.image))
-      ) {
-        await this.fileService.deleteFile(debtor.data.image);
-      }
+      const debtor = await this.findOne(id);
 
-      // Upload new image
-      const imageUrl = await this.fileService.createFile(file);
+      // Upload image
+      const { path: imagePath } = await this.fileService.uploadFile(file, 'debtors');
 
-      // Update debtor with new image
-      await this.debtorRepository.update(id, {
-        image: imageUrl,
-        updated_at: Date.now(),
-      });
+      // Update debtor with new image path
+      await this.debtorRepository.update(id, { image: imagePath });
 
       return {
         status_code: 200,
         message: 'Image uploaded successfully',
-        data: { image_url: imageUrl },
+        data: { image_url: imagePath },
       };
     } catch (error) {
       throw new BadRequestException(`Failed to upload image: ${error.message}`);

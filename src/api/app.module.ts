@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { resolve } from 'path';
 import { config } from '../config';
@@ -26,6 +26,11 @@ import { SampleMessageModule } from './sample-message/sample-message.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    ThrottlerModule.forRoot([{
+      name: 'short',
+      ttl: 1000,
+      limit: 3,
+    }]),
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, '..', '..', '..', 'base'),
       serveRoot: '/base',
