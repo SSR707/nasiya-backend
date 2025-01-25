@@ -80,7 +80,10 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(AdminGuard)
+  @UseGuards(JwtGuard)
   @Post('createStore')
+  @ApiBearerAuth()
   createStore(@Body() createStoreDto: CreateStoreDto) {
     return this.adminService.createStore(createStoreDto);
   }
@@ -147,6 +150,7 @@ export class AdminController {
       },
     },
   })
+  @UseGuards(AdminGuard)
   @UseGuards(JwtGuard)
   @Post('refresh-token')
   @ApiBearerAuth()
