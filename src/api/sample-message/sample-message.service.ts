@@ -20,7 +20,15 @@ export class SampleMessageService extends BaseService<
   }
 
   async getAllSampleMsg() {
-    return await this.findAll();
+    const data = await this.getRepository.find();
+    if (data.length === 0) {
+      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+    }
+    return {
+      status_code: HttpStatus.OK,
+      message: 'Sample Messages retrieved successfully',
+      data,
+    };
   }
 
   async getOneSampleMsg(id: string) {
@@ -31,11 +39,11 @@ export class SampleMessageService extends BaseService<
     id: string,
     updateSampleMessageDto: UpdateSampleMessageDto,
   ) {
-    const getMsg = await this.findOneBy({
+    const getMsg = await this.getRepository.findOneBy({
       where: { id },
     });
     if (!getMsg) {
-      throw new HttpException('Message not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('not found', HttpStatus.NOT_FOUND);
     }
     const updateMsg = await this.getRepository.update(
       id,
@@ -51,14 +59,6 @@ export class SampleMessageService extends BaseService<
   }
 
   async removeSampleMsg(id: string) {
-    const getMsg = await this.findOneBy({ where: { id } });
-    if (!getMsg) {
-      throw new HttpException('Message not found', HttpStatus.NOT_FOUND);
-    }
-    await this.delete(id);
-    return {
-      status_code: HttpStatus.OK,
-      message: 'Sample Message deleted successfully',
-    };
+    return await this.delete(id);
   }
 }
