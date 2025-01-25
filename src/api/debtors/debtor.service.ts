@@ -261,7 +261,6 @@ export class DebtorService extends BaseService<
   async uploadImage(id: string, file: Express.Multer.File) {
     try {
       const debtor = await this.findOne(id);
-
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();

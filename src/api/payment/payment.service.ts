@@ -33,7 +33,7 @@ export class PaymentService extends BaseService<
     const data = await this.paymentRepository.find({
       where: { debt_id: debtId },
     });
-    if(!data){
+    if (!data) {
       throw new NotFoundException(`Debtid with id ${debtId} not found.`);
     }
     return {
@@ -59,7 +59,7 @@ export class PaymentService extends BaseService<
 
   async deletePaymentsByDebtId(debtId: string) {
     const result = await this.paymentRepository.delete({ debt_id: debtId });
-    if(!result){
+    if (!result) {
       throw new NotFoundException(`Debtid with id ${debtId} not found.`);
     }
     return {

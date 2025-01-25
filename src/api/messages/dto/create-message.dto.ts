@@ -22,6 +22,7 @@ export class CreateMessageDto {
   @ApiProperty({
     type: MessageStatus,
     enum: MessageStatus,
+    enumName: 'MessageStatus',
     example: MessageStatus.SENT,
     description: 'The status of the message',
   })

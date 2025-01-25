@@ -23,7 +23,7 @@ import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto';
 import { PaymentType } from '../../common';
 
-@ApiTags('Payments')
+@ApiTags('Payments API')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
@@ -154,7 +154,7 @@ export class PaymentController {
     },
   })
   @ApiBearerAuth()
-  async getPaymentById(@Param('id' , ParseUUIDPipe) id: string) {
+  async getPaymentById(@Param('id', ParseUUIDPipe) id: string) {
     return await this.paymentService.findOneById(id);
   }
 
@@ -176,7 +176,7 @@ export class PaymentController {
             updated_at: '1730288797974',
             sum: 5000,
             date: '2025-01-20',
-            type: 'ONE_MONTH', 
+            type: 'ONE_MONTH',
             debt: {
               id: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
               created_at: '1730288822952',
@@ -196,14 +196,15 @@ export class PaymentController {
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
-        message: 'Invalid payment type provided. Allowed types: ONE_MONTH, MULTI_MONTH, ANY_PAYMENT',
+        message:
+          'Invalid payment type provided. Allowed types: ONE_MONTH, MULTI_MONTH, ANY_PAYMENT',
       },
     },
   })
   @ApiParam({
     name: 'type',
     description: 'Payment type (ONE_MONTH, MULTI_MONTH, ANY_PAYMENT)',
-    enum: PaymentType, 
+    enum: PaymentType,
   })
   @ApiBearerAuth()
   async getPaymentByType(@Param('type') type: PaymentType) {
@@ -213,7 +214,8 @@ export class PaymentController {
   @Get('debt/:debtId')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Payments related to the specified Debt ID returned successfully.',
+    description:
+      'Payments related to the specified Debt ID returned successfully.',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -374,7 +376,11 @@ export class PaymentController {
       },
     },
   })
-  @ApiParam({ name: 'id', description: 'Payment ID', example: 'b2d4aa27-0768-4456-947f-f8930c294394' })
+  @ApiParam({
+    name: 'id',
+    description: 'Payment ID',
+    example: 'b2d4aa27-0768-4456-947f-f8930c294394',
+  })
   @ApiQuery({
     name: 'newType',
     description: 'New payment type (e.g., ONE_MONTH, MULTI_MONTH, ANY_PAYMENT)',
@@ -413,10 +419,10 @@ export class PaymentController {
       },
     },
   })
-  @ApiParam({ 
-    name: 'id', 
-    description: 'Payment ID', 
-    example: 'b2d4aa27-0768-4456-947f-f8930c294394' 
+  @ApiParam({
+    name: 'id',
+    description: 'Payment ID',
+    example: 'b2d4aa27-0768-4456-947f-f8930c294394',
   })
   @ApiBearerAuth()
   async deletePayment(@Param('id') id: string) {
@@ -429,11 +435,13 @@ export class PaymentController {
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Payments related to the specified Debt ID deleted successfully.',
+    description:
+      'Payments related to the specified Debt ID deleted successfully.',
     schema: {
       example: {
         status_code: HttpStatus.OK,
-        message: 'Payments related to the specified Debt ID deleted successfully.',
+        message:
+          'Payments related to the specified Debt ID deleted successfully.',
       },
     },
   })

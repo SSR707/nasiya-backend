@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsUUID, Matches } from 'class-validator';
 export class CreateDebtorPhoneDto {
   @ApiProperty({
     description: 'The ID of the debtor',
-    example: '123e4567-e89b-12d3-a456-426614174000'
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsNotEmpty()
   @IsUUID()
@@ -12,12 +12,12 @@ export class CreateDebtorPhoneDto {
 
   @ApiProperty({
     description: 'Phone number of the debtor',
-    example: '+998901234567'
+    example: '+998901234567',
   })
   @IsNotEmpty()
   @IsString()
   @Matches(/^\+998\d{9}$/, {
-    message: 'Phone number must be in format: +998XXXXXXXXX'
+    message: 'Phone number must be in format: +998XXXXXXXXX',
   })
   phone_number: string;
 }

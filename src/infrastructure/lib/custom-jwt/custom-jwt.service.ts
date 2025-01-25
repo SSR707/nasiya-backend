@@ -21,7 +21,6 @@ export class CustomJwtService {
   }
 
   async generateAccessToken(payload: any): Promise<string> {
-
     try {
       const accessToken = this.jwtService.sign(payload, {
         secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),

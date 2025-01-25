@@ -30,7 +30,7 @@ import { JwtGuard } from '../../common';
 import { DebtorEntity } from '../../core';
 import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
 
-@ApiTags('debtors')
+@ApiTags('Debtor API')
 @ApiBearerAuth()
 @ApiHeader({
   name: 'Authorization',

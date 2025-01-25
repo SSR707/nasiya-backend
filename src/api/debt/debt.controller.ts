@@ -10,11 +10,12 @@ import {
   ParseUUIDPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DebtService } from './debt.service';
 import { UpdateDebtDto, CreateDebtDto } from './dto';
 import { JwtGuard } from '../../common';
 
+@ApiTags('Debt API')
 @UseGuards(JwtGuard)
 @Controller('debt')
 export class DebtController {
