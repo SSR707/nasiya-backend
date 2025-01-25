@@ -1,6 +1,11 @@
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common';
-import { DebtorEntity, LikesEntity } from './';
+import {
+  DebtorEntity,
+  LikesEntity,
+  MessageEntity,
+  SampleMessageEntity,
+} from './';
 
 @Entity('stores')
 export class StoreEntity extends BaseEntity {
@@ -12,7 +17,7 @@ export class StoreEntity extends BaseEntity {
 
   @Column({ type: 'varchar', name: 'hashed_password' })
   hashed_password: string;
-  
+
   @Column({
     type: 'decimal',
     precision: 10,
@@ -45,6 +50,12 @@ export class StoreEntity extends BaseEntity {
   @OneToMany(() => LikesEntity, (like) => like.store)
   likes: LikesEntity[];
 
-  @OneToMany(() => DebtorEntity, debtor => debtor.store)
+  @OneToMany(() => DebtorEntity, (debtor) => debtor.store)
   debtors: DebtorEntity[];
+
+  @OneToMany(() => SampleMessageEntity, (sample) => sample.stores)
+  sample_messages: SampleMessageEntity[];
+
+  @OneToMany(() => MessageEntity, (sample) => sample.store)
+  messages: MessageEntity[];
 }

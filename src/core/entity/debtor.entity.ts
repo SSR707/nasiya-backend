@@ -13,6 +13,7 @@ import {
   DebtEntity,
   StoreEntity,
   LikesEntity,
+  MessageEntity,
 } from './';
 
 @Entity('debtors')
@@ -47,6 +48,9 @@ export class DebtorEntity extends BaseEntity {
 
   @OneToMany(() => DebtorImageEntity, (image) => image.debtor)
   images: DebtorImageEntity[];
+
+  @OneToMany(() => MessageEntity, (message) => message.debtor)
+  messages: MessageEntity[];
 
   @OneToMany(() => DebtorPhoneEntity, (phone) => phone.debtor)
   phoneNumbers: DebtorPhoneEntity[];

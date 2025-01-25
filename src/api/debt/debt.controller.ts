@@ -85,7 +85,7 @@ export class DebtController {
   })
   @Get()
   findAll() {
-    return this.debtService.findAll();
+    return this.debtService.getAllMessages();
   }
 
   @ApiOperation({

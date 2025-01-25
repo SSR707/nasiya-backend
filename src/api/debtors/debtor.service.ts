@@ -92,12 +92,12 @@ export class DebtorService extends BaseService<
     }
   }
 
-  async findAll(
+  async getAllMessages(
     options?: IFindOptions,
     relations: string[] = [],
   ): Promise<any> {
     try {
-      const debtors = await this.findAll({
+      const debtors = await this.getAllMessages({
         ...options,
         relations: relations,
       });
@@ -160,7 +160,7 @@ export class DebtorService extends BaseService<
     relations: string[] = [],
   ): Promise<any> {
     try {
-      const debtors = await this.findAll({
+      const debtors = await this.getAllMessages({
         ...options,
         relations: relations,
         order: {
