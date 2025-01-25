@@ -1,6 +1,7 @@
-import { Entity, Column, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../common/database/BaseEntity';
 import { DebtorEntity } from './debtor.entity';
+import { DebtImageEntity } from './debt-image.entity';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
@@ -16,6 +17,15 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @ManyToOne(() => DebtorEntity, debtor => debtor.debts)
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   debtor: DebtorEntity;
+
+  @OneToMany(() => DebtImageEntity, (image) => image.debt, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  images: DebtImageEntity[];
 }
