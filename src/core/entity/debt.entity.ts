@@ -1,12 +1,12 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { BaseEntity } from '../../common';
+import { BaseEntity, DebtPeriod } from '../../common';
 import { DebtImageEntity, DebtorEntity, PaymentEntity } from './';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
-  
+
   @Column({ type: 'uuid' })
   debtor_id: string;
 
