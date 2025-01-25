@@ -1,8 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity, MessageStatus } from '../../common';
-import { SampleMessageEntity } from './sample-message.entity';
-import { StoreEntity } from './store.entity';
-import { DebtorEntity } from './debtor.entity';
+import { DebtorEntity, StoreEntity, SampleMessageEntity } from './';
 
 @Entity('message')
 export class MessageEntity extends BaseEntity {

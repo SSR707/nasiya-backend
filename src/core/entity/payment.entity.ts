@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity, PaymentType } from '../../common';
-import { DebtEntity } from './debt.entity';
+import { DebtEntity } from './';
 
 @Entity('payment')
 export class PaymentEntity extends BaseEntity {

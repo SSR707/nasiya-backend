@@ -1,11 +1,12 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { BaseEntity, DebtPeriod } from '../../common';
-import { DebtorEntity } from './debtor.entity';
-import { DebtImageEntity } from './debt-image.entity';
-import { PaymentEntity } from './payment.entity';
+import { BaseEntity } from '../../common';
+import { DebtImageEntity, DebtorEntity, PaymentEntity } from './';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
+  @Column('decimal', { precision: 10, scale: 2 })
+  amount: number;
+  
   @Column({ type: 'uuid' })
   debtor_id: string;
 
@@ -21,6 +22,9 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @OneToMany(() => PaymentEntity, (payment) => payment.debt)
+  payments: PaymentEntity[];
+
   @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
@@ -33,7 +37,4 @@ export class DebtEntity extends BaseEntity {
     onUpdate: 'CASCADE',
   })
   images: DebtImageEntity[];
-
-  @OneToMany(() => PaymentEntity, (payment) => payment.debt)
-  payments: PaymentEntity[];
 }
