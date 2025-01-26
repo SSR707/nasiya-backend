@@ -1,8 +1,9 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
+  NotFoundException,HttpStatus
 } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 import { BaseService } from '../../infrastructure/lib/baseService';
@@ -56,6 +57,10 @@ export class DebtService extends BaseService<
       throw new NotFoundException('No debt in database!');
     }
 
+
+  async getAllMessages(page: number, limit:number) {
+    page = (page -1 )* limit
+    const data = await this.getRepository.find({skip :page , take : limit ,relations:['payments']});
     return {
       status_code: 200,
       message: 'Debt fetched.',

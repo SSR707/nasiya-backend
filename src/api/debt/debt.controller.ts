@@ -9,6 +9,9 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { DebtService } from './debt.service';
 import {
@@ -100,7 +103,13 @@ export class DebtController {
   findAll() {
     return this.debtService.findAllDebts();
   }
-
+  @Get('find-pagination')
+  findAllWithPaginations(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
+  ) {
+    return this.debtService.getAllMessages(page , limit);
+  }
   @ApiOperation({
     summary: 'Get debt by ID',
   })

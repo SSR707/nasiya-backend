@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  IsPositive,
   IsString,
   IsStrongPassword,
 } from 'class-validator';
@@ -44,6 +45,7 @@ export class CreateStoreDto {
     example: 0,
   })
   @IsNumber()
+  @IsPositive()
   @IsOptional()
   wallet: number;
 

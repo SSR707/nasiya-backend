@@ -15,7 +15,8 @@ import {
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SigninStoreDto } from './dto';
-import { JwtGuard, CookieGetter } from '../../common';
+import { JwtGuard, CookieGetter, UserID } from '../../common';
+import { PasscodeStoreDto } from '../store/dto';
 
 @ApiTags('Auth Api')
 @Controller('auth')
@@ -88,6 +89,13 @@ export class AuthController {
   @ApiBearerAuth()
   refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
     return this.authService.refresh_token(refresh_token);
+  }
+  @Post('signin-passcode')
+  signinWithPasscode(
+    @UserID('id') id: string,
+    @Body('passcode') passcode: PasscodeStoreDto,
+  ) {
+    return this.authService.loginWithPasscode(id, passcode);
   }
 
   @ApiOperation({ summary: 'Logout store' })
