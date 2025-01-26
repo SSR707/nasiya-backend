@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { DebtEntity } from './debt.entity';
 import { BaseEntity } from '../../common/database/index';
 
-@Entity('debt_image')
+@Entity('images_of_debts')
 export class DebtImageEntity extends BaseEntity {
   @Column({ type: 'varchar' })
   image: string;

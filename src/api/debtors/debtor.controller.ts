@@ -36,7 +36,7 @@ import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
   name: 'Authorization',
   description: 'Bearer token for authentication',
 })
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('debtors')
 export class DebtorController {
   constructor(private readonly debtorService: DebtorService) {}

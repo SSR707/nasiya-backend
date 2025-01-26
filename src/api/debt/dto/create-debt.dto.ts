@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsDate,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -25,6 +26,7 @@ export class CreateDebtDto {
     example: new Date(),
   })
   @IsNotEmpty()
+  @IsDate()
   debt_date: Date;
 
   @ApiProperty({

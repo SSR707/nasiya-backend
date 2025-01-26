@@ -12,6 +12,9 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFile,
 } from '@nestjs/common';
 import { DebtService } from './debt.service';
 import {
@@ -24,6 +27,10 @@ import {
 } from '@nestjs/swagger';
 import { UpdateDebtDto, CreateDebtDto } from './dto';
 import { JwtGuard } from '../../common';
+import { CreateDebtImageDto } from './dto/create-debt-image.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @ApiBearerAuth()
 @ApiHeader({
@@ -227,5 +234,42 @@ export class DebtController {
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.debtService.deleteDebtById(id);
+  }
+
+  // image
+
+  @Post('image/:id')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/debts',
+        filename: (req, file, callback) => {
+          const ext = extname(file.originalname);
+          callback(null, `${file.originalname}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|heic)$/)) {
+          return callback(
+            new BadRequestException(
+              'Only image files are allowed! Like: .jpg .jpeg .png .gif .heic',
+            ),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  createDebtImage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.debtService.createDebtImage(id, file);
+  }
+
+  @Get('images/:id')
+  findImagesById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.debtService.findDebtImages(id);
   }
 }
