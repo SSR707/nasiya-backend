@@ -146,4 +146,48 @@ export class DebtService extends BaseService<
       data: debtData,
     };
   }
+
+  async createDebtImage(id: string, file: Express.Multer.File) {
+    // find debt
+    const debtData = await this.debtRepository.findOne({
+      where: { id },
+    });
+    if (!debtData) {
+      throw new NotFoundException('Debt not found!');
+    }
+
+    // create image
+    const debtImage = this.debtImageRepository.create({
+      debt_id: id,
+      image: file.originalname,
+    });
+    await this.debtImageRepository.save(debtImage);
+
+    return {
+      status_code: HttpStatus.CREATED,
+      message: 'Debt image successfully created.',
+      data: debtImage,
+    };
+  }
+
+  async findDebtImages(id: string) {
+    // find debt
+    const debtData = await this.debtRepository.findOne({
+      where: { id },
+    });
+    if (!debtData) {
+      throw new NotFoundException('Debt not found!');
+    }
+
+    // find images of this debt
+    const debtImages = await this.debtImageRepository.find({
+      where: { debt_id: id },
+    });
+
+    return {
+      status_code: HttpStatus.OK,
+      message: 'Debt images fetched successfully.',
+      data: debtImages,
+    };
+  }
 }
