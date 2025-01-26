@@ -26,4 +26,8 @@ export class CreateDebtorDto {
   @IsOptional()
   @IsString()
   note?: string;
+
+  @IsOptional()
+  @IsString()
+  store_id:string
 }

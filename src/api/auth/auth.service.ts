@@ -48,7 +48,7 @@ export class AuthService extends BaseService<
       data: {
         accessToken,
         access_token_expire:
-          this.configService.get<string>('REFRESH_TOKEN_KEY'),
+          this.configService.get<string>('ACCESS_TOKEN_TIME'),
         refreshToken,
         refresh_token_expire:
           this.configService.get<string>('REFRESH_TOKEN_TIME'),
