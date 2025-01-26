@@ -9,6 +9,9 @@ import {
   HttpStatus,
   ParseUUIDPipe,
   UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { DebtService } from './debt.service';
 import {
@@ -97,8 +100,11 @@ export class DebtController {
     },
   })
   @Get()
-  findAll() {
-    return this.debtService.getAllMessages();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
+  ) {
+    return this.debtService.getAllMessages(page , limit);
   }
 
   @ApiOperation({
@@ -142,7 +148,7 @@ export class DebtController {
   })
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.debtService.findOneById(id);
+    return this.debtService.findOneById(id , {relations:['payments']});
   }
 
   @ApiOperation({

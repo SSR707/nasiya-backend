@@ -21,6 +21,7 @@ export class PaymentService extends BaseService<
   async findPaymentsByType(type: PaymentType) {
     const data = await this.paymentRepository.find({
       where: { type },
+      relations: ['debt'],
     });
     return {
       status_code: 200,
@@ -29,9 +30,15 @@ export class PaymentService extends BaseService<
     };
   }
 
+  async findAllPayment(page: number, limit: number) {
+    page = (page - 1) * limit;
+    return this.findAll({ skip: page, take: limit, relations: ['debt'] });
+  }
+
   async findPaymentsByDebtId(debtId: string) {
     const data = await this.paymentRepository.find({
       where: { debt_id: debtId },
+      relations: ['debt'],
     });
     if (!data) {
       throw new NotFoundException(`Debtid with id ${debtId} not found.`);
@@ -48,6 +55,7 @@ export class PaymentService extends BaseService<
       where: {
         date: Between(new Date(startDate), new Date(endDate)),
       },
+      relations: ['debt'],
     });
 
     return {
