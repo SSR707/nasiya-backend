@@ -142,7 +142,7 @@ export class StoreController {
   @UseGuards(JwtGuard)
   @Get('reset-password')
   resetPass(
-    @UserID() store_id: string,
+    @UserID('id') store_id: string,
     @Body() resetPasswordStoreDto: ResetPasscodeStoreDto,
   ) {
     return this.storeService.resetPasscode(resetPasswordStoreDto, store_id);
@@ -210,7 +210,7 @@ export class StoreController {
   @UseGuards(JwtGuard)
   @Post('create-passcode')
   createPasscode(
-    @UserID() id: string,
+    @UserID('id') id: string,
     @Body() addPasscode: AddPasscodeStoreDto,
   ) {
     return this.storeService.addPasscode(id, addPasscode);
