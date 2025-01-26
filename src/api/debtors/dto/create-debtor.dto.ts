@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsUUID } from 'class-validator';
 
 export class CreateDebtorDto {
   @ApiProperty({ example: 'Zufarbek' })
@@ -28,6 +28,6 @@ export class CreateDebtorDto {
   note?: string;
 
   @IsOptional()
-  @IsString()
-  store_id:string
+  @IsUUID()
+  store_id: string;
 }

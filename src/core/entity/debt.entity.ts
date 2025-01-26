@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { BaseEntity, DebtPeriod } from '../../common';
+import { BaseEntity, DebtPeriod } from '../../common/index';
 import { DebtImageEntity, DebtorEntity, PaymentEntity } from './';
 
 @Entity('debts')
@@ -19,7 +19,10 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => PaymentEntity, (payment) => payment.debt)
+  @OneToMany(() => PaymentEntity, (payment) => payment.debt, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   payments: PaymentEntity[];
 
   @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts)
