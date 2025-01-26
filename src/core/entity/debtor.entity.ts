@@ -43,8 +43,8 @@ export class DebtorEntity extends BaseEntity {
   @OneToMany(() => DebtEntity, (debt) => debt.debtor)
   debts: DebtEntity[];
 
-  @OneToOne(() => LikesEntity, (like) => like.debtor)
-  likes: LikesEntity;
+  @OneToMany(() => LikesEntity, (like) => like.debtor)
+  likes: LikesEntity[];
 
   @OneToMany(() => DebtorImageEntity, (image) => image.debtor)
   images: DebtorImageEntity[];

@@ -1,25 +1,40 @@
-import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
-import { BaseEntity } from '../../common/database/BaseEntity';
-import { DebtorEntity } from './debtor.entity';
-import { PaymentEntity } from './payment.entity';
+import { Entity, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { BaseEntity, DebtPeriod } from '../../common';
+import { DebtImageEntity, DebtorEntity, PaymentEntity } from './';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
-  @Column()
+  @Column({ type: 'uuid' })
   debtor_id: string;
 
   @Column({ type: 'timestamp' })
   debt_date: Date;
 
+  @Column({ type: 'decimal' })
+  debt_sum: number;
+
+  @Column({ type: 'enum', enum: DebtPeriod })
+  debt_period: DebtPeriod;
+
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts)
+  @OneToMany(() => PaymentEntity, (payment) => payment.debt)
+  payments: PaymentEntity[];
+
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'debtor_id' })
   debtor: DebtorEntity;
 
-  @OneToMany(() => PaymentEntity, (debtor) => debtor.debt)
-  payments: PaymentEntity[];
+  @OneToMany(() => DebtImageEntity, (image) => image.debt, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  images: DebtImageEntity[];
 }

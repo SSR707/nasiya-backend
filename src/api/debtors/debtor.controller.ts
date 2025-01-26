@@ -26,7 +26,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { DebtorService } from './debtor.service';
-import { JwtGuard } from '../../common';
+import { JwtGuard, UserID } from '../../common';
 import { DebtorEntity } from '../../core';
 import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
 
@@ -64,8 +64,8 @@ export class DebtorController {
     status: 401,
     description: 'Unauthorized - JWT token is missing or invalid',
   })
-  create(@Body() createDebtorDto: CreateDebtorDto) {
-    return this.debtorService.create(createDebtorDto);
+  create(@UserID('id') id: string, @Body() createDebtorDto: CreateDebtorDto) {
+    return this.debtorService.create({...createDebtorDto , store_id:id});
   }
 
   @Get()

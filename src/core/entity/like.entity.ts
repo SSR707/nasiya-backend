@@ -14,7 +14,7 @@ export class LikesEntity extends BaseEntity {
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
 
-  @OneToOne(() => DebtorEntity, (debtor) => debtor.likes)
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.likes)
   @JoinColumn({ name: 'debtor_id' })
   debtor: DebtorEntity;
 }

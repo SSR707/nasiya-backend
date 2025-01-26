@@ -8,3 +8,4 @@ export * from './payment.entity';
 export * from './store.entity';
 export * from './message.entity';
 export * from './sample-message.entity';
+export * from './debt-image.entity';

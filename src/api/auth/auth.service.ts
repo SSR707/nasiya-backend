@@ -38,7 +38,7 @@ export class AuthService extends BaseService<
     if (!is_match_pass) {
       throw new BadRequestException('Username or password invalid');
     }
-    const payload = { sub: user.username, id: user.id };
+    const payload = { sub: user.login, id: user.id };
     const accessToken = await this.jwt.generateAccessToken(payload);
     const refreshToken = await this.jwt.generateRefreshToken(payload);
     this.writeToCookie(refreshToken, res);
@@ -48,7 +48,7 @@ export class AuthService extends BaseService<
       data: {
         accessToken,
         access_token_expire:
-          this.configService.get<string>('REFRESH_TOKEN_KEY'),
+          this.configService.get<string>('ACCESS_TOKEN_TIME'),
         refreshToken,
         refresh_token_expire:
           this.configService.get<string>('REFRESH_TOKEN_TIME'),
@@ -59,7 +59,8 @@ export class AuthService extends BaseService<
   async refresh_token(refresh_token: string) {
     const data = await this.jwt.verifyRefreshToken(refresh_token);
     const user = await this.findOneById(data?.id);
-    const accessToken = await this.jwt.generateAccessToken(user.data);
+    const payload = { sub: user.data.login, id: user.data.id };
+    const accessToken = await this.jwt.generateAccessToken(payload);
     return {
       status_code: HttpStatus.OK,
       message: 'success',

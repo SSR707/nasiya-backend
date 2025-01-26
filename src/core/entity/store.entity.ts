@@ -41,7 +41,7 @@ export class StoreEntity extends BaseEntity {
   })
   phone_number: string;
 
-  @Column({ type: 'varchar', name: 'passcode' })
+  @Column({ type: 'varchar', name: 'passcode', nullable: true })
   passcode: string;
 
   @Column({ type: 'boolean', name: 'is_active', default: false })
