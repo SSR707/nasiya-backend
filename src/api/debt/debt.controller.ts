@@ -31,7 +31,7 @@ import { JwtGuard } from '../../common';
   description: 'Bearer token for authentication',
 })
 @ApiTags('Debt API')
-@UseGuards(JwtGuard)
+// @UseGuards(JwtGuard)
 @Controller('debt')
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
@@ -103,13 +103,15 @@ export class DebtController {
   findAll() {
     return this.debtService.findAllDebts();
   }
+
   @Get('find-pagination')
   findAllWithPaginations(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
   ) {
-    return this.debtService.getAllMessages(page , limit);
+    return this.debtService.getAllMessages(page, limit);
   }
+
   @ApiOperation({
     summary: 'Get debt by ID',
   })
