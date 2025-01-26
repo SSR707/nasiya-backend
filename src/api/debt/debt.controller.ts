@@ -61,7 +61,7 @@ export class DebtController {
   })
   @Post()
   create(@Body() createDebtDto: CreateDebtDto) {
-    return this.debtService.create(createDebtDto);
+    return this.debtService.createDebt(createDebtDto);
   }
 
   @ApiOperation({
@@ -100,13 +100,16 @@ export class DebtController {
     },
   })
   @Get()
-  findAll(
+  findAll() {
+    return this.debtService.findAllDebts();
+  }
+  @Get('find-pagination')
+  findAllWithPaginations(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
   ) {
     return this.debtService.getAllMessages(page , limit);
   }
-
   @ApiOperation({
     summary: 'Get debt by ID',
   })
@@ -148,7 +151,7 @@ export class DebtController {
   })
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.debtService.findOneById(id , {relations:['payments']});
+    return this.debtService.findOneDebtById(id);
   }
 
   @ApiOperation({
@@ -186,7 +189,7 @@ export class DebtController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateDebtDto: UpdateDebtDto,
   ) {
-    return this.debtService.updateProfile(id, updateDebtDto);
+    return this.debtService.updateDebtById(id, updateDebtDto);
   }
 
   @ApiOperation({
@@ -221,6 +224,6 @@ export class DebtController {
   })
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.debtService.delete(id);
+    return this.debtService.deleteDebtById(id);
   }
 }
