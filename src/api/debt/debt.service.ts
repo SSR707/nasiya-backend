@@ -4,17 +4,18 @@ import {
   NotFoundException,
   HttpStatus,
 } from '@nestjs/common';
-
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial } from 'typeorm';
 import { BaseService } from '../../infrastructure/lib/baseService';
 import {
   DebtEntity,
+  DebtImageEntity,
   DebtorEntity,
   DebtorRepository,
   DebtRepository,
 } from '../../core';
 import { CreateDebtDto, UpdateDebtDto } from './dto';
+import { DebtImageRepostiory } from 'src/core/repository/debt.image.repository';
 
 @Injectable()
 export class DebtService extends BaseService<
@@ -26,6 +27,8 @@ export class DebtService extends BaseService<
     private readonly debtRepository: DebtRepository,
     @InjectRepository(DebtorEntity)
     private readonly debtorRepository: DebtorRepository,
+    @InjectRepository(DebtImageEntity)
+    private readonly debtImageRepository: DebtImageRepostiory,
   ) {
     super(debtRepository);
   }
@@ -44,7 +47,7 @@ export class DebtService extends BaseService<
     await this.debtRepository.save(data);
 
     return {
-      status_code: 201,
+      status_code: HttpStatus.CREATED,
       message: 'Debt created successfully.',
       data: data,
     };
@@ -59,7 +62,7 @@ export class DebtService extends BaseService<
     }
 
     return {
-      status_code: 200,
+      status_code: HttpStatus.OK,
       message: 'Debt fetched.',
       data: allData,
     };
@@ -75,7 +78,7 @@ export class DebtService extends BaseService<
     });
 
     return {
-      status_code: 200,
+      status_code: HttpStatus.OK,
       message: `${limit} debts fetched.`,
       data: data,
     };
@@ -90,7 +93,7 @@ export class DebtService extends BaseService<
     }
 
     return {
-      status_code: 200,
+      status_code: HttpStatus.OK,
       message: 'Debt found.',
       data: debtData,
     };
@@ -116,7 +119,7 @@ export class DebtService extends BaseService<
     });
 
     return {
-      status_code: 200,
+      status_code: HttpStatus.OK,
       message: 'Debt updated successfully.',
       data: newDebtData,
     };
@@ -138,7 +141,7 @@ export class DebtService extends BaseService<
     }
 
     return {
-      status_code: 200,
+      status_code: HttpStatus.OK,
       message: 'Debt deleted successfully.',
       data: debtData,
     };

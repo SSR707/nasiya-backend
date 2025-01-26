@@ -65,7 +65,7 @@ export class DebtorController {
     description: 'Unauthorized - JWT token is missing or invalid',
   })
   create(@UserID('id') id: string, @Body() createDebtorDto: CreateDebtorDto) {
-    return this.debtorService.create({...createDebtorDto , store_id:id});
+    return this.debtorService.create({ ...createDebtorDto, store_id: id });
   }
 
   @Get()
