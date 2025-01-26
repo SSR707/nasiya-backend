@@ -8,6 +8,7 @@ import {
   Delete,
   ParseUUIDPipe,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 
 import {
@@ -19,9 +20,11 @@ import {
 } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
 import { UpdateLikeDto, CreateLikeDto } from './dto';
+import { JwtGuard } from 'src/common';
 
-// @UseGuards(JwtGuard)
 @ApiTags('Like Api')
+@UseGuards(JwtGuard)
+@ApiBearerAuth()
 @Controller('likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
@@ -63,7 +66,6 @@ export class LikesController {
     },
   })
   @Post('createLike')
-  @ApiBearerAuth()
   create(@Body() createLikeDto: CreateLikeDto) {
     return this.likesService.createLikes(createLikeDto);
   }
