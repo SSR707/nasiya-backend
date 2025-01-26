@@ -7,11 +7,20 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { SampleMessageService } from './sample-message.service';
 import { UpdateSampleMessageDto, CreateSampleMessageDto } from './dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtGuard } from 'src/common';
 
+@UseGuards(JwtGuard)
+@ApiBearerAuth()
 @ApiTags('Sample Message API')
 @Controller('sample-message')
 export class SampleMessageController {
