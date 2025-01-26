@@ -17,11 +17,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { StoreService } from './store.service';
-import {
-  AddPasscodeStoreDto,
-  ResetPasscodeStoreDto,
-  UpdateStoreDto,
-} from './dto';
+import { PasscodeStoreDto, ResetPasscodeStoreDto, UpdateStoreDto } from './dto';
 import { JwtGuard, UserID } from '../../common';
 
 @UseGuards(JwtGuard)
@@ -192,7 +188,7 @@ export class StoreController {
       example: {
         status_code: 200,
         message: 'OK',
-        data: AddPasscodeStoreDto,
+        data: PasscodeStoreDto,
       },
     },
   })
@@ -211,7 +207,7 @@ export class StoreController {
   @Post('create-passcode')
   createPasscode(
     @UserID('id') id: string,
-    @Body() addPasscode: AddPasscodeStoreDto,
+    @Body() addPasscode: PasscodeStoreDto,
   ) {
     return this.storeService.addPasscode(id, addPasscode);
   }

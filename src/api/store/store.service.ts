@@ -4,7 +4,7 @@ import { DeepPartial } from 'typeorm';
 import {
   ResetPasscodeStoreDto,
   UpdateStoreDto,
-  AddPasscodeStoreDto,
+  PasscodeStoreDto,
   CreateStoreDto,
 } from './dto';
 import { BcryptEncryption, BaseService } from '../../infrastructure';
@@ -98,7 +98,7 @@ export class StoreService extends BaseService<
     const updatedEntity = await this.getProfile(id);
     return updatedEntity;
   }
-  async addPasscode(store_id: string, addPasscode: AddPasscodeStoreDto) {
+  async addPasscode(store_id: string, addPasscode: PasscodeStoreDto) {
     const hash = await BcryptEncryption.encrypt(addPasscode.passcode);
     const getUser = await this.findOneBy({ where: { id: store_id } });
     const addPassCode = await this.getRepository.update(

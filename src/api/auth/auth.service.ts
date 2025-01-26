@@ -10,7 +10,7 @@ import {
   BaseService,
 } from '../../infrastructure';
 import { SigninStoreDto } from './dto';
-import { CreateStoreDto } from '../store/dto';
+import { CreateStoreDto, PasscodeStoreDto } from '../store/dto';
 
 @Injectable()
 export class AuthService extends BaseService<
@@ -55,7 +55,25 @@ export class AuthService extends BaseService<
       },
     };
   }
-
+  async loginWithPasscode(id: string, passcodeDto: PasscodeStoreDto) {
+    const getStore = await this.getRepository.findOneBy({
+      where: { id },
+    });
+    const checkPasscode = await BcryptEncryption.compare(
+      passcodeDto.passcode,
+      getStore.passcode,
+    );
+    if (checkPasscode) {
+      return {
+        status_code: HttpStatus.OK,
+        message: 'success',
+      };
+    }
+    return {
+      status_code: HttpStatus.UNAUTHORIZED,
+      message: 'Invalid passcode',
+    };
+  }
   async refresh_token(refresh_token: string) {
     const data = await this.jwt.verifyRefreshToken(refresh_token);
     const user = await this.findOneById(data?.id);
