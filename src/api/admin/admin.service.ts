@@ -98,7 +98,11 @@ export class AdminService extends BaseService<
   async refresh_token(refresh_token: string) {
     const data = await this.jwt.verifyRefreshToken(refresh_token);
     const admin = await this.findOneById(data?.id);
-    const payload = { sub: admin.data.username, id: admin.data.id, role: admin.data.role };
+    const payload = {
+      sub: admin.data.username,
+      id: admin.data.id,
+      role: admin.data.role,
+    };
     const accessToken = await this.jwt.generateAccessToken(payload);
     return {
       status_code: HttpStatus.OK,

@@ -110,7 +110,6 @@ export class PaymentController {
     return await this.paymentService.findAllPayment(page, limit);
   }
 
-
   @ApiOperation({
     summary: 'Get a payment by ID',
   })
@@ -166,7 +165,6 @@ export class PaymentController {
     return await this.paymentService.findOneById(id, { relations: ['debt'] });
   }
 
-
   @ApiOperation({
     summary: 'Get payments by type',
   })
@@ -219,7 +217,6 @@ export class PaymentController {
   async getPaymentByType(@Param('type') type: PaymentType) {
     return await this.paymentService.findPaymentsByType(type);
   }
-
 
   @ApiResponse({
     status: HttpStatus.OK,
@@ -330,13 +327,9 @@ export class PaymentController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
-    return this.paymentService.findPaymentsBetweenDates(
-      startDate,
-      endDate,
-    );
+    return this.paymentService.findPaymentsBetweenDates(startDate, endDate);
   }
 
-  
   @ApiOperation({
     summary: 'Update payment type',
   })
@@ -395,7 +388,7 @@ export class PaymentController {
     name: 'newType',
     description: 'New payment type (e.g., one_month, multi_month, any_payment)',
     required: true,
-    enum:PaymentType,
+    enum: PaymentType,
   })
   @Put(':id/type')
   @ApiBearerAuth()
@@ -406,7 +399,6 @@ export class PaymentController {
     return await this.paymentService.updatePaymentType(id, newType);
   }
 
-  
   @ApiOperation({
     summary: 'Delete a payment',
   })
@@ -441,7 +433,6 @@ export class PaymentController {
     return await this.paymentService.delete(id);
   }
 
-  
   @ApiOperation({
     summary: 'Delete payments by Debt ID',
   })
