@@ -4,16 +4,13 @@ import { DebtImageEntity, DebtorEntity, PaymentEntity } from './';
 
 @Entity('debts')
 export class DebtEntity extends BaseEntity {
-  @Column('decimal', { precision: 10, scale: 2 })
-  amount: number;
-
   @Column({ type: 'uuid' })
   debtor_id: string;
 
   @Column({ type: 'timestamp' })
   debt_date: Date;
 
-  @Column({ type: 'decimal' })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   debt_sum: number;
 
   @Column({ type: 'enum', enum: DebtPeriod })

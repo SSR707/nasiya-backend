@@ -10,7 +10,7 @@ export class PaymentEntity extends BaseEntity {
   @Column({ type: 'decimal', name: 'sum' })
   sum: number;
 
-  @Column({ type: 'date', name: 'date' })
+  @Column({ type: 'timestamp', name: 'date', default: () => 'CURRENT_TIMESTAMP' })
   date: Date;
 
   @Column({ type: 'enum', enum: PaymentType, default: PaymentType.ONE_MONTH })

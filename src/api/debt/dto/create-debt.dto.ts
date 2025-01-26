@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsPositive,
   IsString,
   IsUUID,
 } from 'class-validator';
@@ -38,6 +39,7 @@ export class CreateDebtDto {
   @ApiProperty({ type: Number, description: 'Debt sum', example: 1000 })
   @IsNotEmpty()
   @IsNumber()
+  @IsPositive()
   debt_sum: number;
 
   @ApiProperty({

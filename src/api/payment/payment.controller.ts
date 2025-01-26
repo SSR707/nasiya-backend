@@ -9,6 +9,9 @@ import {
   Query,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,14 +24,14 @@ import {
 } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto';
-import { PaymentType } from '../../common';
+import { JwtGuard, PaymentType } from '../../common';
 
+@UseGuards(JwtGuard)
 @ApiTags('Payments API')
 @Controller('payments')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Post()
   @ApiOperation({ summary: 'create a new payment' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -51,12 +54,12 @@ export class PaymentController {
     },
   })
   @ApiBody({ type: CreatePaymentDto })
+  @Post()
   @ApiBearerAuth()
   async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
     return await this.paymentService.create(createPaymentDto);
   }
 
-  @Get()
   @ApiOperation({
     summary: 'Get all payments',
   })
@@ -98,12 +101,16 @@ export class PaymentController {
       },
     },
   })
+  @Get()
   @ApiBearerAuth()
-  async getAllPayment(@Query() query: any) {
-    return await this.paymentService.findAll(query);
+  async getAllPayment(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
+  ) {
+    return await this.paymentService.findAllPayment(page, limit);
   }
 
-  @Get(':id')
+
   @ApiOperation({
     summary: 'Get a payment by ID',
   })
@@ -153,12 +160,13 @@ export class PaymentController {
       },
     },
   })
+  @Get(':id')
   @ApiBearerAuth()
   async getPaymentById(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.paymentService.findOneById(id);
+    return await this.paymentService.findOneById(id, { relations: ['debt'] });
   }
 
-  @Get('type/:type')
+
   @ApiOperation({
     summary: 'Get payments by type',
   })
@@ -206,12 +214,13 @@ export class PaymentController {
     description: 'Payment type (ONE_MONTH, MULTI_MONTH, ANY_PAYMENT)',
     enum: PaymentType,
   })
+  @Get('type/:type')
   @ApiBearerAuth()
   async getPaymentByType(@Param('type') type: PaymentType) {
     return await this.paymentService.findPaymentsByType(type);
   }
 
-  @Get('debt/:debtId')
+
   @ApiResponse({
     status: HttpStatus.OK,
     description:
@@ -256,12 +265,12 @@ export class PaymentController {
     description: 'Debt ID related to payments',
     example: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
   })
+  @Get('debt/:debtId')
   @ApiBearerAuth()
   async getPaymentsByDebtId(@Param('debtId') debtId: string) {
     return await this.paymentService.findPaymentsByDebtId(debtId);
   }
 
-  @Get('date-range')
   @ApiOperation({
     summary: 'Get payments between dates',
   })
@@ -315,18 +324,19 @@ export class PaymentController {
     required: true,
     example: '2025-01-31',
   })
+  @Get('date-range')
   @ApiBearerAuth()
   async getPaymentsBetweenDates(
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
-    return await this.paymentService.findPaymentsBetweenDates(
+    return this.paymentService.findPaymentsBetweenDates(
       startDate,
       endDate,
     );
   }
 
-  @Put(':id/type')
+  
   @ApiOperation({
     summary: 'Update payment type',
   })
@@ -383,10 +393,11 @@ export class PaymentController {
   })
   @ApiQuery({
     name: 'newType',
-    description: 'New payment type (e.g., ONE_MONTH, MULTI_MONTH, ANY_PAYMENT)',
+    description: 'New payment type (e.g., one_month, multi_month, any_payment)',
     required: true,
-    example: 'MULTI_MONTH',
+    enum:PaymentType,
   })
+  @Put(':id/type')
   @ApiBearerAuth()
   async updatePaymentType(
     @Param('id') id: string,
@@ -395,7 +406,7 @@ export class PaymentController {
     return await this.paymentService.updatePaymentType(id, newType);
   }
 
-  @Delete(':id')
+  
   @ApiOperation({
     summary: 'Delete a payment',
   })
@@ -424,12 +435,13 @@ export class PaymentController {
     description: 'Payment ID',
     example: 'b2d4aa27-0768-4456-947f-f8930c294394',
   })
+  @Delete(':id')
   @ApiBearerAuth()
   async deletePayment(@Param('id') id: string) {
     return await this.paymentService.delete(id);
   }
 
-  @Delete('debt/:debtId')
+  
   @ApiOperation({
     summary: 'Delete payments by Debt ID',
   })
@@ -460,6 +472,7 @@ export class PaymentController {
     description: 'Debt ID related to payments to be deleted',
     example: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
   })
+  @Delete('debt/:debtId')
   @ApiBearerAuth()
   async deletePaymentsByDebtId(@Param('debtId') debtId: string) {
     return await this.paymentService.deletePaymentsByDebtId(debtId);
