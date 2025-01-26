@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
-export class AddPasscodeStoreDto {
+export class PasscodeStoreDto {
   @ApiProperty({
-    type: Number,
+    type: String,
     description: 'Passcode of store',
     example: 1245,
   })
