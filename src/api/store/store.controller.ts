@@ -7,16 +7,25 @@ import {
   Delete,
   HttpStatus,
   Post,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StoreService } from './store.service';
 import {
   AddPasscodeStoreDto,
   ResetPasscodeStoreDto,
   UpdateStoreDto,
 } from './dto';
-import { UserID } from '../../common';
+import { JwtGuard, UserID } from '../../common';
 
+@UseGuards(JwtGuard)
+@ApiBearerAuth()
 @ApiTags('Store Api')
 @Controller('store')
 export class StoreController {
@@ -55,6 +64,8 @@ export class StoreController {
       },
     },
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Get()
   findAll() {
     return this.storeService.findAllData();
@@ -97,6 +108,8 @@ export class StoreController {
       },
     },
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.storeService.findOne(id);
@@ -125,6 +138,8 @@ export class StoreController {
       },
     },
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Get('reset-password')
   resetPass(
     @UserID() store_id: string,
@@ -162,6 +177,8 @@ export class StoreController {
       },
     },
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Get('profile')
   getProfile(@UserID() id: string) {
     return this.storeService.getProfile(id);
@@ -189,6 +206,8 @@ export class StoreController {
       },
     },
   })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
   @Post('create-passcode')
   createPasscode(
     @UserID() id: string,

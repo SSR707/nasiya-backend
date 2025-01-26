@@ -7,11 +7,19 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { UpdateMessageDto, CreateMessageDto } from './dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { MessageStatus } from 'src/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { JwtGuard, MessageStatus } from 'src/common';
+@UseGuards(JwtGuard)
+@ApiBearerAuth()
 @ApiTags('Message API')
 @Controller('messages')
 export class MessagesController {
@@ -100,7 +108,7 @@ export class MessagesController {
     },
   })
   @Get(':id')
-  findOne(@Param('67a6c34c-6959-4e3e-a298-64b505e7f5e4id') id: string) {
+  findOne(@Param() id: string) {
     return this.messagesService.getOneMessage(id);
   }
 
