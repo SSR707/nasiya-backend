@@ -13,8 +13,11 @@ export class MessagesService extends BaseService<
   constructor(@InjectRepository(MessageEntity) repository: MessageRepository) {
     super(repository);
   }
-  async createMessage(createMessageDto: CreateMessageDto) {
-    return await this.create(createMessageDto);
+  async createMessage(id: string, createMessageDto: CreateMessageDto) {
+    return await this.create({
+      ...createMessageDto,
+      store_id: id,
+    });
   }
 
   async getAllMessages() {
@@ -39,15 +42,14 @@ export class MessagesService extends BaseService<
   }
 
   async updateMessage(id: string, updateMessageDto: UpdateMessageDto) {
-    const message = await this.getRepository.findOneBy({ where: { id } });
+    const message = await this.getRepository.findOne({ where: { id } });
     if (!message) {
       throw new HttpException(`Message with id ${id} not found.`, 404);
     }
-    const updatedData = await this.getRepository.update(id, updateMessageDto);
+    await this.getRepository.update(id, updateMessageDto);
     return {
       status_code: 200,
       message: 'Message updated successfully',
-      data: updatedData.raw,
     };
   }
 

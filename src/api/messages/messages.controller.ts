@@ -17,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard, MessageStatus } from 'src/common';
+import { JwtGuard, MessageStatus, UserID } from 'src/common';
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 @ApiTags('Message API')
@@ -38,8 +38,8 @@ export class MessagesController {
     },
   })
   @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create(createMessageDto);
+  create(@UserID() id: string, @Body() createMessageDto: CreateMessageDto) {
+    return this.messagesService.createMessage(id, createMessageDto);
   }
 
   @ApiOperation({ summary: 'Get All Messages' })
@@ -108,7 +108,7 @@ export class MessagesController {
     },
   })
   @Get(':id')
-  findOne(@Param() id: string) {
+  findOne(@Param('id') id: string) {
     return this.messagesService.getOneMessage(id);
   }
 

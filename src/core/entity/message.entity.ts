@@ -19,7 +19,7 @@ export class MessageEntity extends BaseEntity {
   @Column({ type: 'uuid', name: 'debtor_id' })
   debtor_id: string;
 
-  @Column({ type: 'uuid', name: 'sample_message_id' })
+  @Column({ type: 'uuid', name: 'sample_message_id', nullable: true })
   sample_message_id: string;
 
   @ManyToOne(() => StoreEntity, (store) => store.messages)

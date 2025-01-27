@@ -16,7 +16,6 @@ import {
   BadRequestException,
   UploadedFile,
 } from '@nestjs/common';
-import { DebtService } from './debt.service';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -25,12 +24,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
+import { DebtService } from './debt.service';
 import { UpdateDebtDto, CreateDebtDto } from './dto';
 import { JwtGuard } from '../../common';
-import { CreateDebtImageDto } from './dto/create-debt-image.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 @ApiBearerAuth()
 @ApiHeader({
@@ -38,7 +37,7 @@ import { extname } from 'path';
   description: 'Bearer token for authentication',
 })
 @ApiTags('Debt API')
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('debt')
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}

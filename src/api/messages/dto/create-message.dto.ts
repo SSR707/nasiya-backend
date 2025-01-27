@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { MessageStatus } from 'src/common';
 
 export class CreateMessageDto {
@@ -9,7 +9,16 @@ export class CreateMessageDto {
     description: 'The ID of the debtor',
   })
   @IsString()
-  deptor_id: string;
+  debtor_id: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'g5a3b2f5-d123-4234-98e9-ff6ab9c8f67d',
+    description: 'The ID of the debtor',
+  })
+  @IsString()
+  @IsOptional()
+  store_id: string;
 
   @ApiProperty({
     type: String,
@@ -35,5 +44,6 @@ export class CreateMessageDto {
     description: 'The ID of the sample message',
   })
   @IsString()
+  @IsOptional()
   sample_message_id: string;
 }
