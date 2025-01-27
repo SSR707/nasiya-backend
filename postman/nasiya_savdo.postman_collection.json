@@ -523,6 +523,409 @@
           }
         }
       ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"your_username\",\n    \"password\": \"your_password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"new_user\",\n    \"password\": \"password123\",\n    \"full_name\": \"Full Name\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Debtors",
+      "item": [
+        {
+          "name": "Create Debtor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"full_name\": \"John Doe\",\n    \"phone_number\": \"+998901234567\",\n    \"address\": \"Test Address\",\n    \"note\": \"Test Note\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/debtors",
+              "host": ["{{base_url}}"],
+              "path": ["debtors"]
+            }
+          }
+        },
+        {
+          "name": "Get All Debtors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/debtors",
+              "host": ["{{base_url}}"],
+              "path": ["debtors"]
+            }
+          }
+        },
+        {
+          "name": "Get Active Debtors",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/debtors/active/all",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", "active", "all"]
+            }
+          }
+        },
+        {
+          "name": "Get Debtor by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/debtors/:id",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "debtor_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Debtor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"full_name\": \"Updated Name\",\n    \"phone_number\": \"+998901234567\",\n    \"address\": \"Updated Address\",\n    \"note\": \"Updated Note\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/debtors/:id",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "debtor_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/debtors/upload/:id",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", "upload", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "debtor_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Phone Number",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"debtor_id\": \"debtor_id_here\",\n    \"phone_number\": \"+998901234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/debtors/phone",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", "phone"]
+            }
+          }
+        },
+        {
+          "name": "Remove Phone Number",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/debtors/phone/:id",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", "phone", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "phone_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Images",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/debtors/:id/images",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", ":id", "images"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "debtor_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove Image",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/debtors/image/:id",
+              "host": ["{{base_url}}"],
+              "path": ["debtors", "image", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "image_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Create Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"debtor_id\": \"debtor_id_here\",\n    \"message\": \"Test message\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["messages"]
+            }
+          }
+        },
+        {
+          "name": "Get All Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["messages"]
+            }
+          }
+        },
+        {
+          "name": "Get Message by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/:id",
+              "host": ["{{base_url}}"],
+              "path": ["messages", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "message_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Message",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/messages/:id",
+              "host": ["{{base_url}}"],
+              "path": ["messages", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "message_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }

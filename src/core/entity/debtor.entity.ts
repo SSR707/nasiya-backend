@@ -36,6 +36,9 @@ export class DebtorEntity extends BaseEntity {
   @Column({ type: 'uuid', name: 'store_id' })
   store_id: string;
 
+  @Column({ type: 'boolean', name: 'is_active', default: true })
+  is_active: boolean;
+
   @ManyToOne(() => StoreEntity, (store) => store.debtors)
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;

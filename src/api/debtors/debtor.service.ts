@@ -176,15 +176,20 @@ export class DebtorService extends BaseService<
     relations: string[] = [],
   ): Promise<any> {
     try {
-      const debtors = await this.debtorRepository.find({
+      const findOptions = {
         ...options,
         relations: relations,
-        where: { ...options?.where, is_active: true },
-        order: {
-          created_at: 'DESC',
-          ...options?.order,
+        where: {
+          ...(options?.where || {}),
+          is_active: true,
         },
-      });
+        order: {
+          created_at: options?.order?.created_at || { direction: 'DESC' },
+          ...(options?.order || {}),
+        },
+      };
+
+      const debtors = await this.debtorRepository.find(findOptions);
 
       return {
         status_code: 200,
@@ -254,41 +259,108 @@ export class DebtorService extends BaseService<
     }
   }
 
-  async uploadImage(id: string, file: Express.Multer.File) {
+  async uploadDebtorImage(id: string, file: Express.Multer.File) {
     try {
       const debtor = await this.findOne(id);
+
+      
+      // Eski rasmni o'chirish
+      if (debtor.image && await this.fileService.existFile(debtor.image)) {
+        await this.fileService.deleteFile(debtor.image);
+      }
+
+
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-      try {
-        // Upload image
-        const { path: imagePath } = await this.fileService.uploadFile(
-          file,
-          'debtors',
-        );
 
-        // Update debtor with new image path
+      try {
+        // Yangi rasmni yuklash
+        const uploadedFile = await this.fileService.uploadFile(file, 'debtors');
+
+        // DebtorEntity jadvalida asosiy rasm yo'lini yangilash
         await queryRunner.manager.update(DebtorEntity, id, {
-          image: imagePath,
+          image: uploadedFile.path,
           updated_at: Date.now(),
         });
 
+        // DebtorImageEntity jadvaliga qo'shimcha rasm qo'shish
+        const newImage = this.debtorImageRepository.create({
+          debtor_id: id,
+          image: uploadedFile.path,
+          debtor: debtor
+        });
+
+        await queryRunner.manager.save(newImage);
         await queryRunner.commitTransaction();
 
         return {
-          status_code: 200,
-          message: 'Image uploaded successfully',
-          data: { image_url: imagePath },
+          status_code: 201,
+          message: 'Rasm muvaffaqiyatli yuklandi',
+          data: {
+            image_url: uploadedFile.path,
+            debtor_image: newImage
+          }
         };
+
       } catch (error) {
         await queryRunner.rollbackTransaction();
         throw error;
       } finally {
         await queryRunner.release();
       }
+
     } catch (error) {
-      throw new BadRequestException(`Failed to upload image: ${error.message}`);
+      throw new BadRequestException(`Rasmni yuklashda xatolik: ${error.message}`);
+    }
+  }
+
+  async getDebtorImages(id: string) {
+    try {
+      const debtor = await this.findOne(id);
+      const images = await this.debtorImageRepository.find({
+        where: { debtor_id: id },
+        order: {
+          created_at: { direction: 'DESC' }
+        }
+      });
+
+      return {
+        status_code: 200,
+        message: 'Debtor rasmlar ro\'yxati olindi',
+        data: images,
+        total: images.length
+      };
+    } catch (error) {
+      throw new BadRequestException(`Rasmlarni olishda xatolik: ${error.message}`);
+    }
+  }
+
+  async removeDebtorImage(id: string) {
+    try {
+      const image = await this.debtorImageRepository.findOne({ 
+        where: { id }
+      });
+
+      if (!image) {
+        throw new NotFoundException('Rasm topilmadi');
+      }
+
+      // Faylni o'chirish
+      if (await this.fileService.existFile(image.image)) {
+        await this.fileService.deleteFile(image.image);
+      }
+
+      // Ma'lumotlar bazasidan o'chirish
+      await this.debtorImageRepository.remove(image);
+
+      return {
+        status_code: 200,
+        message: 'Rasm muvaffaqiyatli o\'chirildi'
+      };
+    } catch (error) {
+      throw new BadRequestException(`Rasmni o'chirishda xatolik: ${error.message}`);
     }
   }
 
@@ -307,37 +379,6 @@ export class DebtorService extends BaseService<
       message: 'Debtor image added successfully',
       data: newImage,
     };
-  }
-
-  async removeDebtorImage(id: string) {
-    const image = await this.debtorImageRepository.findOne({ where: { id } });
-    if (!image) {
-      throw new NotFoundException('Debtor image not found');
-    }
-
-    await this.debtorImageRepository.softDelete(id);
-
-    return {
-      status_code: 200,
-      message: 'Debtor image removed successfully',
-    };
-  }
-
-  async uploadDebtorImage(id: string, file: Express.Multer.File) {
-    const debtor = await this.findOne(id);
-
-    try {
-      const uploadedFile = await this.fileService.uploadFile(file, 'debtors');
-
-      const createImageDto: CreateDebtorImageDto = {
-        debtor_id: id,
-        image: uploadedFile.path,
-      };
-
-      return this.addDebtorImage(createImageDto);
-    } catch (error) {
-      throw new BadRequestException(`Failed to upload image: ${error.message}`);
-    }
   }
 
   async addDebtorPhone(createDebtorPhoneDto: CreateDebtorPhoneDto) {
@@ -422,19 +463,6 @@ export class DebtorService extends BaseService<
         `Failed to remove phone number: ${error.message}`,
       );
     }
-  }
-
-  async getDebtorImages(id: string) {
-    const debtor = await this.findOne(id);
-    const images = await this.debtorImageRepository.find({
-      where: { debtor_id: id },
-    });
-
-    return {
-      status_code: 200,
-      message: 'Debtor images retrieved successfully',
-      data: images,
-    };
   }
 
   async getDebtorPhones(id: string) {
