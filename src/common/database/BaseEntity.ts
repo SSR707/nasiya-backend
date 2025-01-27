@@ -19,10 +19,4 @@ export class BaseEntity {
   })
   updated_at: number;
 
-  @Column({
-    name: 'is_active',
-    type: 'boolean',
-    default: true,
-  })
-  is_active: boolean;
 }
