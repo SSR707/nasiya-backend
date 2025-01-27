@@ -262,15 +262,18 @@ export class DebtorService extends BaseService<
   async uploadDebtorImage(id: string, file: Express.Multer.File) {
     try {
       const debtor = await this.findOne(id);
+
       
       // Eski rasmni o'chirish
       if (debtor.image && await this.fileService.existFile(debtor.image)) {
         await this.fileService.deleteFile(debtor.image);
       }
 
+
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
+
 
       try {
         // Yangi rasmni yuklash

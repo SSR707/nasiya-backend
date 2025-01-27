@@ -37,7 +37,9 @@ export default class Application {
 
     const documentFactory = () =>
       SwaggerModule.createDocument(app, config_swagger);
+
     SwaggerModule.setup(api, app, documentFactory);
+
 
     await app.listen(config.API_PORT, () => {
       console.log(Date.now());
