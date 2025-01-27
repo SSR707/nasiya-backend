@@ -9,7 +9,7 @@ import { AllExceptionsFilter } from '../infrastructure';
 export default class Application {
   public static async main(): Promise<void> {
     const app = await NestFactory.create(AppModule);
-    app.useGlobalFilters(new AllExceptionsFilter());
+    // app.useGlobalFilters(new AllExceptionsFilter());
     app.enableCors({
       origin: '*',
     });

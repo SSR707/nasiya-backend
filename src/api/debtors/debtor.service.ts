@@ -20,6 +20,7 @@ import {
   DebtorPhoneNumberRepository,
 } from '../../core';
 import { FileService, BaseService, IFindOptions } from '../../infrastructure';
+import { log } from 'console';
 
 @Injectable()
 export class DebtorService extends BaseService<
@@ -69,6 +70,8 @@ export class DebtorService extends BaseService<
         data: savedDebtor,
       };
     } catch (error) {
+
+      
       await queryRunner.rollbackTransaction();
       throw new BadRequestException(
         `Failed to create debtor: ${error.message}`,
@@ -80,7 +83,8 @@ export class DebtorService extends BaseService<
 
   async findOne(id: string, relations: string[] = []): Promise<any> {
     try {
-      const debtor = await this.findOneById(id, {
+      const debtor = await this.debtorRepository.findOne({
+        where: { id },
         relations: relations,
       });
 
@@ -247,15 +251,16 @@ export class DebtorService extends BaseService<
   }
 
   async uploadDebtorImage(id: string, file: Express.Multer.File) {
+    if (!id || !file) {
+      throw new BadRequestException('Debtor ID and file are required');
+    }
+
     try {
       const debtor = await this.findOne(id);
 
-      // Delete image if exists
-      if (
-        debtor.data.image &&
-        (await this.fileService.existFile(debtor.data.image))
-      ) {
-        await this.fileService.deleteFile(debtor.data.image);
+      // Delete old image if exists
+      if (debtor.image && await this.fileService.existFile(debtor.image)) {
+        await this.fileService.deleteFile(debtor.image);
       }
 
       const queryRunner = this.dataSource.createQueryRunner();
@@ -263,8 +268,19 @@ export class DebtorService extends BaseService<
       await queryRunner.startTransaction();
 
       try {
+        // Check if file is an image
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+          
+          throw new BadRequestException('Only JPG, PNG and GIF files are allowed');
+        }
+
         // Upload new image
         const uploadedFile = await this.fileService.uploadFile(file, 'debtors');
+
+        if (!uploadedFile || !uploadedFile.path) {
+          throw new BadRequestException('Failed to upload image');
+        }
 
         // Update DebtorEntity with new image path
         await queryRunner.manager.update(DebtorEntity, id, {
@@ -279,7 +295,7 @@ export class DebtorService extends BaseService<
           debtor: debtor,
         });
 
-        await queryRunner.manager.save(newImage);
+        await queryRunner.manager.save(DebtorImageEntity, newImage);
         await queryRunner.commitTransaction();
 
         return {
@@ -292,11 +308,20 @@ export class DebtorService extends BaseService<
         };
       } catch (error) {
         await queryRunner.rollbackTransaction();
-        throw error;
+        if (error instanceof BadRequestException) {
+          throw error;
+        }
+        throw new BadRequestException(`Failed to process image: ${error.message}`);
       } finally {
         await queryRunner.release();
       }
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new BadRequestException(`Error uploading image: ${error.message}`);
     }
   }

@@ -19,6 +19,10 @@ export class FileService {
     subDirectory: string = '',
   ): Promise<{ path: string }> {
     try {
+      if (!file || !file.buffer) {
+        throw new BadRequestException('No file provided or file is empty');
+      }
+
       const targetDir = path.join(this.uploadDir, subDirectory);
 
       // Create subdirectory if it doesn't exist
@@ -27,25 +31,34 @@ export class FileService {
       }
 
       // Generate unique filename
-      const fileExt = path.extname(file.originalname);
+      const fileExt = path.extname(file.originalname).toLowerCase();
+      const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+      
+      if (!allowedExtensions.includes(fileExt)) {
+        throw new BadRequestException('Only image files (jpg, jpeg, png, gif) are allowed');
+      }
+
       const fileName = `${uuidv4()}${fileExt}`;
       const filePath = path.join(targetDir, fileName);
 
       // Write file
-      fs.writeFileSync(filePath, file.buffer);
+      await fs.promises.writeFile(filePath, file.buffer);
 
       return {
         path: filePath.replace(/\\/g, '/'), // Normalize path for different OS
       };
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new BadRequestException(`Failed to upload file: ${error.message}`);
     }
   }
 
   async deleteFile(filePath: string): Promise<boolean> {
     try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      if (await this.existFile(filePath)) {
+        await fs.promises.unlink(filePath);
         return true;
       }
       return false;
@@ -55,6 +68,11 @@ export class FileService {
   }
 
   async existFile(filePath: string): Promise<boolean> {
-    return fs.existsSync(filePath);
+    try {
+      await fs.promises.access(filePath, fs.constants.F_OK);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
