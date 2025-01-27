@@ -72,7 +72,6 @@ export class PaymentService extends BaseService<
     };
   }
 
-
   async updatePaymentType(id: string, newType: PaymentType) {
     const payment = await this.paymentRepository.findOneBy({ id });
     if (!payment) {

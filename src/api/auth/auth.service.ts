@@ -36,8 +36,10 @@ export class AuthService extends BaseService<
     if (!user) {
       throw new BadRequestException('login  or password invalid');
     }
-    if(user.is_active === false){
-      throw new Error("The user is not active or the wallet balance is insufficient.");
+    if (user.is_active === false) {
+      throw new Error(
+        'The user is not active or the wallet balance is insufficient.',
+      );
     }
     const is_match_pass = await BcryptEncryption.compare(
       password,

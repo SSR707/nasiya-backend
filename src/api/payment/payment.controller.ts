@@ -340,7 +340,6 @@ export class PaymentController {
     return await this.paymentService.findPaymentsByDebtId(debtId);
   }
 
-
   @ApiOperation({
     summary: 'Update payment type',
   })
@@ -443,5 +442,4 @@ export class PaymentController {
   async deletePayment(@Param('id') id: string) {
     return await this.paymentService.delete(id);
   }
-
 }
