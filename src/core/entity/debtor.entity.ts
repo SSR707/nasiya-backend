@@ -33,7 +33,7 @@ export class DebtorEntity extends BaseEntity {
   @Column({ type: 'text', name: 'note', nullable: true })
   note: string;
 
-  @Column({ type: 'uuid', name: 'store_id' })
+  @Column({ type: 'uuid', name: 'store_id', nullable: true })
   store_id: string;
 
   @Column({ type: 'boolean', name: 'is_active', default: true })

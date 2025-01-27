@@ -64,8 +64,8 @@ export class DebtorController {
     status: 401,
     description: 'Unauthorized - JWT token is missing or invalid',
   })
-  create(@UserID('id') id: string, @Body() createDebtorDto: CreateDebtorDto) {
-    return this.debtorService.create({ ...createDebtorDto, store_id: id });
+  create(@UserID() id: string, @Body() createDebtorDto: CreateDebtorDto) {
+    return this.debtorService.create({store_id: id, ...createDebtorDto });
   }
 
   @Get()
@@ -222,31 +222,14 @@ export class DebtorController {
       },
     },
   })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/debtors',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `${uniqueSuffix}-${file.originalname}`);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-          return cb(
-            new BadRequestException('Only image files are allowed!'),
-            false,
-          );
-        }
-        cb(null, true);
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   uploadImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
     return this.debtorService.uploadDebtorImage(id, file);
   }
 
