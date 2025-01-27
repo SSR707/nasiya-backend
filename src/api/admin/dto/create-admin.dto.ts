@@ -25,7 +25,7 @@ export class CreateAdminDto {
   })
   @IsStrongPassword()
   @IsNotEmpty()
-  hashed_password: string;
+  password: string;
 
   @ApiProperty({
     type: String,
@@ -38,9 +38,8 @@ export class CreateAdminDto {
   @ApiProperty({
     type: String,
     description: 'ROLE of admin',
-    example: 'ADMIN',
     enum: RoleAdmin,
-    default: RoleAdmin,
+    default: RoleAdmin.ADMIN,
   })
   @IsEnum(RoleAdmin)
   @IsOptional()

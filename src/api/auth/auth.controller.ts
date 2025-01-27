@@ -80,7 +80,7 @@ export class AuthController {
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
-        message: 'Error on refresh token',
+        message: 'Failed to generate access token.',
       },
     },
   })
