@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Delete,
   Param,
   Body,
@@ -12,6 +11,7 @@ import {
   UseGuards,
   ParseIntPipe,
   DefaultValuePipe,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -44,6 +44,16 @@ export class PaymentController {
     },
   })
   @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debt NOT FOUND',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'Debt NOT FOUND',
+      },
+    },
+  })
+  @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Failed creating Payment',
     schema: {
@@ -57,7 +67,7 @@ export class PaymentController {
   @Post()
   @ApiBearerAuth()
   async createPayment(@Body() createPaymentDto: CreatePaymentDto) {
-    return await this.paymentService.create(createPaymentDto);
+    return await this.paymentService.createPayments(createPaymentDto);
   }
 
   @ApiOperation({
@@ -108,6 +118,68 @@ export class PaymentController {
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
   ) {
     return await this.paymentService.findAllPayment(page, limit);
+  }
+
+  @ApiOperation({
+    summary: 'Get payments between dates',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Payments in the specified date range returned successfully.',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'Payments fetched successfully',
+        data: [
+          {
+            id: 'b2d4aa27-0768-4456-947f-f8930c294394',
+            created_at: '1730288822952',
+            updated_at: '1730288797974',
+            sum: 5000,
+            date: '2025-01-20',
+            type: 'ONE_MONTH',
+            debt: {
+              id: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
+              created_at: '1730288822952',
+              updated_at: '1730288797974',
+              amount: 20000,
+              debt_date: '2025-01-15',
+              description: 'OK',
+            },
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid date range or missing parameters.',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Invalid date range or missing parameters',
+      },
+    },
+  })
+  @ApiQuery({
+    name: 'startDate',
+    description: 'Start date (YYYY-MM-DD)',
+    required: true,
+    example: '2025-01-01',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    description: 'End date (YYYY-MM-DD)',
+    required: true,
+    example: '2025-01-31',
+  })
+  @Get('date-range')
+  @ApiBearerAuth()
+  async getPaymentsBetweenDates(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.paymentService.findPaymentsBetweenDates(startDate, endDate);
   }
 
   @ApiOperation({
@@ -268,67 +340,6 @@ export class PaymentController {
     return await this.paymentService.findPaymentsByDebtId(debtId);
   }
 
-  @ApiOperation({
-    summary: 'Get payments between dates',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Payments in the specified date range returned successfully.',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        message: 'Payments fetched successfully',
-        data: [
-          {
-            id: 'b2d4aa27-0768-4456-947f-f8930c294394',
-            created_at: '1730288822952',
-            updated_at: '1730288797974',
-            sum: 5000,
-            date: '2025-01-20',
-            type: 'ONE_MONTH',
-            debt: {
-              id: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
-              created_at: '1730288822952',
-              updated_at: '1730288797974',
-              amount: 20000,
-              debt_date: '2025-01-15',
-              description: 'OK',
-            },
-          },
-        ],
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid date range or missing parameters.',
-    schema: {
-      example: {
-        status_code: HttpStatus.BAD_REQUEST,
-        message: 'Invalid date range or missing parameters',
-      },
-    },
-  })
-  @ApiQuery({
-    name: 'startDate',
-    description: 'Start date (YYYY-MM-DD)',
-    required: true,
-    example: '2025-01-01',
-  })
-  @ApiQuery({
-    name: 'endDate',
-    description: 'End date (YYYY-MM-DD)',
-    required: true,
-    example: '2025-01-31',
-  })
-  @Get('date-range')
-  @ApiBearerAuth()
-  async getPaymentsBetweenDates(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
-  ) {
-    return this.paymentService.findPaymentsBetweenDates(startDate, endDate);
-  }
 
   @ApiOperation({
     summary: 'Update payment type',
@@ -390,7 +401,7 @@ export class PaymentController {
     required: true,
     enum: PaymentType,
   })
-  @Put(':id/type')
+  @Patch(':id/type')
   @ApiBearerAuth()
   async updatePaymentType(
     @Param('id') id: string,
@@ -433,39 +444,4 @@ export class PaymentController {
     return await this.paymentService.delete(id);
   }
 
-  @ApiOperation({
-    summary: 'Delete payments by Debt ID',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description:
-      'Payments related to the specified Debt ID deleted successfully.',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        message:
-          'Payments related to the specified Debt ID deleted successfully.',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'No payments found for the specified Debt ID.',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'No payments found for the specified Debt ID',
-      },
-    },
-  })
-  @ApiParam({
-    name: 'debtId',
-    description: 'Debt ID related to payments to be deleted',
-    example: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
-  })
-  @Delete('debt/:debtId')
-  @ApiBearerAuth()
-  async deletePaymentsByDebtId(@Param('debtId') debtId: string) {
-    return await this.paymentService.deletePaymentsByDebtId(debtId);
-  }
 }

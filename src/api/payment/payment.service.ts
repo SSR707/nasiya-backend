@@ -5,6 +5,7 @@ import { CreatePaymentDto } from './dto';
 import { PaymentRepository, PaymentEntity } from '../../core';
 import { BaseService } from '../../infrastructure';
 import { PaymentType } from '../../common';
+import { DebtService } from '../debt/debt.service';
 
 @Injectable()
 export class PaymentService extends BaseService<
@@ -14,8 +15,14 @@ export class PaymentService extends BaseService<
   constructor(
     @InjectRepository(PaymentEntity)
     private readonly paymentRepository: PaymentRepository,
+    private readonly debtService: DebtService,
   ) {
     super(paymentRepository);
+  }
+
+  async createPayments(createPaymentDto: CreatePaymentDto) {
+    await this.debtService.findOneById(createPaymentDto.debt_id);
+    return this.create(createPaymentDto);
   }
 
   async findPaymentsByType(type: PaymentType) {
@@ -65,17 +72,6 @@ export class PaymentService extends BaseService<
     };
   }
 
-  async deletePaymentsByDebtId(debtId: string) {
-    const result = await this.paymentRepository.delete({ debt_id: debtId });
-    if (!result) {
-      throw new NotFoundException(`Debtid with id ${debtId} not found.`);
-    }
-    return {
-      status_code: 200,
-      message: 'success',
-      deleted_count: result.affected,
-    };
-  }
 
   async updatePaymentType(id: string, newType: PaymentType) {
     const payment = await this.paymentRepository.findOneBy({ id });
