@@ -37,7 +37,7 @@ export class CreateStoreDto {
   })
   @IsStrongPassword()
   @IsNotEmpty()
-  password: string;
+  hashed_password: string;
 
   @ApiProperty({
     type: Number,

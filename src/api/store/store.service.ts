@@ -22,11 +22,13 @@ export class StoreService extends BaseService<
     const getUser = await this.getRepository.findOne({
       where: { login: createStoreDto.login },
     });
-    const hashPass = await BcryptEncryption.encrypt(createStoreDto.password);
+    const hashPass = await BcryptEncryption.encrypt(
+      createStoreDto.hashed_password,
+    );
     if (!getUser) {
       const storeData = await this.create({
         ...createStoreDto,
-        password: hashPass,
+        hashed_password: hashPass,
       });
       const { data } = storeData;
       const { hashed_password, passcode, ...withoutPass } = data;
