@@ -90,12 +90,33 @@ export class AuthController {
   refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
     return this.authService.refresh_token(refresh_token);
   }
+  @ApiOperation({ summary: 'Signin with passcode' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: 'Passcode is ',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    schema: {
+      example: {
+        status_code: HttpStatus.UNAUTHORIZED,
+        message: 'not found',
+        data: 'Invalid passcode',
+      },
+    },
+  })
   @Post('signin-passcode')
   signinWithPasscode(
     @UserID('id') id: string,
-    @Body('passcode') passcode: PasscodeStoreDto,
+    @Body() passcodeDto: PasscodeStoreDto,
   ) {
-    return this.authService.loginWithPasscode(id, passcode);
+    return this.authService.loginWithPasscode(id, passcodeDto);
   }
 
   @ApiOperation({ summary: 'Logout store' })

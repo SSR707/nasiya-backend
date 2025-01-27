@@ -22,13 +22,11 @@ export class StoreService extends BaseService<
     const getUser = await this.getRepository.findOne({
       where: { login: createStoreDto.login },
     });
-    const hashPass = await BcryptEncryption.encrypt(
-      createStoreDto.hashed_password,
-    );
+    const hashPass = await BcryptEncryption.encrypt(createStoreDto.password);
     if (!getUser) {
       const storeData = await this.create({
         ...createStoreDto,
-        hashed_password: hashPass,
+        password: hashPass,
       });
       const { data } = storeData;
       const { hashed_password, passcode, ...withoutPass } = data;
@@ -54,20 +52,6 @@ export class StoreService extends BaseService<
     };
   }
 
-  async findOne(id: string) {
-    return await this.findOneBy({
-      where: { id },
-      relations: ['debtors'],
-      select: {
-        login: true,
-        image: true,
-        wallet: true,
-        is_active: true,
-        created_at: true,
-        updated_at: true,
-      },
-    });
-  }
   async getProfile(id: string) {
     return await this.findOneBy({
       where: { id },
@@ -92,7 +76,7 @@ export class StoreService extends BaseService<
       phone_number: updateStoreDto.phone_number,
       image: updateStoreDto.image,
     };
-    await this.updateProfile(id, {
+    await this.getRepository.update(id, {
       ...dto,
     });
     const updatedEntity = await this.getProfile(id);
@@ -108,7 +92,7 @@ export class StoreService extends BaseService<
     return {
       status_code: 200,
       message: 'OK',
-      data: addPassCode,
+      data: 'Passcode created successfully',
     };
   }
   async resetPasscode(

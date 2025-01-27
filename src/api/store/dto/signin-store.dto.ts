@@ -17,5 +17,5 @@ export class SignInStoreDto {
   })
   @IsStrongPassword()
   @IsNotEmpty()
-  hashed_password: string;
+  password: string;
 }
