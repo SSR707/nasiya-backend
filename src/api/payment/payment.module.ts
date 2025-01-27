@@ -7,7 +7,11 @@ import { CustomJwtModule } from 'src/infrastructure';
 import { DebtModule } from '../debt/debt.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PaymentEntity]),DebtModule, CustomJwtModule],
+  imports: [
+    TypeOrmModule.forFeature([PaymentEntity]),
+    DebtModule,
+    CustomJwtModule,
+  ],
   controllers: [PaymentController],
   providers: [PaymentService],
 })

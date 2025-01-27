@@ -13,6 +13,6 @@ import { DebtImageEntity } from 'src/core/entity/debt-image.entity';
   ],
   controllers: [DebtController],
   providers: [DebtService],
-  exports:[DebtService]
+  exports: [DebtService],
 })
 export class DebtModule {}

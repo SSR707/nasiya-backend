@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { config } from '../config';
 import { AllExceptionsFilter } from '../infrastructure';
@@ -13,6 +14,7 @@ export default class Application {
     app.enableCors({
       origin: '*',
     });
+    app.use(helmet());
     app.use(cookieParser());
     app.useGlobalPipes(
       new ValidationPipe({

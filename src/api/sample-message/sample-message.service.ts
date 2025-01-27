@@ -15,8 +15,11 @@ export class SampleMessageService extends BaseService<
   ) {
     super(repository);
   }
-  async createSampleMsg(createSampleMessageDto: CreateSampleMessageDto) {
-    return await this.create(createSampleMessageDto);
+  async createSampleMsg(
+    id: string,
+    createSampleMessageDto: CreateSampleMessageDto,
+  ) {
+    return await this.create({ store_id: id, ...createSampleMessageDto });
   }
 
   async getAllSampleMsg() {
@@ -39,21 +42,17 @@ export class SampleMessageService extends BaseService<
     id: string,
     updateSampleMessageDto: UpdateSampleMessageDto,
   ) {
-    const getMsg = await this.getRepository.findOneBy({
+    const getMsg = await this.getRepository.findOne({
       where: { id },
     });
     if (!getMsg) {
       throw new HttpException('not found', HttpStatus.NOT_FOUND);
     }
-    const updateMsg = await this.getRepository.update(
-      id,
-      updateSampleMessageDto,
-    );
+    await this.getRepository.update(id, updateSampleMessageDto);
     return {
       status_code: {
-        code: HttpStatus.NOT_FOUND,
-        message: 'Message not found',
-        data: updateMsg.raw,
+        code: HttpStatus.OK,
+        message: 'Message updated',
       },
     };
   }

@@ -17,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard } from 'src/common';
+import { JwtGuard, UserID } from '../../common';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -38,8 +38,14 @@ export class SampleMessageController {
     },
   })
   @Post()
-  create(@Body() createSampleMessageDto: CreateSampleMessageDto) {
-    return this.sampleMessageService.create(createSampleMessageDto);
+  create(
+    @UserID() id: string,
+    @Body() createSampleMessageDto: CreateSampleMessageDto,
+  ) {
+    return this.sampleMessageService.createSampleMsg(
+      id,
+      createSampleMessageDto,
+    );
   }
 
   @ApiOperation({ summary: 'Get All Sample Message' })
@@ -127,7 +133,7 @@ export class SampleMessageController {
     description: '',
     schema: {
       example: {
-        status_code: HttpStatus.OK,
+        status_code: HttpStatus.NOT_FOUND,
         message: 'not found',
       },
     },
@@ -160,7 +166,7 @@ export class SampleMessageController {
     description: '',
     schema: {
       example: {
-        status_code: HttpStatus.OK,
+        status_code: HttpStatus.NOT_FOUND,
         message: 'not found',
       },
     },

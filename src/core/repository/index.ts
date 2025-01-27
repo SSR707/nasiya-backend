@@ -8,3 +8,4 @@ export * from './debtor.image.repository';
 export * from './debtor.number.repository';
 export * from './sample-message.repository';
 export * from './message.repository';
+export * from './debt.image.repository';
