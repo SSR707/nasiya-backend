@@ -76,74 +76,6 @@ export class StoreController {
     type: String,
     example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'One of store owner',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        message: 'success',
-        data: {
-          login: 'johndoe12_1',
-          image: './image.png',
-          wallet: 134000.99,
-          is_active: true,
-          created_at: '1723900952341',
-          updated_at: '1728794668799',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Store not found',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'not found',
-      },
-    },
-  })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.storeService.findOne(id);
-  }
-
-  @ApiOperation({
-    summary: 'Reset passcode store',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Store passcode resetted',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        messsage: 'Passcode updated',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Store not found',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'not found',
-      },
-    },
-  })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
-  @Get('reset-password')
-  resetPass(
-    @UserID('id') store_id: string,
-    @Body() resetPasswordStoreDto: ResetPasscodeStoreDto,
-  ) {
-    return this.storeService.resetPasscode(resetPasswordStoreDto, store_id);
-  }
-
   @ApiOperation({ summary: 'Fetch store profile' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -180,6 +112,39 @@ export class StoreController {
     return this.storeService.getProfile(id);
   }
 
+  @ApiOperation({
+    summary: 'Reset passcode store',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Store passcode resetted',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        messsage: 'Passcode updated',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Store not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get('reset-password')
+  resetPass(
+    @UserID('id') store_id: string,
+    @Body() resetPasswordStoreDto: ResetPasscodeStoreDto,
+  ) {
+    return this.storeService.resetPasscode(resetPasswordStoreDto, store_id);
+  }
+
   @ApiOperation({ summary: 'Add passcode to store profile' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -188,7 +153,7 @@ export class StoreController {
       example: {
         status_code: 200,
         message: 'OK',
-        data: PasscodeStoreDto,
+        data: 'Passcode added successfully',
       },
     },
   })

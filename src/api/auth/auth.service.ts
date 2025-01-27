@@ -1,4 +1,9 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
@@ -56,7 +61,7 @@ export class AuthService extends BaseService<
     };
   }
   async loginWithPasscode(id: string, passcodeDto: PasscodeStoreDto) {
-    const getStore = await this.getRepository.findOneBy({
+    const getStore = await this.getRepository.findOne({
       where: { id },
     });
     const checkPasscode = await BcryptEncryption.compare(
