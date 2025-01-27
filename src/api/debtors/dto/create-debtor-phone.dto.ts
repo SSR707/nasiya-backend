@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsUUID, Matches } from 'class-validator';
+import { IsPhoneNumber } from '../../../common/decorator';
 
 export class CreateDebtorPhoneDto {
   @ApiProperty({
@@ -19,5 +20,6 @@ export class CreateDebtorPhoneDto {
   @Matches(/^\+998\d{9}$/, {
     message: 'Phone number must be in format: +998XXXXXXXXX',
   })
+  @IsPhoneNumber()
   phone_number: string;
 }

@@ -40,11 +40,6 @@ export class DebtorService extends BaseService<
   }
 
   async create(createDebtorDto: CreateDebtorDto) {
-    // Validate phone number format
-    if (!this.isValidPhoneNumber(createDebtorDto.phone_number)) {
-      throw new BadRequestException('Invalid phone number format');
-    }
-
     // Check if phone number already exists
     const existingDebtor = await this.debtorRepository.findOne({
       where: { phone_number: createDebtorDto.phone_number },
@@ -128,10 +123,6 @@ export class DebtorService extends BaseService<
 
     // If phone number is being updated, check if it's unique
     if (updateDebtorDto.phone_number) {
-      if (!this.isValidPhoneNumber(updateDebtorDto.phone_number)) {
-        throw new BadRequestException('Invalid phone number format');
-      }
-
       const phoneExists = await this.debtorRepository.findOne({
         where: {
           phone_number: updateDebtorDto.phone_number,
@@ -203,10 +194,6 @@ export class DebtorService extends BaseService<
   }
 
   async findByPhoneNumber(phone_number: string) {
-    if (!this.isValidPhoneNumber(phone_number)) {
-      throw new BadRequestException('Invalid phone number format');
-    }
-
     try {
       const debtor = await this.findOneBy({
         where: { phone_number },
@@ -263,33 +250,33 @@ export class DebtorService extends BaseService<
     try {
       const debtor = await this.findOne(id);
 
-      
-      // Eski rasmni o'chirish
-      if (debtor.image && await this.fileService.existFile(debtor.image)) {
-        await this.fileService.deleteFile(debtor.image);
+      // Delete image if exists
+      if (
+        debtor.data.image &&
+        (await this.fileService.existFile(debtor.data.image))
+      ) {
+        await this.fileService.deleteFile(debtor.data.image);
       }
-
 
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();
 
-
       try {
-        // Yangi rasmni yuklash
+        // Upload new image
         const uploadedFile = await this.fileService.uploadFile(file, 'debtors');
 
-        // DebtorEntity jadvalida asosiy rasm yo'lini yangilash
+        // Update DebtorEntity with new image path
         await queryRunner.manager.update(DebtorEntity, id, {
           image: uploadedFile.path,
           updated_at: Date.now(),
         });
 
-        // DebtorImageEntity jadvaliga qo'shimcha rasm qo'shish
+        // Add new image to DebtorImageEntity
         const newImage = this.debtorImageRepository.create({
           debtor_id: id,
           image: uploadedFile.path,
-          debtor: debtor
+          debtor: debtor,
         });
 
         await queryRunner.manager.save(newImage);
@@ -297,22 +284,20 @@ export class DebtorService extends BaseService<
 
         return {
           status_code: 201,
-          message: 'Rasm muvaffaqiyatli yuklandi',
+          message: 'Image uploaded successfully',
           data: {
             image_url: uploadedFile.path,
-            debtor_image: newImage
-          }
+            debtor_image: newImage,
+          },
         };
-
       } catch (error) {
         await queryRunner.rollbackTransaction();
         throw error;
       } finally {
         await queryRunner.release();
       }
-
     } catch (error) {
-      throw new BadRequestException(`Rasmni yuklashda xatolik: ${error.message}`);
+      throw new BadRequestException(`Error uploading image: ${error.message}`);
     }
   }
 
@@ -322,45 +307,45 @@ export class DebtorService extends BaseService<
       const images = await this.debtorImageRepository.find({
         where: { debtor_id: id },
         order: {
-          created_at: { direction: 'DESC' }
-        }
+          created_at: { direction: 'DESC' },
+        },
       });
 
       return {
         status_code: 200,
-        message: 'Debtor rasmlar ro\'yxati olindi',
+        message: 'Debtor images retrieved successfully',
         data: images,
-        total: images.length
+        total: images.length,
       };
     } catch (error) {
-      throw new BadRequestException(`Rasmlarni olishda xatolik: ${error.message}`);
+      throw new BadRequestException(`Error fetching images: ${error.message}`);
     }
   }
 
   async removeDebtorImage(id: string) {
     try {
-      const image = await this.debtorImageRepository.findOne({ 
-        where: { id }
+      const image = await this.debtorImageRepository.findOne({
+        where: { id },
       });
 
       if (!image) {
-        throw new NotFoundException('Rasm topilmadi');
+        throw new NotFoundException('Image not found');
       }
 
-      // Faylni o'chirish
+      // Delete file if exists
       if (await this.fileService.existFile(image.image)) {
         await this.fileService.deleteFile(image.image);
       }
 
-      // Ma'lumotlar bazasidan o'chirish
+      // Remove image from database
       await this.debtorImageRepository.remove(image);
 
       return {
         status_code: 200,
-        message: 'Rasm muvaffaqiyatli o\'chirildi'
+        message: 'Image removed successfully',
       };
     } catch (error) {
-      throw new BadRequestException(`Rasmni o'chirishda xatolik: ${error.message}`);
+      throw new BadRequestException(`Error removing image: ${error.message}`);
     }
   }
 
@@ -383,11 +368,6 @@ export class DebtorService extends BaseService<
 
   async addDebtorPhone(createDebtorPhoneDto: CreateDebtorPhoneDto) {
     try {
-      // Validate phone number format
-      if (!this.isValidPhoneNumber(createDebtorPhoneDto.phone_number)) {
-        throw new BadRequestException('Invalid phone number format');
-      }
-
       // Check if phone number already exists
       const existingPhone = await this.debtorPhoneRepository.findOne({
         where: { phone_number: createDebtorPhoneDto.phone_number },
@@ -501,11 +481,5 @@ export class DebtorService extends BaseService<
         `Failed to delete debtor: ${error.message}`,
       );
     }
-  }
-
-  private isValidPhoneNumber(phone: string): boolean {
-    // Uzbekistan phone number format validation
-    const phoneRegex = /^\+998[0-9]{9}$/;
-    return phoneRegex.test(phone);
   }
 }
