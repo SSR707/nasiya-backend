@@ -32,7 +32,7 @@ export class AdminService extends BaseService<
     super(repository);
   }
   async createAdmin(createAdminDto: CreateAdminDto) {
-    const { username, hashed_password, phone_number } = createAdminDto;
+    const { username, password, phone_number } = createAdminDto;
     const exist_username = await this.getRepository.findOne({
       where: { username },
     });
@@ -47,11 +47,11 @@ export class AdminService extends BaseService<
         throw new ConflictException(`Phone number already exist`);
       }
     }
-    const password = await BcryptEncryption.encrypt(hashed_password);
+    const hashed_password = await BcryptEncryption.encrypt(password);
     try {
       const Admin = await this.getRepository.create({
         ...createAdminDto,
-        hashed_password: password,
+        hashed_password,
       });
       await this.getRepository.save(Admin);
     } catch (error) {
@@ -87,7 +87,7 @@ export class AdminService extends BaseService<
       data: {
         accessToken,
         access_token_expire:
-          this.configService.get<string>('REFRESH_TOKEN_KEY'),
+          this.configService.get<string>('ACCESS_TOKEN_TIME'),
         refreshToken,
         refresh_token_expire:
           this.configService.get<string>('REFRESH_TOKEN_TIME'),
@@ -143,17 +143,17 @@ export class AdminService extends BaseService<
     }
   }
   async editProfile(id: string, updateAdminDto: UpdateAdminDto) {
-    let { username, phone_number, hashed_password, role } = updateAdminDto;
+    let { username, phone_number, password, role } = updateAdminDto;
     const admin = await this.getRepository.findOne({
       where: { id },
     });
     if (!admin) {
       throw new NotFoundException(`Admin with id ${id} not found.`);
     }
-    if (hashed_password) {
-      hashed_password = await BcryptEncryption.encrypt(hashed_password);
+    if (password) {
+      password = await BcryptEncryption.encrypt(password);
     } else {
-      hashed_password = admin.hashed_password;
+      password = admin.hashed_password;
     }
     if (!username) {
       username = admin.username;
@@ -165,7 +165,7 @@ export class AdminService extends BaseService<
     try {
       await this.getRepository.update(id, {
         username,
-        hashed_password,
+        hashed_password: password,
         phone_number,
         updated_at: Date.now(),
       });
