@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsDate,
   IsEnum,
+  IsISO8601,
   IsNotEmpty,
   IsNumber,
   IsPositive,
@@ -26,8 +26,8 @@ export class CreateDebtDto {
     example: new Date(),
   })
   @IsNotEmpty()
-  @IsDate()
-  debt_date: Date;
+  @IsISO8601()
+  debt_date: string;
 
   @ApiProperty({
     type: String,

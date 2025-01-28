@@ -113,15 +113,8 @@ export class DebtorController {
   @Get(':id')
   @ApiOperation({ summary: 'Get debtor by id' })
   @ApiParam({ name: 'id', description: 'Debtor ID' })
-  @ApiQuery({
-    name: 'include',
-    required: false,
-    type: String,
-    description: 'Comma-separated relations to include (e.g., "images,phones")',
-  })
-  async findOne(@Param('id') id: string, @Query('include') include?: string) {
-    const relations = include?.split(',').filter(Boolean) || [];
-    return this.debtorService.findOne(id, relations);
+  async findOne(@Param('id') id: string) {
+    return this.debtorService.findOne(id , ['debts']);
   }
 
   @Get(':id/total-debt')

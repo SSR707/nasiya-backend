@@ -21,8 +21,16 @@ export class PaymentService extends BaseService<
   }
 
   async createPayments(createPaymentDto: CreatePaymentDto) {
-    await this.debtService.findOneById(createPaymentDto.debt_id);
-    return this.create(createPaymentDto);
+    const debt = await this.debtService.findOneById(createPaymentDto.debt_id);
+    const payment = await this.create(createPaymentDto);
+    await this.debtService.updateDebtById(debt.data.id, {
+      debt_sum: debt.data.debt_sum - createPaymentDto.sum,
+    });
+    return {
+      status_code: 201,
+      message: 'success',
+      data: payment,
+    };
   }
 
   async getTotalPaymentsByDebt(debtId: string) {
