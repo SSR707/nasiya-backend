@@ -8,6 +8,7 @@ import { DeepPartial, Not, DataSource } from 'typeorm';
 import {
   UpdateDebtorDto,
   CreateDebtorDto,
+  
   CreateDebtorImageDto,
   CreateDebtorPhoneDto,
 } from './dto';
@@ -21,6 +22,7 @@ import {
 } from '../../core';
 import { FileService, BaseService, IFindOptions } from '../../infrastructure';
 import { log } from 'console';
+import { FilterDebtorsDto } from './dto/filter-debtors.dto';
 
 @Injectable()
 export class DebtorService extends BaseService<
@@ -142,11 +144,17 @@ export class DebtorService extends BaseService<
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-
+     
     try {
-      const updatedDebtor = await queryRunner.manager.update(DebtorEntity, id, {
+      // Update the debtor
+      await this.debtorRepository.update(id, {
         ...updateDebtorDto,
         updated_at: Date.now(),
+      });
+
+      // Fetch the updated debtor
+      const updatedDebtor = await this.debtorRepository.findOne({
+        where: { id },
       });
 
       await queryRunner.commitTransaction();
@@ -507,4 +515,64 @@ export class DebtorService extends BaseService<
       );
     }
   }
+  async filterDebtors(storeId: string, filterDto: FilterDebtorsDto){
+    const {
+      searchTerm,
+      isActive,
+      hasOverdueDebt,
+      minDebtAmount,
+      maxDebtAmount,
+      sortBy,
+      sortOrder
+    } = filterDto;
+
+    const query = this.debtorRepository
+      .createQueryBuilder('debtor')
+      .leftJoinAndSelect('debtor.debts', 'debt')
+      .leftJoinAndSelect('debt.payments', 'payment')
+      .where('debtor.store_id = :storeId', {storeId});
+    
+    if(searchTerm){
+      query.andWhere(
+        '(debtor.full_name ILIKE :searchTerm OR debtor.phone_number ILIKE :searchTerm)',
+        { searchTerm: `%${searchTerm}%` },
+      );
+    }
+
+    if (isActive !== undefined) {
+      query.andWhere('debtor.is_active = :isActive', { isActive });
+    }
+
+    if (hasOverdueDebt) {
+      const currentDate = new Date();
+      query.andWhere('debt.debt_date < :currentDate', { currentDate });
+    }
+
+    if (minDebtAmount !== undefined) {
+      query.andWhere('debt.debt_sum >= :minDebtAmount', { minDebtAmount });
+    }
+    if (maxDebtAmount !== undefined) {
+      query.andWhere('debt.debt_sum <= :maxDebtAmount', { maxDebtAmount });
+    }
+    if (sortBy) {
+      const order = sortOrder === 'DESC' ? 'DESC' : 'ASC';
+      switch (sortBy) {
+        case 'name':
+          query.orderBy('debtor.full_name', order);
+          break;
+        case 'debtAmount':
+          query.orderBy('debt.debt_sum', order);
+          break;
+        case 'debtDate':
+          query.orderBy('debt.debt_date', order);
+          break;
+        default:
+          query.orderBy('debtor.created_at', 'DESC');
+      }
+    }
+
+    return query.getMany();
+
+  }
 }
+
