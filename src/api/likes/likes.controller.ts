@@ -1,11 +1,7 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
   HttpStatus,
   UseGuards,
@@ -19,8 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
-import { UpdateLikeDto, CreateLikeDto } from './dto';
-import { JwtGuard } from 'src/common';
+import { JwtGuard, UserID } from 'src/common';
 
 @ApiTags('Like Api')
 @UseGuards(JwtGuard)
@@ -30,52 +25,39 @@ export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @ApiOperation({
-    summary: 'Create Likes ',
-  })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Like Created',
-    schema: {
-      example: {
-        status_code: HttpStatus.CREATED,
-        message: 'success',
-        data: {},
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed creating Like',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'Store with id  b2d4aa27-0768-4456-947f-f8930c2 not found.',
-        data: {},
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed creating Like',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'Debtor with id  b2d4aa27-0768-4456-947f-f8930c2 not found.',
-        data: {},
-      },
-    },
-  })
-  @Post('createLike')
-  create(@Body() createLikeDto: CreateLikeDto) {
-    return this.likesService.createLikes(createLikeDto);
-  }
-
-  @ApiOperation({
-    summary: 'Get all Likes',
+    summary: ' Hand Like And Unlike  ',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'All Likes fetched successfully',
+    description: 'Hand Like And Unlike',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: 'LIKE or UNLIKE',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the DEBTOR',
+    type: String,
+    example: 'b2d4aa27-0768-4456-947f-f8930c294394',
+  })
+  @Get('toggleLike/:id')
+  handleLikeOrUnlike(
+    @UserID() id: string,
+    @Param('id', ParseUUIDPipe) debtorId: string,
+  ) {
+    return this.likesService.handleLikeOrUnlike(id, debtorId);
+  }
+
+  @ApiOperation({
+    summary: 'Get Store all Likes',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Store All Likes fetched successfully',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -84,12 +66,15 @@ export class LikesController {
           id: 'sdf393820-0768-4456-947f-f8930c294394',
           store: [
             {
-              id: 'b2d4aa27-0768-4456-947f-f8930c294394',
-              created_at: '1730288822952',
-              updated_at: '1730288797974',
-              username: 'Ali',
-              phone_number: '+998901234567',
-              email: null,
+              id: '985c9b13-4a80-4b8f-b948-06efc8a78005',
+              created_at: '1737879542488',
+              updated_at: '1737879247573',
+              fullname: 'Ali Hakimov',
+              login: 'ALI001',
+              wallet: '0.00',
+              image: '.jpg',
+              email: 'ali@gmail.com',
+              phone_number: '+998991231212',
             },
           ],
           debtor: [
@@ -121,9 +106,9 @@ export class LikesController {
       },
     },
   })
-  @Get('all')
-  findAll() {
-    return this.likesService.findAllLikes();
+  @Get('StoreAllLike')
+  findStoreAllLike(@UserID() id: string) {
+    return this.likesService.findAllLikes(id);
   }
 
   @ApiOperation({
@@ -146,12 +131,15 @@ export class LikesController {
           id: 'sdf393820-0768-4456-947f-f8930c294394',
           store: [
             {
-              id: 'b2d4aa27-0768-4456-947f-f8930c294394',
-              created_at: '1730288822952',
-              updated_at: '1730288797974',
-              username: 'Ali',
-              phone_number: '+998901234567',
-              email: null,
+              id: '985c9b13-4a80-4b8f-b948-06efc8a78005',
+              created_at: '1737879542488',
+              updated_at: '1737879247573',
+              fullname: 'Ali Hakimov',
+              login: 'ALI001',
+              wallet: '0.00',
+              image: '.jpg',
+              email: 'ali@gmail.com',
+              phone_number: '+998991231212',
             },
           ],
           debtor: [
@@ -196,88 +184,5 @@ export class LikesController {
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.likesService.findOneLikes(id);
-  }
-
-  @ApiOperation({
-    summary: 'Edit profile of Like',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the Like',
-    type: String,
-    example: 'b2d4aa27-0768-4456-947f-f8930c294394',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Profile of like edited',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        message: 'success',
-        data: {},
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Failed edit profile of Like',
-    schema: {
-      example: {
-        status_code: HttpStatus.BAD_REQUEST,
-        message: 'Error on update profile of Like',
-      },
-    },
-  })
-  @Patch(':id')
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateLikeDto: UpdateLikeDto,
-  ) {
-    return this.likesService.updateLikes(id, updateLikeDto);
-  }
-
-  @ApiOperation({
-    summary: 'Delete Like by ID',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'ID of Like',
-    type: String,
-    example: 'b2d4aa27-0768-4456-947f-f8930c294394',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Like by ID deleted successfully',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        message: 'success',
-        data: {},
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed creating Like',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'Like with id  b2d4aa27-0768-4456-947f-f8930c2 not found',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Failed delete LIke by ID',
-    schema: {
-      example: {
-        status_code: HttpStatus.BAD_REQUEST,
-        message: 'Error on deleting Like by ID',
-      },
-    },
-  })
-  @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.likesService.removeLIkes(id);
   }
 }

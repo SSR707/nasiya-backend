@@ -71,6 +71,45 @@ export class PaymentController {
   }
 
   @ApiOperation({
+    summary: 'Get total payments made by a specific debt',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Total payments fetched successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'Total payments fetched successfully',
+        data: [
+          {
+            total: '1690523',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debt not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'Debt not found',
+      },
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debt',
+    example: 'd3e1aa34-7659-4897-872f-cf8c9e2f01b2',
+  })
+  @Get('TotalPaymentById/:id')
+  @ApiBearerAuth()
+  async getTotalPaymentsByDebt(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.paymentService.getTotalPaymentsByDebt(id);
+  }
+
+  @ApiOperation({
     summary: 'Get all payments',
   })
   @ApiResponse({
