@@ -8,6 +8,8 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,6 +21,7 @@ import {
 import { StoreService } from './store.service';
 import { PasscodeStoreDto, ResetPasscodeStoreDto, UpdateStoreDto } from './dto';
 import { JwtGuard, UserID } from '../../common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -67,15 +70,6 @@ export class StoreController {
     return this.storeService.findAllData();
   }
 
-  @ApiOperation({
-    summary: 'Get store by ID',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the store',
-    type: String,
-    example: '1412ahrqw-e351ad34-12g41934s-asr',
-  })
   @ApiOperation({ summary: 'Fetch store profile' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -217,6 +211,15 @@ export class StoreController {
     return this.storeService.updateProfile(id, updateStoreDto);
   }
 
+  @ApiOperation({ summary: 'Upload store profile image' })
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('profile-image')
+  uploadImage(
+    @UserID() id: string,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    return this.storeService.uploadProfileImage(id, image);
+  }
   @ApiOperation({ summary: 'Delete Store' })
   @ApiParam({
     name: 'id',

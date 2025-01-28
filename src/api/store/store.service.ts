@@ -7,7 +7,11 @@ import {
   PasscodeStoreDto,
   CreateStoreDto,
 } from './dto';
-import { BcryptEncryption, BaseService } from '../../infrastructure';
+import {
+  BcryptEncryption,
+  BaseService,
+  FileService,
+} from '../../infrastructure';
 import { StoreRepository, StoreEntity } from '../../core';
 
 @Injectable()
@@ -15,7 +19,10 @@ export class StoreService extends BaseService<
   CreateStoreDto,
   DeepPartial<StoreEntity>
 > {
-  constructor(@InjectRepository(StoreEntity) repository: StoreRepository) {
+  constructor(
+    @InjectRepository(StoreEntity) repository: StoreRepository,
+    private readonly fileService: FileService,
+  ) {
     super(repository);
   }
   async storeCreate(createStoreDto: CreateStoreDto) {
@@ -76,13 +83,27 @@ export class StoreService extends BaseService<
       email: updateStoreDto.email,
       fullname: updateStoreDto.fullname,
       phone_number: updateStoreDto.phone_number,
-      image: updateStoreDto.image,
     };
     await this.getRepository.update(id, {
       ...dto,
     });
     const updatedEntity = await this.getProfile(id);
     return updatedEntity;
+  }
+  async uploadProfileImage(id: string, image: Express.Multer.File) {
+    const storeData = await this.getRepository.findOne({
+      where: { id },
+    });
+    if (!storeData) {
+      throw new HttpException('Store not found!', 404);
+    }
+    if (storeData.image) {
+      await this.fileService.deleteFile(storeData.image);
+    }
+    const fileUrl = await this.fileService.uploadFile(image, 'profileImage');
+    await this.getRepository.update(id, { image: fileUrl.path });
+    const updatedStoreData = await this.getProfile(id);
+    return updatedStoreData;
   }
   async addPasscode(store_id: string, addPasscode: PasscodeStoreDto) {
     const hash = await BcryptEncryption.encrypt(addPasscode.passcode);
