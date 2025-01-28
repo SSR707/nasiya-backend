@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, Repository } from 'typeorm';
-import { UpdateLikeDto, CreateLikeDto } from './dto';
+import { CreateLikeDto } from './dto';
 import { BaseService } from '../../infrastructure';
 import {
   StoreEntity,
@@ -41,28 +41,58 @@ export class LikesService extends BaseService<
     }
     const like = await this.getRepository.create({ store, debtor });
     await this.getRepository.save(like);
-    return { status_code: HttpStatus.CREATED, message: 'success', data: like };
   }
 
-  findAllLikes() {
-    return this.getRepository.find({ relations: ['debtor', 'store'] });
+  async handleLikeOrUnlike(storeId: string, debtorId: string) {
+    const IsChek = await this.getRepository.findOne({
+      where: { debtor_id: debtorId },
+    });
+    if (IsChek) {
+      await this.delete(IsChek.id);
+      return { status_code: HttpStatus.OK, message: 'success', data: 'UNLIKE' };
+    } else {
+      await this.createLikes({ store_id: storeId, debtor_id: debtorId });
+      return { status_code: HttpStatus.OK, message: 'success', data: 'LIKE' };
+    }
+  }
+
+  async findAllLikes(id: string) {
+    const likes = await this.getRepository.find({
+      where: { store_id: id },
+      relations: ['debtor', 'store'],
+      select: {
+        store: {
+          id: true,
+          created_at: true,
+          updated_at: true,
+          fullname: true,
+          login: true,
+          wallet: true,
+          image: true,
+          email: true,
+          phone_number: true,
+        },
+      },
+    });
+    return { status_code: HttpStatus.OK, message: 'success', data: likes };
   }
 
   async findOneLikes(id: string) {
     return this.findOneById(id, {
       relations: ['debtor', 'store'],
+      select: {
+        store: {
+          id: true,
+          created_at: true,
+          updated_at: true,
+          fullname: true,
+          login: true,
+          wallet: true,
+          image: true,
+          email: true,
+          phone_number: true,
+        },
+      },
     });
-  }
-
-  updateLikes(id: string, updateLikeDto: UpdateLikeDto) {
-    return `This action updates a #${id} like`;
-  }
-
-  async removeLIkes(id: string) {
-    const like = await this.getRepository.findOne({ where: { id } });
-    if (!like) {
-      throw new NotFoundException(`Like with id ${id} not found.`);
-    }
-    return this.delete(id);
   }
 }

@@ -25,6 +25,19 @@ export class PaymentService extends BaseService<
     return this.create(createPaymentDto);
   }
 
+  async getTotalPaymentsByDebt(debtId: string) {
+    await this.debtService.findOneById(debtId);
+    const TotalPayment = await this.getRepository.query(
+      `SELECT SUM(sum) as total FROM payment WHERE debt_id = $1`,
+      [debtId],
+    );
+    return {
+      status_code: 200,
+      message: 'success',
+      data: TotalPayment,
+    };
+  }
+
   async findPaymentsByType(type: PaymentType) {
     const data = await this.paymentRepository.find({
       where: { type },
