@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsBoolean, IsNumber, IsString, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  IsString,
+  IsEnum,
+} from 'class-validator';
 
 export enum DebtorSortBy {
   NAME = 'name',

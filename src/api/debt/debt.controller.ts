@@ -13,20 +13,20 @@ import {
   DefaultValuePipe,
   ParseIntPipe,
   UseInterceptors,
-  BadRequestException,
   UploadedFile,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiHeader,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { extname } from 'path';
-import { diskStorage } from 'multer';
 import { DebtService } from './debt.service';
 import { UpdateDebtDto, CreateDebtDto } from './dto';
 import { JwtGuard } from '../../common';
@@ -110,6 +110,13 @@ export class DebtController {
     return this.debtService.findAllDebts();
   }
 
+  @ApiOperation({ summary: 'Get all debts with pagination' })
+  @ApiQuery({
+    name: 'include',
+    required: false,
+    type: String,
+    description: 'Comma-separated relations to include (e.g., "images,phones")',
+  })
   @Get('find-pagination')
   findAllWithPaginations(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
@@ -235,31 +242,27 @@ export class DebtController {
     return this.debtService.deleteDebtById(id);
   }
 
-  // image
-
-  @Post('image/:id')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/debts',
-        filename: (req, file, callback) => {
-          const ext = extname(file.originalname);
-          callback(null, `${file.originalname}`);
+  // Image of Debts
+  @ApiOperation({
+    summary: 'Upload debt image',
+    description: 'Upload an image file for a specific debt',
+  })
+  @ApiParam({ name: 'id', description: 'Debt ID' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file to upload',
         },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|heic)$/)) {
-          return callback(
-            new BadRequestException(
-              'Only image files are allowed! Like: .jpg .jpeg .png .gif .heic',
-            ),
-            false,
-          );
-        }
-        callback(null, true);
       },
-    }),
-  )
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('image/:id')
   createDebtImage(
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File,
@@ -267,8 +270,23 @@ export class DebtController {
     return this.debtService.createDebtImage(id, file);
   }
 
+  @ApiOperation({
+    summary: 'Get debt images',
+    description: 'Get all images for a specific debt',
+  })
+  @ApiParam({ name: 'id', description: 'Debt ID' })
   @Get('images/:id')
   findImagesById(@Param('id', ParseUUIDPipe) id: string) {
     return this.debtService.findDebtImages(id);
+  }
+
+  @ApiOperation({
+    summary: 'Remove debtor image',
+    description: 'Remove an image from a debtor',
+  })
+  @ApiParam({ name: 'id', description: 'Image ID' })
+  @Delete('image/:id')
+  deleteImageById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.debtService.deleteDebtImage(id);
   }
 }
