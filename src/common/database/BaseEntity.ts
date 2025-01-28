@@ -18,5 +18,4 @@ export class BaseEntity {
     default: Date.now(),
   })
   updated_at: number;
-
 }

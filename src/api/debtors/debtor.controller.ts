@@ -24,7 +24,6 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { DebtorService } from './debtor.service';
 import { JwtGuard, UserID } from '../../common';
 import { DebtorEntity } from '../../core';
@@ -65,7 +64,7 @@ export class DebtorController {
     description: 'Unauthorized - JWT token is missing or invalid',
   })
   create(@UserID() id: string, @Body() createDebtorDto: CreateDebtorDto) {
-    return this.debtorService.create({store_id: id, ...createDebtorDto });
+    return this.debtorService.create({ store_id: id, ...createDebtorDto });
   }
 
   @Get()

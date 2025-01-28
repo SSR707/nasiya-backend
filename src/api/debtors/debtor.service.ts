@@ -21,7 +21,6 @@ import {
   DebtorPhoneNumberRepository,
 } from '../../core';
 import { FileService, BaseService, IFindOptions } from '../../infrastructure';
-import { log } from 'console';
 import { FilterDebtorsDto } from './dto/filter-debtors.dto';
 
 @Injectable()
@@ -72,8 +71,6 @@ export class DebtorService extends BaseService<
         data: savedDebtor,
       };
     } catch (error) {
-
-      
       await queryRunner.rollbackTransaction();
       throw new BadRequestException(
         `Failed to create debtor: ${error.message}`,
@@ -267,7 +264,7 @@ export class DebtorService extends BaseService<
       const debtor = await this.findOne(id);
 
       // Delete old image if exists
-      if (debtor.image && await this.fileService.existFile(debtor.image)) {
+      if (debtor.image && (await this.fileService.existFile(debtor.image))) {
         await this.fileService.deleteFile(debtor.image);
       }
 
@@ -279,8 +276,9 @@ export class DebtorService extends BaseService<
         // Check if file is an image
         const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
         if (!allowedMimeTypes.includes(file.mimetype)) {
-          
-          throw new BadRequestException('Only JPG, PNG and GIF files are allowed');
+          throw new BadRequestException(
+            'Only JPG, PNG and GIF files are allowed',
+          );
         }
 
         // Upload new image
@@ -319,7 +317,9 @@ export class DebtorService extends BaseService<
         if (error instanceof BadRequestException) {
           throw error;
         }
-        throw new BadRequestException(`Failed to process image: ${error.message}`);
+        throw new BadRequestException(
+          `Failed to process image: ${error.message}`,
+        );
       } finally {
         await queryRunner.release();
       }
