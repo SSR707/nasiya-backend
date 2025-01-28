@@ -33,9 +33,11 @@ export class FileService {
       // Generate unique filename
       const fileExt = path.extname(file.originalname).toLowerCase();
       const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-      
+
       if (!allowedExtensions.includes(fileExt)) {
-        throw new BadRequestException('Only image files (jpg, jpeg, png, gif) are allowed');
+        throw new BadRequestException(
+          'Only image files (jpg, jpeg, png, gif) are allowed',
+        );
       }
 
       const fileName = `${uuidv4()}${fileExt}`;
