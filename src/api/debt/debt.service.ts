@@ -5,8 +5,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial } from 'typeorm';
-import { BaseService } from '../../infrastructure';
+import { DataSource, DeepPartial } from 'typeorm';
+import { BaseService, FileService } from '../../infrastructure';
 import {
   DebtEntity,
   DebtImageEntity,
@@ -29,10 +29,13 @@ export class DebtService extends BaseService<
     private readonly debtorRepository: DebtorRepository,
     @InjectRepository(DebtImageEntity)
     private readonly debtImageRepository: DebtImageRepostiory,
+    private readonly fileService: FileService,
+    private readonly dataSource: DataSource,
   ) {
     super(debtRepository);
   }
 
+  // Debts
   async createDebt(createDebtDto: CreateDebtDto) {
     // find debtor by id
     const debtorData = await this.debtorRepository.findOne({
@@ -147,47 +150,101 @@ export class DebtService extends BaseService<
     };
   }
 
+  // Image of Debts
   async createDebtImage(id: string, file: Express.Multer.File) {
-    // find debt
+    // Find debt
     const debtData = await this.debtRepository.findOne({
       where: { id },
     });
-    if (!debtData) {
-      throw new NotFoundException('Debt not found!');
+    if (!debtData || !file) {
+      throw new NotFoundException('Debt ID and file are required!');
     }
 
-    // create image
-    const debtImage = this.debtImageRepository.create({
-      debt_id: id,
-      image: file.originalname,
-    });
-    await this.debtImageRepository.save(debtImage);
+    // Start transaction
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    return {
-      status_code: HttpStatus.CREATED,
-      message: 'Debt image successfully created.',
-      data: debtImage,
-    };
+    try {
+      // Check if file is an image
+      const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/gif'];
+      if (!allowedMimeTypes.includes(file.mimetype)) {
+        throw new BadRequestException(
+          'Only JPG, PNG and GIF files are allowed',
+        );
+      }
+
+      // Upload new image
+      const uploadFile = await this.fileService.uploadFile(file, 'debts');
+
+      if (!uploadFile || !uploadFile.path) {
+        throw new BadRequestException('Failed to upload image');
+      }
+
+      const newImage = queryRunner.manager.create(DebtImageEntity, {
+        image: uploadFile.path,
+        debt_id: id,
+      });
+
+      await queryRunner.manager.save(DebtImageEntity, newImage);
+      await queryRunner.commitTransaction();
+
+      return {
+        status_code: HttpStatus.CREATED,
+        message: 'Debt image successfully created.',
+        data: newImage,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      throw new BadRequestException(
+        `Failed to process image: ${error.message}`,
+      );
+    } finally {
+      // End transaction
+      await queryRunner.release();
+    }
   }
 
   async findDebtImages(id: string) {
-    // find debt
-    const debtData = await this.debtRepository.findOne({
-      where: { id },
-    });
-    if (!debtData) {
-      throw new NotFoundException('Debt not found!');
-    }
-
-    // find images of this debt
     const debtImages = await this.debtImageRepository.find({
       where: { debt_id: id },
+      order: {
+        created_at: { direction: 'DESC' },
+      },
     });
 
     return {
       status_code: HttpStatus.OK,
-      message: 'Debt images fetched successfully.',
+      message: 'Debt images retrieved successfully.',
       data: debtImages,
     };
+  }
+
+  async deleteDebtImage(id: string) {
+    try {
+      const imageData = await this.debtImageRepository.findOne({
+        where: { id },
+      });
+
+      if (!imageData) {
+        throw new NotFoundException('Image not found!');
+      }
+
+      // Delete file if exists
+      if (await this.fileService.existFile(imageData.image)) {
+        await this.fileService.deleteFile(imageData.image);
+      }
+
+      // Remove Image from database
+      await this.debtImageRepository.remove(imageData);
+
+      return {
+        status_code: HttpStatus.OK,
+        message: 'Image deleted successfully.',
+      };
+    } catch (error) {
+      throw new BadRequestException(`Error deleting image: ${error.message}`);
+    }
   }
 }
