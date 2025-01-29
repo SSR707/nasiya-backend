@@ -17,9 +17,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtGuard, UserID } from '../../common';
+import { UserID } from '../../common';
 
-@UseGuards(JwtGuard)
 @ApiBearerAuth()
 @ApiTags('Sample Message API')
 @Controller('sample-message')

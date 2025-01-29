@@ -25,7 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DebtorService } from './debtor.service';
-import { JwtGuard, UserID } from '../../common';
+import { UserID } from '../../common';
 import { DebtorEntity } from '../../core';
 import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
 
@@ -35,7 +35,6 @@ import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
   name: 'Authorization',
   description: 'Bearer token for authentication',
 })
-@UseGuards(JwtGuard)
 @Controller('debtors')
 export class DebtorController {
   constructor(private readonly debtorService: DebtorService) {}

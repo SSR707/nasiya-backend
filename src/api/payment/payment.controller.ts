@@ -24,9 +24,8 @@ import {
 } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto';
-import { JwtGuard, PaymentType, UserID } from '../../common';
+import { PaymentType, UserID } from '../../common';
 
-@UseGuards(JwtGuard)
 @ApiTags('Payments API')
 @Controller('payments')
 export class PaymentController {

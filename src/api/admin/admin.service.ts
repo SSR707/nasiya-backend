@@ -18,6 +18,7 @@ import {
 } from '../../infrastructure';
 import { AdminEntity, AdminRepository } from '../../core';
 import { StoreService } from '../store/store.service';
+import { PayStoreDto } from './dto/payStore-admin.dto';
 @Injectable()
 export class AdminService extends BaseService<
   CreateAdminDto,
@@ -62,6 +63,15 @@ export class AdminService extends BaseService<
 
   async createStore(createStoreDto: CreateStoreDto) {
     return this.storeService.storeCreate(createStoreDto);
+  }
+
+  async payToSotore(payStoreDto: PayStoreDto) {
+    const store = await this.storeService.findOneById(payStoreDto.store_id);
+    const sum = +store.data.wallet + payStoreDto.sum;
+    await this.storeService.getRepository.update(store.data.id, {
+      wallet: sum,
+    });
+    return { status_code: HttpStatus.OK, message: 'success' };
   }
 
   async signin(signinDto: SigninAdminDto, res: Response) {
