@@ -11,6 +11,9 @@ export type ConfigType = {
   ACCESS_TOKEN_TIME: string;
   REFRESH_TOKEN_KEY: string;
   REFRESH_TOKEN_TIME: string;
+  NASIYA_CLIENT_USERNAME: string;
+  NASIYA_SMS_SEND_URL: string;
+  SMS_CLIENT_SECRET: string;
   // FILE_PATH: string;
 };
 
@@ -23,6 +26,9 @@ const requiredVariables = [
   'ACCESS_TOKEN_TIME',
   'REFRESH_TOKEN_KEY',
   'REFRESH_TOKEN_TIME',
+  'NASIYA_CLIENT_USERNAME',
+  'NASIYA_SMS_SEND_URL',
+  'SMS_CLIENT_SECRET',
   // 'FILE_PATH',
 ];
 
@@ -49,5 +55,8 @@ export const config: ConfigType = {
   ACCESS_TOKEN_TIME: process.env.ACCESS_TOKEN_TIME as string,
   REFRESH_TOKEN_KEY: process.env.REFRESH_TOKEN_KEY as string,
   REFRESH_TOKEN_TIME: process.env.REFRESH_TOKEN_TIME,
+  NASIYA_CLIENT_USERNAME: process.env.NASIYA_CLIENT_USERNAME,
+  NASIYA_SMS_SEND_URL: process.env.NASIYA_SMS_SEND_URL,
+  SMS_CLIENT_SECRET: process.env.SMS_CLIENT_SECRET,
   // FILE_PATH: process.env.FILE_PATH,
 };
