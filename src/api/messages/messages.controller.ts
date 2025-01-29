@@ -17,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import {  MessageStatus, UserID } from 'src/common';
+import { MessageStatus, UserID } from 'src/common';
 @ApiBearerAuth()
 @ApiTags('Message API')
 @Controller('messages')

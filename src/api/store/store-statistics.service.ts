@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
-import { StoreEntity, DebtEntity, PaymentEntity, DebtorEntity } from '../../core/entity';
+import {
+  StoreEntity,
+  DebtEntity,
+  PaymentEntity,
+  DebtorEntity,
+} from '../../core/entity';
 
 @Injectable()
 export class StoreStatisticsService {
@@ -19,7 +24,7 @@ export class StoreStatisticsService {
   async getDailyStoreStatistics(storeId: string, date: Date) {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
@@ -46,8 +51,14 @@ export class StoreStatisticsService {
       })
       .getMany();
 
-    const totalDailyDebt = dailyDebts.reduce((sum, debt) => sum + Number(debt.debt_sum), 0);
-    const totalDailyPayments = dailyPayments.reduce((sum, payment) => sum + Number(payment.sum), 0);
+    const totalDailyDebt = dailyDebts.reduce(
+      (sum, debt) => sum + Number(debt.debt_sum),
+      0,
+    );
+    const totalDailyPayments = dailyPayments.reduce(
+      (sum, payment) => sum + Number(payment.sum),
+      0,
+    );
 
     return {
       date,
@@ -59,7 +70,11 @@ export class StoreStatisticsService {
     };
   }
 
-  async getMonthlyStoreStatistics(storeId: string, year: number, month: number) {
+  async getMonthlyStoreStatistics(
+    storeId: string,
+    year: number,
+    month: number,
+  ) {
     const startOfMonth = new Date(year, month - 1, 1);
     const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
 
@@ -88,7 +103,7 @@ export class StoreStatisticsService {
 
     // Get daily breakdown
     const dailyStats = {};
-    monthlyDebts.forEach(debt => {
+    monthlyDebts.forEach((debt) => {
       const day = debt.debt_date.getDate();
       if (!dailyStats[day]) {
         dailyStats[day] = {
@@ -99,7 +114,7 @@ export class StoreStatisticsService {
       dailyStats[day].debts += Number(debt.debt_sum);
     });
 
-    monthlyPayments.forEach(payment => {
+    monthlyPayments.forEach((payment) => {
       const day = payment.date.getDate();
       if (!dailyStats[day]) {
         dailyStats[day] = {
@@ -110,8 +125,14 @@ export class StoreStatisticsService {
       dailyStats[day].payments += Number(payment.sum);
     });
 
-    const totalMonthlyDebt = monthlyDebts.reduce((sum, debt) => sum + Number(debt.debt_sum), 0);
-    const totalMonthlyPayments = monthlyPayments.reduce((sum, payment) => sum + Number(payment.sum), 0);
+    const totalMonthlyDebt = monthlyDebts.reduce(
+      (sum, debt) => sum + Number(debt.debt_sum),
+      0,
+    );
+    const totalMonthlyPayments = monthlyPayments.reduce(
+      (sum, payment) => sum + Number(payment.sum),
+      0,
+    );
 
     return {
       year,
@@ -140,14 +161,29 @@ export class StoreStatisticsService {
     let totalDebt = 0;
     let totalPaid = 0;
 
-    const debtorStats = debtors.map(debtor => {
-      const debtorTotalDebt = debtor.debts.reduce((sum, debt) => sum + Number(debt.debt_sum), 0);
-      const debtorTotalPaid = debtor.debts.reduce((sum, debt) => 
-        sum + debt.payments.reduce((pSum, payment) => pSum + Number(payment.sum), 0), 0);
-      
-      const hasOverdueDebt = debtor.debts.some(debt => 
-        debt.debt_date < today && 
-        debt.debt_sum > debt.payments.reduce((sum, payment) => sum + Number(payment.sum), 0)
+    const debtorStats = debtors.map((debtor) => {
+      const debtorTotalDebt = debtor.debts.reduce(
+        (sum, debt) => sum + Number(debt.debt_sum),
+        0,
+      );
+      const debtorTotalPaid = debtor.debts.reduce(
+        (sum, debt) =>
+          sum +
+          debt.payments.reduce(
+            (pSum, payment) => pSum + Number(payment.sum),
+            0,
+          ),
+        0,
+      );
+
+      const hasOverdueDebt = debtor.debts.some(
+        (debt) =>
+          debt.debt_date < today &&
+          debt.debt_sum >
+            debt.payments.reduce(
+              (sum, payment) => sum + Number(payment.sum),
+              0,
+            ),
       );
 
       const isActive = debtorTotalDebt > debtorTotalPaid;
@@ -182,7 +218,7 @@ export class StoreStatisticsService {
 
   async updateStoreStatistics(storeId: string) {
     const stats = await this.getDebtorStatistics(storeId);
-    
+
     await this.storeRepository.update(storeId, {
       wallet: stats.total_debt_amount,
     });

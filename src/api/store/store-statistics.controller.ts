@@ -54,7 +54,8 @@ export class StoreStatisticsController {
   async getMonthlyStatistics(
     @Param('storeId') storeId: string,
     @Query('year', new ParseIntPipe({ errorHttpStatusCode: 400 })) year: number,
-    @Query('month', new ParseIntPipe({ errorHttpStatusCode: 400 })) month: number,
+    @Query('month', new ParseIntPipe({ errorHttpStatusCode: 400 }))
+    month: number,
   ) {
     if (month < 1 || month > 12) {
       throw new BadRequestException('Month must be between 1 and 12');
