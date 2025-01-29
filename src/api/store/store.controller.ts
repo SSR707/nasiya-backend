@@ -18,10 +18,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { StoreService } from './store.service';
-import { PasscodeStoreDto, ResetPasscodeStoreDto, UpdateStoreDto } from './dto';
-import { JwtGuard, UserID } from '../../common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { StoreService } from './store.service';
+import { UpdateStoreDto } from './dto';
+import { JwtGuard, UserID } from '../../common';
 
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -104,71 +104,6 @@ export class StoreController {
   @Get('profile')
   getProfile(@UserID() id: string) {
     return this.storeService.getProfile(id);
-  }
-
-  @ApiOperation({
-    summary: 'Reset passcode store',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Store passcode resetted',
-    schema: {
-      example: {
-        status_code: HttpStatus.OK,
-        messsage: 'Passcode updated',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Store not found',
-    schema: {
-      example: {
-        status_code: HttpStatus.NOT_FOUND,
-        message: 'not found',
-      },
-    },
-  })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
-  @Get('reset-password')
-  resetPass(
-    @UserID('id') store_id: string,
-    @Body() resetPasswordStoreDto: ResetPasscodeStoreDto,
-  ) {
-    return this.storeService.resetPasscode(resetPasswordStoreDto, store_id);
-  }
-
-  @ApiOperation({ summary: 'Add passcode to store profile' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Store passcode added',
-    schema: {
-      example: {
-        status_code: 200,
-        message: 'OK',
-        data: 'Passcode added successfully',
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Store not found',
-    schema: {
-      example: {
-        status_code: 404,
-        message: 'not found',
-      },
-    },
-  })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
-  @Post('create-passcode')
-  createPasscode(
-    @UserID('id') id: string,
-    @Body() addPasscode: PasscodeStoreDto,
-  ) {
-    return this.storeService.addPasscode(id, addPasscode);
   }
 
   @ApiOperation({ summary: 'Update store profile' })

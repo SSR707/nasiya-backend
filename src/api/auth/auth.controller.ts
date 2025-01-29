@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Res,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -16,12 +17,16 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SigninStoreDto } from './dto';
 import { JwtGuard, CookieGetter, UserID } from '../../common';
-import { PasscodeStoreDto } from '../store/dto';
+import { PasscodeStoreDto, ResetPasscodeStoreDto } from '../store/dto';
+import { StoreService } from '../store/store.service';
 
 @ApiTags('Auth Api')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly storeService: StoreService,
+  ) {}
   @ApiOperation({
     summary: 'Signin Sorte',
   })
@@ -90,6 +95,38 @@ export class AuthController {
   refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
     return this.authService.refresh_token(refresh_token);
   }
+  @ApiOperation({
+    summary: 'Reset passcode store',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Store passcode resetted',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        messsage: 'Passcode updated',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Store not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get('reset-passcode')
+  resetPass(
+    @UserID('id') store_id: string,
+    @Body() resetPasswordStoreDto: ResetPasscodeStoreDto,
+  ) {
+    return this.storeService.resetPasscode(resetPasswordStoreDto, store_id);
+  }
   @ApiOperation({ summary: 'Signin with passcode' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -101,6 +138,37 @@ export class AuthController {
       },
     },
   })
+  @ApiOperation({ summary: 'Add passcode to store profile' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Store passcode added',
+    schema: {
+      example: {
+        status_code: 200,
+        message: 'OK',
+        data: 'Passcode added successfully',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Store not found',
+    schema: {
+      example: {
+        status_code: 404,
+        message: 'not found',
+      },
+    },
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Post('create-passcode')
+  createPasscode(
+    @UserID('id') id: string,
+    @Body() addPasscode: PasscodeStoreDto,
+  ) {
+    return this.storeService.addPasscode(id, addPasscode);
+  }
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     schema: {
