@@ -10,7 +10,7 @@ import { AllExceptionsFilter } from '../infrastructure';
 export default class Application {
   public static async main(): Promise<void> {
     const app = await NestFactory.create(AppModule);
-    // app.useGlobalFilters(new AllExceptionsFilter());
+    app.useGlobalFilters(new AllExceptionsFilter());
     app.enableCors({
       origin: '*',
     });
@@ -25,6 +25,7 @@ export default class Application {
     );
 
     const api = 'api/v1';
+    const swaggerApi = 'api/docs';
     app.setGlobalPrefix(api);
 
     const config_swagger = new DocumentBuilder()
@@ -40,7 +41,7 @@ export default class Application {
     const documentFactory = () =>
       SwaggerModule.createDocument(app, config_swagger);
 
-    SwaggerModule.setup(api, app, documentFactory);
+    SwaggerModule.setup(swaggerApi, app, documentFactory);
 
     await app.listen(config.API_PORT, () => {
       console.log(Date.now());

@@ -132,7 +132,7 @@ export class StoreService extends BaseService<
     }
     const isChecked = await BcryptEncryption.compare(
       resetPasscodeStoreDto.oldPasscode,
-      resetPasscodeStoreDto.passcode,
+      getStore.passcode,
     );
     if (!isChecked) {
       throw new HttpException('Your entered wrong password', 400);
@@ -140,7 +140,9 @@ export class StoreService extends BaseService<
       await this.getRepository.update(
         { id: store_id },
         {
-          passcode: BcryptEncryption.encrypt(resetPasscodeStoreDto.passcode),
+          passcode: await BcryptEncryption.encrypt(
+            resetPasscodeStoreDto.passcode,
+          ),
         },
       );
       return {
