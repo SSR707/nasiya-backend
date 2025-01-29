@@ -5,3 +5,4 @@ export * from './exception';
 export * from './file';
 export * from './pagination';
 export * from './pipe';
+export * from './SMS';

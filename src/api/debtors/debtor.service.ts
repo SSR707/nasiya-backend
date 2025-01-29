@@ -8,7 +8,6 @@ import { DeepPartial, Not, DataSource } from 'typeorm';
 import {
   UpdateDebtorDto,
   CreateDebtorDto,
-  
   CreateDebtorImageDto,
   CreateDebtorPhoneDto,
 } from './dto';
@@ -141,7 +140,7 @@ export class DebtorService extends BaseService<
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-     
+
     try {
       // Update the debtor
       await this.debtorRepository.update(id, {
@@ -515,7 +514,7 @@ export class DebtorService extends BaseService<
       );
     }
   }
-  async filterDebtors(storeId: string, filterDto: FilterDebtorsDto){
+  async filterDebtors(storeId: string, filterDto: FilterDebtorsDto) {
     const {
       searchTerm,
       isActive,
@@ -523,16 +522,16 @@ export class DebtorService extends BaseService<
       minDebtAmount,
       maxDebtAmount,
       sortBy,
-      sortOrder
+      sortOrder,
     } = filterDto;
 
     const query = this.debtorRepository
       .createQueryBuilder('debtor')
       .leftJoinAndSelect('debtor.debts', 'debt')
       .leftJoinAndSelect('debt.payments', 'payment')
-      .where('debtor.store_id = :storeId', {storeId});
-    
-    if(searchTerm){
+      .where('debtor.store_id = :storeId', { storeId });
+
+    if (searchTerm) {
       query.andWhere(
         '(debtor.full_name ILIKE :searchTerm OR debtor.phone_number ILIKE :searchTerm)',
         { searchTerm: `%${searchTerm}%` },
@@ -572,7 +571,5 @@ export class DebtorService extends BaseService<
     }
 
     return query.getMany();
-
   }
 }
-
