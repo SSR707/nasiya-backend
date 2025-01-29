@@ -5,7 +5,6 @@ import {
   Query,
   ParseIntPipe,
   UseGuards,
-  SetMetadata,
   BadRequestException,
 } from '@nestjs/common';
 import {
@@ -15,22 +14,16 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { JwtGuard } from '../../common/guard/jwt-auth.guard';
-import { RolesGuard } from '../../common/guard/roles.guard';
-import { RoleAdmin } from '../../common';
 import { StoreStatisticsService } from './store-statistics.service';
 
-export const ROLES_KEY = 'roles';
-export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
-
 @ApiTags('store-statistics')
-@Controller('api/v1/store-statistics')
-// @UseGuards(JwtGuard, RolesGuard)
+@Controller('store-statistics')
+@UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class StoreStatisticsController {
   constructor(private readonly statisticsService: StoreStatisticsService) {}
 
   @Get(':storeId/daily')
-  // @Roles(RoleAdmin.ADMIN)
   @ApiOperation({ summary: 'Get daily store statistics' })
   @ApiResponse({
     status: 200,
@@ -45,7 +38,6 @@ export class StoreStatisticsController {
   }
 
   @Get(':storeId/monthly')
-  @Roles(RoleAdmin.ADMIN)
   @ApiOperation({ summary: 'Get monthly store statistics' })
   @ApiResponse({
     status: 200,
@@ -68,7 +60,6 @@ export class StoreStatisticsController {
   }
 
   @Get(':storeId/debtors')
-  @Roles(RoleAdmin.ADMIN)
   @ApiOperation({ summary: 'Get debtor statistics for store' })
   @ApiResponse({
     status: 200,
@@ -79,7 +70,6 @@ export class StoreStatisticsController {
   }
 
   @Get(':storeId/update-stats')
-  @Roles(RoleAdmin.ADMIN)
   @ApiOperation({ summary: 'Update store statistics' })
   @ApiResponse({
     status: 200,

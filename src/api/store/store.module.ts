@@ -11,7 +11,6 @@ import {
 import { CustomJwtModule, FileModule } from 'src/infrastructure';
 import { StoreStatisticsController } from './store-statistics.controller';
 import { StoreStatisticsService } from './store-statistics.service';
-import { Reflector } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { Reflector } from '@nestjs/core';
     FileModule,
   ],
   controllers: [StoreController, StoreStatisticsController],
-  providers: [StoreService, StoreStatisticsService, Reflector],
+  providers: [StoreService, StoreStatisticsService],
   exports: [StoreService],
 })
 export class StoreModule {}
