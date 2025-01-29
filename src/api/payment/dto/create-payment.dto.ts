@@ -6,7 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsPositive,
-  IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreatePaymentDto {
@@ -43,6 +43,6 @@ export class CreatePaymentDto {
     example: '2f711c2e-e5ef-4f49-8b45-45c32d0efa79',
     description: 'Debt ID related to the payment',
   })
-  @IsString()
+  @IsUUID()
   debt_id: string;
 }
