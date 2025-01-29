@@ -8,11 +8,22 @@ import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { CustomJwtService } from '../../infrastructure/lib/custom-jwt/custom-jwt.service';
 import { config } from '../../config';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
-  constructor(private jwt: CustomJwtService) {}
+  constructor(
+    private readonly reflecotr: Reflector,
+    private jwt: CustomJwtService,
+  ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflecotr.get<boolean>(
+      'isPublic',
+      context.getHandler(),
+    );
+    if (isPublic) {
+      return true;
+    }
     const req = context.switchToHttp().getRequest();
     const auth = req.headers.authorization;
     if (!auth) {

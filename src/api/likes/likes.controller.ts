@@ -15,10 +15,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
-import { JwtGuard, UserID } from 'src/common';
+import {  UserID } from 'src/common';
 
 @ApiTags('Like Api')
-@UseGuards(JwtGuard)
 @ApiBearerAuth()
 @Controller('likes')
 export class LikesController {

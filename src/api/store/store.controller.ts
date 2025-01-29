@@ -23,7 +23,6 @@ import { StoreService } from './store.service';
 import { UpdateStoreDto } from './dto';
 import { JwtGuard, UserID } from '../../common';
 
-@UseGuards(JwtGuard)
 @ApiBearerAuth()
 @ApiTags('Store Api')
 @Controller('store')
@@ -64,7 +63,6 @@ export class StoreController {
     },
   })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
   @Get()
   findAll() {
     return this.storeService.findAllData();
@@ -100,7 +98,6 @@ export class StoreController {
     },
   })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
   @Get('profile')
   getProfile(@UserID() id: string) {
     return this.storeService.getProfile(id);
@@ -147,6 +144,34 @@ export class StoreController {
   }
 
   @ApiOperation({ summary: 'Upload store profile image' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Upload store profile image',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          image: './logo.png',
+          fullname: 'John Doe',
+          phone_number: '+998995564733',
+          email: 'johndoe@example.com',
+          created_at: '1723900952341',
+          updated_at: '1728794668799',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Store not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file'))
   @Post('profile-image')
   uploadImage(
@@ -155,6 +180,7 @@ export class StoreController {
   ) {
     return this.storeService.uploadProfileImage(id, image);
   }
+
   @ApiOperation({ summary: 'Delete Store' })
   @ApiParam({
     name: 'id',

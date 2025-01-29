@@ -16,9 +16,10 @@ import {
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SigninStoreDto } from './dto';
-import { JwtGuard, CookieGetter, UserID } from '../../common';
+import {  CookieGetter, UserID } from '../../common';
 import { PasscodeStoreDto, ResetPasscodeStoreDto } from '../store/dto';
 import { StoreService } from '../store/store.service';
+import { Public } from 'src/common/decorator/auth.decorator';
 
 @ApiTags('Auth Api')
 @Controller('auth')
@@ -56,6 +57,7 @@ export class AuthController {
       },
     },
   })
+  @Public()
   @Post('signin')
   signin(
     @Body() signinDto: SigninStoreDto,
@@ -89,7 +91,6 @@ export class AuthController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Post('refresh-token')
   @ApiBearerAuth()
   refresh_token(@CookieGetter('refresh_token_store') refresh_token: string) {
@@ -119,7 +120,6 @@ export class AuthController {
     },
   })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
   @Get('reset-passcode')
   resetPass(
     @UserID('id') store_id: string,
@@ -161,7 +161,6 @@ export class AuthController {
     },
   })
   @ApiBearerAuth()
-  @UseGuards(JwtGuard)
   @Post('create-passcode')
   createPasscode(
     @UserID('id') id: string,
@@ -180,6 +179,7 @@ export class AuthController {
     },
   })
   @Post('signin-passcode')
+  @ApiBearerAuth()
   signinWithPasscode(
     @UserID('id') id: string,
     @Body() passcodeDto: PasscodeStoreDto,
@@ -208,7 +208,6 @@ export class AuthController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Post('logout')
   @ApiBearerAuth()
   logout(

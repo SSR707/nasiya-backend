@@ -16,6 +16,7 @@ import { LikesModule } from './likes/likes.module';
 import { CustomJwtModule } from '../infrastructure';
 import { MessagesModule } from './messages/messages.module';
 import { SampleMessageModule } from './sample-message/sample-message.module';
+import { JwtGuard } from 'src/common';
 
 @Module({
   imports: [
@@ -52,6 +53,10 @@ import { SampleMessageModule } from './sample-message/sample-message.module';
     SampleMessageModule,
   ],
   providers: [
+    {
+      provide:APP_GUARD,
+      useClass:JwtGuard
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,

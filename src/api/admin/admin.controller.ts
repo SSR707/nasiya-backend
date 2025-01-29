@@ -23,6 +23,8 @@ import { AdminService } from './admin.service';
 import { CreateStoreDto } from '../store/dto';
 import { CreateAdminDto, UpdateAdminDto, SigninAdminDto } from './dto';
 import { SelfGuard, AdminGuard, JwtGuard, CookieGetter } from '../../common';
+import { PayStoreDto } from './dto/payStore-admin.dto';
+import { Public } from 'src/common/decorator/auth.decorator';
 @ApiTags('Admin Api')
 @Controller('admin')
 export class AdminController {
@@ -51,6 +53,7 @@ export class AdminController {
       },
     },
   })
+  @Public()
   @Post('createAdmin')
   createSuperAdminAndAdmin(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.createAdmin(createAdminDto);
@@ -81,7 +84,6 @@ export class AdminController {
     },
   })
   @UseGuards(AdminGuard)
-  @UseGuards(JwtGuard)
   @Post('createStore')
   @ApiBearerAuth()
   createStore(@Body() createStoreDto: CreateStoreDto) {
@@ -89,7 +91,37 @@ export class AdminController {
   }
 
   @ApiOperation({
-    summary: 'Signin Amin',
+    summary: 'Pay to Store ',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Pay to Store ',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Store id not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'Store id not found',
+      },
+    },
+  })
+  @UseGuards(AdminGuard)
+  @Post('PayStore')
+  @ApiBearerAuth()
+  payToStore(@Body() payStoreDto: PayStoreDto) {
+    return this.adminService.payToSotore(payStoreDto);
+  }
+
+  @ApiOperation({
+    summary: 'Signin Admin',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -117,6 +149,7 @@ export class AdminController {
       },
     },
   })
+  @Public()
   @Post('signin')
   signin(
     @Body() signinDto: SigninAdminDto,
@@ -151,7 +184,6 @@ export class AdminController {
     },
   })
   @UseGuards(AdminGuard)
-  @UseGuards(JwtGuard)
   @Post('refresh-token')
   @ApiBearerAuth()
   refresh_token(@CookieGetter('refresh_token_admin') refresh_token: string) {
@@ -179,7 +211,6 @@ export class AdminController {
       },
     },
   })
-  @UseGuards(JwtGuard)
   @Post('logout')
   @ApiBearerAuth()
   logout(
@@ -225,7 +256,6 @@ export class AdminController {
     },
   })
   @UseGuards(AdminGuard)
-  @UseGuards(JwtGuard)
   @Get()
   @ApiBearerAuth()
   getAllAdmin() {
@@ -272,7 +302,6 @@ export class AdminController {
     },
   })
   @UseGuards(SelfGuard)
-  @UseGuards(JwtGuard)
   @Get(':id')
   @ApiBearerAuth()
   getAdminById(@Param('id', ParseUUIDPipe) id: string) {
@@ -311,7 +340,6 @@ export class AdminController {
     },
   })
   @UseGuards(SelfGuard)
-  @UseGuards(JwtGuard)
   @Patch(':id')
   @ApiBearerAuth()
   editProfile(
@@ -353,7 +381,6 @@ export class AdminController {
     },
   })
   @UseGuards(SelfGuard)
-  @UseGuards(JwtGuard)
   @Delete(':id')
   @ApiBearerAuth()
   deleteAdmin(@Param('id', ParseUUIDPipe) id: string) {

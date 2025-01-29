@@ -29,7 +29,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DebtService } from './debt.service';
 import { UpdateDebtDto, CreateDebtDto } from './dto';
-import { JwtGuard } from '../../common';
 
 @ApiBearerAuth()
 @ApiHeader({
@@ -37,7 +36,6 @@ import { JwtGuard } from '../../common';
   description: 'Bearer token for authentication',
 })
 @ApiTags('Debt API')
-@UseGuards(JwtGuard)
 @Controller('debt')
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
