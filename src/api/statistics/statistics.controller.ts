@@ -49,6 +49,7 @@ export class StatisticsController {
             }
         }
     })
+    
 
     @Get('totalDept')
     async getTotalDept(): Promise<number> {
