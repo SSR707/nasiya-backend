@@ -89,4 +89,14 @@ export class StoreStatisticsController {
     await this.statisticsService.updateStoreStatistics(storeId);
     return this.statisticsService.getDebtorStatistics(storeId);
   }
+
+  @Get(':storeId/late-payments')
+  @ApiOperation({ summary: 'Get late payments statistics' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns total number of months debts are late',
+  })
+  async getLatePayments(@Param('storeId') storeId: string) {
+    return this.statisticsService.latePayments(storeId);
+  }
 }
