@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between } from 'typeorm';
 import { CreatePaymentDto } from './dto';
@@ -6,6 +10,7 @@ import { PaymentRepository, PaymentEntity } from '../../core';
 import { BaseService } from '../../infrastructure';
 import { PaymentType } from '../../common';
 import { DebtService } from '../debt/debt.service';
+import { DebtorService } from '../debtors/debtor.service';
 
 @Injectable()
 export class PaymentService extends BaseService<
@@ -16,12 +21,18 @@ export class PaymentService extends BaseService<
     @InjectRepository(PaymentEntity)
     private readonly paymentRepository: PaymentRepository,
     private readonly debtService: DebtService,
+    private readonly debtorService: DebtorService,
   ) {
     super(paymentRepository);
   }
 
   async createPayments(createPaymentDto: CreatePaymentDto) {
     const debt = await this.debtService.findOneById(createPaymentDto.debt_id);
+    if (debt.data.debt_sum < createPaymentDto.sum) {
+      throw new BadRequestException(
+        'Payment amount exceeds the remaining debt.',
+      );
+    }
     const payment = await this.create(createPaymentDto);
     await this.debtService.updateDebtById(debt.data.id, {
       debt_sum: debt.data.debt_sum - createPaymentDto.sum,
@@ -30,6 +41,33 @@ export class PaymentService extends BaseService<
       status_code: 201,
       message: 'success',
       data: payment,
+    };
+  }
+
+  async findPaymentsForDebtorsHistory(page: number, limit: number, id: string) {
+    page = (page - 1) * limit;
+    const history = await this.debtorService.findAll({
+      where: { store_id: id },
+      relations: ['debts', 'debts.payments'],
+      select: {
+        id: true,
+        full_name: true,
+        phone_number: true,
+        debts: {
+          id: true,
+          payments: {
+            sum: true,
+            date: true,
+          },
+        },
+      },
+      skip: page,
+      take: limit,
+    });
+    return {
+      status_code: 201,
+      message: 'success',
+      data: history,
     };
   }
 

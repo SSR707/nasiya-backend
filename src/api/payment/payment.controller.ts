@@ -24,7 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto';
-import { JwtGuard, PaymentType } from '../../common';
+import { JwtGuard, PaymentType, UserID } from '../../common';
 
 @UseGuards(JwtGuard)
 @ApiTags('Payments API')
@@ -55,11 +55,11 @@ export class PaymentController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Failed creating Payment',
+    description: 'Payment amount exceeds the remaining debt.',
     schema: {
       example: {
         status_code: HttpStatus.BAD_REQUEST,
-        message: 'Error on creating super Payment',
+        message: 'Payment amount exceeds the remaining debt.',
       },
     },
   })
@@ -107,6 +107,61 @@ export class PaymentController {
   @ApiBearerAuth()
   async getTotalPaymentsByDebt(@Param('id', ParseUUIDPipe) id: string) {
     return await this.paymentService.getTotalPaymentsByDebt(id);
+  }
+
+  @ApiOperation({
+    summary: 'Get all Payment History',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All Payments History fetched successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'Payment History fetched successfully',
+        data: [
+          {
+            id: '374e1cc2-fa62-4ef7-839e-b1efb81d6502',
+            full_name: 'Zufarbek',
+            phone_number: '+998971231212',
+            debts: [
+              {
+                id: 'ea3b2196-1fe1-492f-84fa-a68493297bf6',
+                payments: [
+                  {
+                    sum: '90523',
+                    date: '2025-01-28T09:10:32.479Z',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed fetching Payment History',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Error on fetching Payment History',
+      },
+    },
+  })
+  @Get('PaymentHistory')
+  @ApiBearerAuth()
+  async getAllPaymentHistoriy(
+    @UserID() id: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
+  ) {
+    return await this.paymentService.findPaymentsForDebtorsHistory(
+      page,
+      limit,
+      id,
+    );
   }
 
   @ApiOperation({
