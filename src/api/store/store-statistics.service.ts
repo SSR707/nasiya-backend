@@ -237,20 +237,26 @@ export class StoreStatisticsService {
 
     if (store?.debtors) {
       const currentDate = new Date();
-      
+
       for (const debtor of store.debtors) {
         if (debtor.debts && debtor.debts.length > 0) {
           for (const debt of debtor.debts) {
             // Calculate remaining debt amount after payments
-            const paidAmount = debt.payments?.reduce((sum, payment) => sum + Number(payment.sum), 0) || 0;
+            const paidAmount =
+              debt.payments?.reduce(
+                (sum, payment) => sum + Number(payment.sum),
+                0,
+              ) || 0;
             const remainingDebt = Number(debt.debt_sum) - paidAmount;
 
             // Only count if there is remaining debt
             if (remainingDebt > 0) {
               const debtDate = new Date(debt.debt_date);
               const diffTime = currentDate.getTime() - debtDate.getTime();
-              const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30));
-              
+              const diffMonths = Math.floor(
+                diffTime / (1000 * 60 * 60 * 24 * 30),
+              );
+
               // Only count if debt is late (more than 1 month old)
               if (diffMonths > 0) {
                 totalLateDebts += diffMonths;
