@@ -359,7 +359,7 @@ export class DebtorService extends BaseService<
       const image = await this.debtorImageRepository.findOne({
         where: { id },
       });
-
+      console.log(image);
       if (!image) {
         throw new NotFoundException('Image not found');
       }
@@ -370,7 +370,7 @@ export class DebtorService extends BaseService<
       }
 
       // Remove image from database
-      await this.debtorImageRepository.remove(image);
+      await this.debtorImageRepository.delete({ id: image.id });
 
       return {
         status_code: 200,
@@ -492,14 +492,10 @@ export class DebtorService extends BaseService<
 
   async deleteSoft(id: string) {
     const debtor = await this.findOne(id);
-
     try {
       // Delete image if exists
-      if (
-        debtor.data.image &&
-        (await this.fileService.existFile(debtor.data.image))
-      ) {
-        await this.fileService.deleteFile(debtor.data.image);
+      if (debtor.image) {
+        await this.fileService.deleteFile(`uploads/debtors/${debtor.image}`);
       }
 
       await this.debtorRepository.delete(id);
@@ -569,7 +565,6 @@ export class DebtorService extends BaseService<
           query.orderBy('debtor.created_at', 'DESC');
       }
     }
-
     return query.getMany();
   }
 }

@@ -13,7 +13,6 @@ import { DebtorModule } from '../debtors/debtor.module';
     DebtModule,
     DebtorModule,
     CustomJwtModule,
-    
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

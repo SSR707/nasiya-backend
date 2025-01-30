@@ -113,7 +113,7 @@ export class DebtorController {
   @ApiOperation({ summary: 'Get debtor by id' })
   @ApiParam({ name: 'id', description: 'Debtor ID' })
   async findOne(@Param('id') id: string) {
-    return this.debtorService.findOne(id , ['debts']);
+    return this.debtorService.findOne(id, ['debts']);
   }
 
   @Get(':id/total-debt')

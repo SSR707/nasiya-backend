@@ -54,8 +54,8 @@ import { JwtGuard } from 'src/common';
   ],
   providers: [
     {
-      provide:APP_GUARD,
-      useClass:JwtGuard
+      provide: APP_GUARD,
+      useClass: JwtGuard,
     },
     {
       provide: APP_GUARD,

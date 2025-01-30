@@ -15,7 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { LikesService } from './likes.service';
-import {  UserID } from 'src/common';
+import { UserID } from 'src/common';
 
 @ApiTags('Like Api')
 @ApiBearerAuth()

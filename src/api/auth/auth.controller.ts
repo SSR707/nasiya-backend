@@ -16,7 +16,7 @@ import {
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { SigninStoreDto } from './dto';
-import {  CookieGetter, UserID } from '../../common';
+import { CookieGetter, UserID } from '../../common';
 import { PasscodeStoreDto, ResetPasscodeStoreDto } from '../store/dto';
 import { StoreService } from '../store/store.service';
 import { Public } from 'src/common/decorator/auth.decorator';
