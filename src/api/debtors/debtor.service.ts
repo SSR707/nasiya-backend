@@ -335,7 +335,15 @@ export class DebtorService extends BaseService<
 
   async getDebtorImages(id: string) {
     try {
-      const debtor = await this.findOne(id);
+      // First check if debtor exists
+      const debtor = await this.debtorRepository.findOne({
+        where: { id },
+      });
+
+      if (!debtor) {
+        throw new NotFoundException(`Debtor with ID ${id} not found`);
+      }
+
       const images = await this.debtorImageRepository.find({
         where: { debtor_id: id },
         order: {
@@ -350,6 +358,9 @@ export class DebtorService extends BaseService<
         total: images.length,
       };
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new BadRequestException(`Error fetching images: ${error.message}`);
     }
   }
@@ -359,24 +370,40 @@ export class DebtorService extends BaseService<
       const image = await this.debtorImageRepository.findOne({
         where: { id },
       });
-      console.log(image);
+
       if (!image) {
-        throw new NotFoundException('Image not found');
+        throw new NotFoundException(`Image with ID ${id} not found`);
       }
 
-      // Delete file if exists
-      if (await this.fileService.existFile(image.image)) {
-        await this.fileService.deleteFile(image.image);
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        // Delete file if exists
+        if (image.image && await this.fileService.existFile(image.image)) {
+          await this.fileService.deleteFile(image.image);
+        }
+
+        // Remove image from database
+        await queryRunner.manager.delete(DebtorImageEntity, { id: image.id });
+
+        await queryRunner.commitTransaction();
+
+        return {
+          status_code: 200,
+          message: 'Image removed successfully',
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        await queryRunner.release();
       }
-
-      // Remove image from database
-      await this.debtorImageRepository.delete({ id: image.id });
-
-      return {
-        status_code: 200,
-        message: 'Image removed successfully',
-      };
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new BadRequestException(`Error removing image: ${error.message}`);
     }
   }
@@ -492,24 +519,57 @@ export class DebtorService extends BaseService<
 
   async deleteSoft(id: string) {
     const debtor = await this.findOne(id);
+
     try {
-      // Delete image if exists
-      if (debtor.image) {
-        await this.fileService.deleteFile(`uploads/debtors/${debtor.image}`);
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        // Get all related images
+        const images = await this.debtorImageRepository.find({
+          where: { debtor_id: id },
+        });
+
+        // Delete all related images from storage
+        for (const image of images) {
+          if (image.image && await this.fileService.existFile(image.image)) {
+            await this.fileService.deleteFile(image.image);
+          }
+        }
+
+        // Delete main debtor image if exists
+        if (debtor.image && await this.fileService.existFile(debtor.image)) {
+          await this.fileService.deleteFile(debtor.image);
+        }
+
+        // Delete all related images from database
+        if (images.length > 0) {
+          await queryRunner.manager.delete(DebtorImageEntity, { debtor_id: id });
+        }
+
+        // Delete the debtor
+        await queryRunner.manager.delete(DebtorEntity, id);
+
+        await queryRunner.commitTransaction();
+
+        return {
+          status_code: 200,
+          message: 'Debtor and all related images deleted successfully',
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        throw error;
+      } finally {
+        await queryRunner.release();
       }
-
-      await this.debtorRepository.delete(id);
-
-      return {
-        status_code: 200,
-        message: 'Debtor deleted successfully',
-      };
     } catch (error) {
       throw new BadRequestException(
         `Failed to delete debtor: ${error.message}`,
       );
     }
   }
+
   async filterDebtors(storeId: string, filterDto: FilterDebtorsDto) {
     const {
       searchTerm,
