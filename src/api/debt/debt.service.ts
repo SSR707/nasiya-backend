@@ -58,7 +58,9 @@ export class DebtService extends BaseService<
 
   async findAllDebts() {
     // find all debts
-    const allData = await this.debtRepository.find();
+    const allData = await this.debtRepository.find({
+      relations: ['payments'],
+    });
 
     if (allData.length === 0) {
       throw new NotFoundException('No debt in database!');

@@ -9,7 +9,10 @@ export class SampleMessageEntity extends BaseEntity {
   @Column({ type: 'varchar', name: 'sample' })
   sample: string;
 
-  @ManyToOne(() => StoreEntity, (store) => store.sample_messages)
+  @ManyToOne(() => StoreEntity, (store) => store.sample_messages, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'store_id' })
   stores: StoreEntity;
 

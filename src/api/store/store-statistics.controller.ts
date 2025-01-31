@@ -15,6 +15,8 @@ import {
 } from '@nestjs/swagger';
 import { JwtGuard } from '../../common/guard/jwt-auth.guard';
 import { StoreStatisticsService } from './store-statistics.service';
+import { UserID } from 'src/common';
+import { CreateStoreDto } from './dto';
 
 @ApiTags('store-statistics')
 @Controller('store-statistics')
@@ -23,14 +25,14 @@ import { StoreStatisticsService } from './store-statistics.service';
 export class StoreStatisticsController {
   constructor(private readonly statisticsService: StoreStatisticsService) {}
 
-  @Get(':storeId/daily')
+  @Get('daily')
   @ApiOperation({ summary: 'Get daily store statistics' })
   @ApiResponse({
     status: 200,
     description: 'Returns daily statistics for the store',
   })
   async getDailyStatistics(
-    @Param('storeId') storeId: string,
+    @UserID() storeId: string,
     @Query('date') dateStr: string,
   ) {
     const date = dateStr ? new Date(dateStr) : new Date();

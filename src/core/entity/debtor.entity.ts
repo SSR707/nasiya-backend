@@ -39,7 +39,10 @@ export class DebtorEntity extends BaseEntity {
   @Column({ type: 'boolean', name: 'is_active', default: true })
   is_active: boolean;
 
-  @ManyToOne(() => StoreEntity, (store) => store.debtors)
+  @ManyToOne(() => StoreEntity, (store) => store.debtors, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
 

@@ -19,19 +19,16 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => PaymentEntity, (payment) => payment.debt, {
+  @OneToMany(() => PaymentEntity, (payment) => payment.debt)
+  payments: PaymentEntity[];
+
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  payments: PaymentEntity[];
-
-  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts)
   @JoinColumn({ name: 'debtor_id' })
   debtor: DebtorEntity;
 
-  @OneToMany(() => DebtImageEntity, (image) => image.debt, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  })
+  @OneToMany(() => DebtImageEntity, (image) => image.debt)
   images: DebtImageEntity[];
 }

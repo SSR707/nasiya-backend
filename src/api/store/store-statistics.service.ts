@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, LessThan, MoreThanOrEqual, Repository } from 'typeorm';
 import {
@@ -7,6 +7,7 @@ import {
   PaymentEntity,
   DebtorEntity,
 } from '../../core/entity';
+import { AllExceptionsFilter } from 'src/infrastructure';
 
 @Injectable()
 export class StoreStatisticsService {
@@ -21,53 +22,80 @@ export class StoreStatisticsService {
     private readonly debtorRepository: Repository<DebtorEntity>,
   ) {}
 
-  async getDailyStoreStatistics(storeId: string, date: Date) {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
+  async getDailyStoreStatistics(storeId: string, dateForStatistics: Date) {
+    // Find store by id and retrieve all data depends
+    const allStoreData = await this.storeRepository.findOne({
+      where: { id: storeId },
+      relations: ['debtors', 'debtors.debts', 'debtors.debts.payments'],
+    });
+    if (!allStoreData) {
+      throw new NotFoundException('Store not found!');
+    }
 
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    // search dependency variables
+    const data = allStoreData?.debtors;
 
-    // Get daily sales
-    const dailyDebts = await this.debtRepository
-      .createQueryBuilder('debt')
-      .innerJoinAndSelect('debt.debtor', 'debtor')
-      .where('debtor.store_id = :storeId', { storeId })
-      .andWhere('debt.debt_date BETWEEN :startOfDay AND :endOfDay', {
-        startOfDay,
-        endOfDay,
-      })
-      .getMany();
+    const allDebtorsData = data.map((debtor) => ({
+      debtor_name: debtor.full_name,
+      debt_period: debtor.debts.map((debt) => {
+        return debt.debt_period;
+      }),
+      debtor_payment: debtor.debts.map((debt) => {
+        if (debt.payments.length > 0) {
+          const [{ sum }] = debt.payments;
+          return sum;
+        }
+        return null;
+      }),
+      debtor_payment_date: debtor.debts.map((debt) => {
+        if (debt.payments.length > 0) {
+          const [{ date }] = debt.payments;
+          return date;
+        }
+        return null;
+      }),
+    }));
 
-    // Get daily payments
-    const dailyPayments = await this.paymentRepository
-      .createQueryBuilder('payment')
-      .leftJoin('payment.debt', 'debt')
-      .leftJoin('debt.debtor', 'debtor')
-      .where('debtor.store_id = :storeId', { storeId })
-      .andWhere('payment.date BETWEEN :startOfDay AND :endOfDay', {
-        startOfDay,
-        endOfDay,
-      })
-      .getMany();
+    // console.log(dateForStatistics, {
+    //   date_month: dateForStatistics.getMonth() + 1,
+    //   date_date: dateForStatistics.getDate(),
+    // });
 
-    const totalDailyDebt = dailyDebts.reduce(
-      (sum, debt) => sum + Number(debt.debt_sum),
-      0,
-    );
-    const totalDailyPayments = dailyPayments.reduce(
-      (sum, payment) => sum + Number(payment.sum),
-      0,
-    );
+    // filter data
+    const result = [];
 
-    return {
-      date,
-      total_new_debts: dailyDebts.length,
-      total_debt_amount: totalDailyDebt,
-      total_payments: dailyPayments.length,
-      total_payment_amount: totalDailyPayments,
-      net_daily_balance: totalDailyPayments - totalDailyDebt,
-    };
+    for (const data of allDebtorsData) {
+      const payment_date = data.debtor_payment_date[0];
+
+      const year = dateForStatistics.getFullYear() - payment_date.getFullYear();
+      if (-1 <= year && year <= 1) {
+        let month =
+          dateForStatistics.getMonth() + 1 - (payment_date.getMonth() + 1);
+
+        // console.log({
+        //   date: dateForStatistics.getMonth() + 1,
+        //   debtor_payment_date: payment_date.getMonth() + 1,
+        //   month: month,
+        // });
+        if (0 <= month && month <= 12 && data.debt_period[0] >= month) {
+          const day = dateForStatistics.getDate() - payment_date.getDate();
+
+          // console.log({
+          //   date: dateForStatistics.getDate(),
+          //   debtor_payment_date: payment_date.getDate(),
+          //   day: day,
+          // });
+          if (-3 <= day && day <= 0) {
+            if (month == 0 && day < 0) {
+              continue;
+            }
+            result.push(data);
+          }
+        }
+      }
+    }
+
+    return { status_code: HttpStatus.OK, result };
   }
 
   async getMonthlyStoreStatistics(
