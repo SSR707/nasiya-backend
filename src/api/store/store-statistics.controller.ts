@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  ParseIntPipe,
-  UseGuards,
-  BadRequestException,
-} from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -16,16 +8,15 @@ import {
 import { JwtGuard } from '../../common/guard/jwt-auth.guard';
 import { StoreStatisticsService } from './store-statistics.service';
 import { UserID } from 'src/common';
-import { CreateStoreDto } from './dto';
 
 @ApiTags('store-statistics')
-@Controller('store-statistics')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
+@Controller('store-statistics')
 export class StoreStatisticsController {
   constructor(private readonly statisticsService: StoreStatisticsService) {}
 
-  @Get('daily')
+  @Get('calendar')
   @ApiOperation({ summary: 'Get daily store statistics' })
   @ApiResponse({
     status: 200,
@@ -38,57 +29,36 @@ export class StoreStatisticsController {
     const date = dateStr ? new Date(dateStr) : new Date();
     return this.statisticsService.getDailyStoreStatistics(storeId, date);
   }
+  // get onde monthly all payments sum
 
-  @Get(':storeId/monthly')
-  @ApiOperation({ summary: 'Get monthly store statistics' })
+  @Get('main')
+  @ApiOperation({ summary: 'Get all debtors debt sum and all debtors count' })
   @ApiResponse({
-    status: 200,
-    description: 'Returns monthly statistics for the store',
+    status: HttpStatus.OK,
+    description:
+      'This will get all count of debtors and get all debtors debt sum',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          total_debts: 139880000.293,
+          debtors_count: 120,
+        },
+      },
+    },
   })
-  async getMonthlyStatistics(
-    @Param('storeId') storeId: string,
-    @Query('year', new ParseIntPipe({ errorHttpStatusCode: 400 })) year: number,
-    @Query('month', new ParseIntPipe({ errorHttpStatusCode: 400 }))
-    month: number,
-  ) {
-    if (month < 1 || month > 12) {
-      throw new BadRequestException('Month must be between 1 and 12');
-    }
-    return this.statisticsService.getMonthlyStoreStatistics(
-      storeId,
-      year,
-      month,
-    );
+  async getMainStatistics(@UserID() id: string) {
+    return this.statisticsService.mainMenuStatistics(id);
   }
 
-  @Get(':storeId/debtors')
-  @ApiOperation({ summary: 'Get debtor statistics for store' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns detailed debtor statistics for the store',
-  })
-  async getDebtorStatistics(@Param('storeId') storeId: string) {
-    return this.statisticsService.getDebtorStatistics(storeId);
-  }
-
-  @Get(':storeId/update-stats')
-  @ApiOperation({ summary: 'Update store statistics' })
-  @ApiResponse({
-    status: 200,
-    description: 'Updates and returns latest store statistics',
-  })
-  async updateStoreStatistics(@Param('storeId') storeId: string) {
-    await this.statisticsService.updateStoreStatistics(storeId);
-    return this.statisticsService.getDebtorStatistics(storeId);
-  }
-
-  @Get(':storeId/late-payments')
+  @Get('late-payments')
   @ApiOperation({ summary: 'Get late payments statistics' })
   @ApiResponse({
     status: 200,
     description: 'Returns total number of months debts are late',
   })
-  async getLatePayments(@Param('storeId') storeId: string) {
+  async getLatePayments(@UserID() storeId: string) {
     return this.statisticsService.latePayments(storeId);
   }
 }
