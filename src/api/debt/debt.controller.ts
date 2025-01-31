@@ -124,6 +124,45 @@ export class DebtController {
   }
 
   @ApiOperation({
+    summary: 'Calculate the next payment for a debt',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'UUID of the debt',
+    type: String,
+    example: 'b2d4aa27-0768-4456-947f-f8930c294394',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Next payment details retrieved successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'Success',
+        data: {
+          nextMonth: 50.0,
+          nextMonths: 100.0,
+          debt_period: 12,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debt Not Found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'Debt Not Found',
+      },
+    },
+  })
+  @Get('next-payment/:id')
+  calculateNextPayment(@Param('id', ParseUUIDPipe) id: string) {
+    return this.debtService.calculateNextPayment(id);
+  }
+  
+  @ApiOperation({
     summary: 'Get debt by ID',
   })
   @ApiParam({

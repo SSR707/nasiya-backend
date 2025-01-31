@@ -30,9 +30,9 @@ export class CreateDebtDto {
   debt_date: string;
 
   @ApiProperty({
-    type: String,
+    type: Number,
     description: 'Debt period',
-    example: '3',
+    example: DebtPeriod.THREE_MONTHS,
   })
   @IsNotEmpty()
   @IsEnum(DebtPeriod)
