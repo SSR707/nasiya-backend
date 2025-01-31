@@ -21,13 +21,42 @@ export class StoreStatisticsController {
   @ApiResponse({
     status: 200,
     description: 'Returns daily statistics for the store',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          totalAmount: 5500000,
+          duePayments: [
+            {
+              debtorName: 'Zufarbek',
+              amount: '2000000.00',
+            },
+            {
+              debtorName: 'Zufarbek',
+              amount: '2500000.00',
+            },
+          ],
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Store not found!',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'Store not found!',
+      },
+    },
   })
   async getDailyStatistics(
     @UserID() storeId: string,
     @Query('date') dateStr: string,
   ) {
-    const date = dateStr ? new Date(dateStr) : new Date();
-    return this.statisticsService.getDailyStoreStatistics(storeId, date);
+    const selectedDate = new Date(dateStr);
+    return this.statisticsService.getDuePayments(storeId, selectedDate);
   }
   // get onde monthly all payments sum
 
@@ -57,6 +86,13 @@ export class StoreStatisticsController {
   @ApiResponse({
     status: 200,
     description: 'Returns total number of months debts are late',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {},
+      },
+    },
   })
   async getLatePayments(@UserID() storeId: string) {
     return this.statisticsService.latePayments(storeId);

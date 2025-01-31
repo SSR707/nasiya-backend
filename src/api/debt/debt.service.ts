@@ -45,8 +45,11 @@ export class DebtService extends BaseService<
       throw new NotFoundException('Debtor not found!');
     }
 
+    const month_sum = Math.floor(
+      createDebtDto.debt_sum / createDebtDto.debt_period,
+    );
     // create debt
-    const data = this.debtRepository.create(createDebtDto);
+    const data = this.debtRepository.create({ ...createDebtDto, month_sum });
     await this.debtRepository.save(data);
 
     return {
@@ -86,6 +89,17 @@ export class DebtService extends BaseService<
       status_code: HttpStatus.OK,
       message: `${limit} debts fetched.`,
       data: data,
+    };
+  }
+
+  async calculateNextPayment(DebtId: string) {
+    const debt = await this.findOneById(DebtId);
+    const count = Math.floor(debt.data.debt_sum / debt.data.month_sum);
+    return {
+      nextMonth:
+        debt.data.debt_sum - debt.data.month_sum * count || debt.data.month_sum,
+      nextMonths: debt.data.month_sum,
+      debt_period: debt.data.debt_period,
     };
   }
 

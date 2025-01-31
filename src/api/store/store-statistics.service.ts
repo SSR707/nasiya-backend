@@ -22,56 +22,54 @@ export class StoreStatisticsService {
     private readonly debtorRepository: Repository<DebtorEntity>,
   ) {}
 
-  async getDailyStoreStatistics(storeId: string, dateForStatistics: Date) {
-    // Find store by id and retrieve all data depends
+  async getDuePayments(storeId: string, selectedDate: Date) {
     const allStoreData = await this.storeRepository.findOne({
       where: { id: storeId },
-      relations: ['debtors', 'debtors.debts', 'debtors.debts.payments'],
+      select: {
+        debtors: {
+          id: true,
+          full_name: true,
+          debts: {
+            id: true,
+            debt_sum: true,
+            month_sum: true,
+            debt_period: true,
+            debt_date: true,
+          },
+        },
+      },
+      relations: ['debtors', 'debtors.debts'],
     });
-    if (!allStoreData) {
-      throw new NotFoundException('Store not found!');
-    }
-    // search dependency variables
-    const data = allStoreData?.debtors;
-    const allDebtorsData = data.map((debtor) => ({
-      debtor_name: debtor.full_name,
-      debt_period: debtor.debts.map((debt) => {
-        return debt.debt_period;
-      }),
-      debtor_payment: debtor.debts.map((debt) => {
-        if (debt.payments.length > 0) {
-          const [{ sum }] = debt.payments;
-          return sum;
-        }
-        return null;
-      }),
-      debtor_payment_date: debtor.debts.map((debt) => {
-        if (debt.payments.length > 0) {
-          const [{ date }] = debt.payments;
-          return date;
-        }
-        return null;
-      }),
-    }));
-    const result = [];
-    for (const data of allDebtorsData) {
-      const payment_date = data.debtor_payment_date[0];
-      const year = dateForStatistics.getFullYear() - payment_date.getFullYear();
-      if (-1 <= year && year <= 1) {
-        let month =
-          dateForStatistics.getMonth() + 1 - (payment_date.getMonth() + 1);
-        if (0 <= month && month <= 12 && data.debt_period[0] >= month) {
-          const day = dateForStatistics.getDate() - payment_date.getDate();
-          if (-3 <= day && day <= 0) {
-            if (month == 0 && day < 0) {
-              continue;
-            }
-            result.push(data);
-          }
+
+    if (!allStoreData) return { totalAmount: 0, duePayments: [] };
+
+    const duePayments = [];
+    let totalAmount: number = 0;
+
+    const selectedYear = selectedDate.getFullYear();
+    const selectedMonth = selectedDate.getMonth();
+
+    for (const debtor of allStoreData.debtors) {
+      for (const debt of debtor.debts) {
+        const startDate = new Date(debt.debt_date);
+        const debtYear = startDate.getFullYear();
+        const debtMonth = startDate.getMonth();
+
+        const monthsDifference =
+          (selectedYear - debtYear) * 12 + selectedMonth - debtMonth;
+
+        if (monthsDifference >= 0 && monthsDifference < debt.debt_period) {
+          duePayments.push({
+            debtorName: debtor.full_name,
+            amount: debt.month_sum,
+          });
+
+          totalAmount += +debt.month_sum;
         }
       }
     }
-    return { status_code: HttpStatus.OK, result };
+
+    return { totalAmount, duePayments };
   }
 
   async mainMenuStatistics(id: string) {

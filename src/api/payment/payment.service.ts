@@ -33,15 +33,27 @@ export class PaymentService extends BaseService<
         'Payment amount exceeds the remaining debt.',
       );
     }
+    let count = 0;
+    if (createPaymentDto.type === 'one_month') {
+      count = 1;
+      createPaymentDto.sum = debt.data.month_sum;
+    } else if (createPaymentDto.type === 'multi_month') {
+      count = Math.floor(createPaymentDto.sum / debt.data.month_sum);
+    } else if (createPaymentDto.type === 'any_payment') {
+      const debt_month_pay = await this.debtService.calculateNextPayment(debt.data.id)
+      if(debt_month_pay.nextMonth <= createPaymentDto.sum &&  createPaymentDto.sum < debt.data.month_sum ){ 
+        count += 1
+      }else{
+
+        count += Math.floor(createPaymentDto.sum / debt.data.month_sum);
+      }
+    }
     const payment = await this.create(createPaymentDto);
     await this.debtService.updateDebtById(debt.data.id, {
       debt_sum: debt.data.debt_sum - createPaymentDto.sum,
+      debt_period: debt.data.debt_period - count
     });
-    return {
-      status_code: 201,
-      message: 'success',
-      data: payment,
-    };
+    return payment
   }
 
   async findPaymentsForDebtorsHistory(page: number, limit: number, id: string) {

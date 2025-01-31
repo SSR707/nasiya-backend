@@ -27,6 +27,7 @@ export class CreatePaymentDto {
   })
   @IsNumber()
   @IsPositive()
+  @IsOptional()
   sum: number;
 
   @ApiProperty({
