@@ -6,6 +6,7 @@ import { DebtorEntity, StoreEntity, SampleMessageEntity } from './';
 export class MessageEntity extends BaseEntity {
   @Column({ type: 'text', name: 'message' })
   message: string;
+
   @Column({
     type: 'enum',
     enum: MessageStatus,
@@ -13,6 +14,7 @@ export class MessageEntity extends BaseEntity {
     default: MessageStatus.SENT,
   })
   status: MessageStatus;
+
   @Column({ type: 'uuid', name: 'store_id' })
   store_id: string;
 
@@ -22,11 +24,17 @@ export class MessageEntity extends BaseEntity {
   @Column({ type: 'uuid', name: 'sample_message_id', nullable: true })
   sample_message_id: string;
 
-  @ManyToOne(() => StoreEntity, (store) => store.messages)
+  @ManyToOne(() => StoreEntity, (store) => store.messages, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
 
-  @ManyToOne(() => DebtorEntity, (debtor) => debtor.messages)
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.messages, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'debtor_id' })
   debtor: DebtorEntity;
 

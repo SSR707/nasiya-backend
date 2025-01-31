@@ -10,7 +10,10 @@ export class DebtImageEntity extends BaseEntity {
   @Column({ type: 'uuid' })
   debt_id: string;
 
-  @ManyToOne(() => DebtEntity, (debt) => debt.images)
+  @ManyToOne(() => DebtEntity, (debt) => debt.images, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'debt_id' })
   debt: DebtEntity;
 }

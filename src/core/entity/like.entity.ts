@@ -10,11 +10,17 @@ export class LikesEntity extends BaseEntity {
   @Column({ type: 'uuid', name: 'debtor_id' })
   debtor_id: string;
 
-  @ManyToOne(() => StoreEntity, (store) => store.likes)
+  @ManyToOne(() => StoreEntity, (store) => store.likes, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'store_id' })
   store: StoreEntity;
 
-  @ManyToOne(() => DebtorEntity, (debtor) => debtor.likes)
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.likes, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'debtor_id' })
   debtor: DebtorEntity;
 }
