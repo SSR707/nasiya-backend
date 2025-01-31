@@ -381,7 +381,7 @@ export class DebtorService extends BaseService<
 
       try {
         // Delete file if exists
-        if (image.image && await this.fileService.existFile(image.image)) {
+        if (image.image && (await this.fileService.existFile(image.image))) {
           await this.fileService.deleteFile(image.image);
         }
 
@@ -533,19 +533,21 @@ export class DebtorService extends BaseService<
 
         // Delete all related images from storage
         for (const image of images) {
-          if (image.image && await this.fileService.existFile(image.image)) {
+          if (image.image && (await this.fileService.existFile(image.image))) {
             await this.fileService.deleteFile(image.image);
           }
         }
 
         // Delete main debtor image if exists
-        if (debtor.image && await this.fileService.existFile(debtor.image)) {
+        if (debtor.image && (await this.fileService.existFile(debtor.image))) {
           await this.fileService.deleteFile(debtor.image);
         }
 
         // Delete all related images from database
         if (images.length > 0) {
-          await queryRunner.manager.delete(DebtorImageEntity, { debtor_id: id });
+          await queryRunner.manager.delete(DebtorImageEntity, {
+            debtor_id: id,
+          });
         }
 
         // Delete the debtor
