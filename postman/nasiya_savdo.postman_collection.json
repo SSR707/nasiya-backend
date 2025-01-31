@@ -1,931 +1,144 @@
 {
   "info": {
-    "_postman_id": "b2d4aa27-0768-4456-947f-f8930c294394",
-    "name": "Nasiya Savdo",
-    "description": "Nasiya Savdo API endpoints",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "_postman_id": "52dda023-007a-4574-b432-b36a909decc5",
+    "name": "NASIYA SAVDO API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41354872"
   },
   "item": [
     {
-      "name": "Admin",
+      "name": "ADMIN",
       "item": [
         {
-          "name": "Create Admin",
+          "name": "AUTH LOGIN",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"admin001\",\n  \"hashed_password\": \"Admin123@\",\n  \"phone_number\": \"+998901234567\"\n}"
-            },
+            "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/v1/admin",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin"]
+              "raw": "{{base_url}}/admin/createAdmin",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "createAdmin"]
             }
           },
           "response": []
         },
         {
-          "name": "Sign In",
+          "name": "ADMIN CREATE",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"admin001\",\n  \"password\": \"Admin123@\"\n}"
-            },
+            "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/v1/admin/signin",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin", "signin"]
+              "raw": "{{base_url}}/admin/signin",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "signin"]
             }
           },
           "response": []
         },
         {
-          "name": "Get All Admins",
+          "name": "SUPER ADMIN CREATE",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "refresh-token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ADMIN LOGOUT",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/logout",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ALL ADMINS",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/v1/admin",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin"]
+              "raw": "{{base_url}}/admin",
+              "host": ["{{base_url}}"],
+              "path": ["admin"]
             }
           },
           "response": []
         },
         {
-          "name": "Get Admin By ID",
+          "name": "GET ONE ADMIN",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/v1/admin/{{admin_id}}",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin", "{{admin_id}}"]
+              "raw": "{{base_url}}/admin/asdfsdfsadfas",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "asdfsdfsadfas"]
             }
           },
           "response": []
         },
         {
-          "name": "Update Admin",
+          "name": "UPDATE ONE ADMIN",
           "request": {
             "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"admin002\",\n  \"hashed_password\": \"Admin123@\",\n  \"phone_number\": \"+998901234568\"\n}"
-            },
+            "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/v1/admin/{{admin_id}}",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin", "{{admin_id}}"]
+              "raw": "{{base_url}}/admin/asdfasdfa",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "asdfasdfa"]
             }
           },
           "response": []
         },
         {
-          "name": "Delete Admin",
+          "name": "DELETE ONE ADMIN",
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "http://localhost:3000/api/v1/admin/{{admin_id}}",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin", "{{admin_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Refresh Token",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "refresh_token_store={{refresh_token}}"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:3000/api/v1/admin/refresh-token",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin", "refresh-token"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{access_token}}"
-              },
-              {
-                "key": "Cookie",
-                "value": "refresh_token_store={{refresh_token}}"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:3000/api/v1/admin/logout",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3000",
-              "path": ["api", "v1", "admin", "logout"]
+              "raw": "{{base_url}}/admin",
+              "host": ["{{base_url}}"],
+              "path": ["admin"]
             }
           },
           "response": []
         }
       ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
     },
     {
-      "name": "Store",
-      "item": [
-        {
-          "name": "Create Store",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"login\": \"test_store\",\n    \"password\": \"test123\",\n    \"wallet\": 1000000,\n    \"image\": \"store.jpg\",\n    \"is_active\": true\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3100/api/v1/store",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "store"]
-            }
-          }
-        },
-        {
-          "name": "Get All Stores",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/store",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "store"]
-            }
-          }
-        },
-        {
-          "name": "Get Store by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/store/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "store", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "store_id"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Store",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"wallet\": 2000000,\n    \"is_active\": true\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3100/api/v1/store/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "store", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "store_id"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Store",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/store/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "store", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "store_id"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
     {
-      "name": "Debt",
-      "item": [
-        {
-          "name": "Create Debt",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"debtor_id\": \"debtor_id\",\n    \"debt_date\": \"2025-01-23T00:00:00Z\",\n    \"debt_period\": \"MONTHLY\",\n    \"debt_sum\": 1000000,\n    \"description\": \"Test debt\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debt",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debt"]
-            }
-          }
-        },
-        {
-          "name": "Get All Debts",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debt",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debt"]
-            }
-          }
-        },
-        {
-          "name": "Get Debt by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debt/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debt", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debt_id"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Debt",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"debt_sum\": 2000000,\n    \"description\": \"Updated test debt\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debt/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debt", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debt_id"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Debt",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debt/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debt", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debt_id"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Debtor",
-      "item": [
-        {
-          "name": "Create Debtor",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"full_name\": \"Test Debtor\",\n    \"phone_number\": \"+998901234567\",\n    \"image\": \"debtor.jpg\",\n    \"address\": \"Test Address\",\n    \"note\": \"Test note\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debtors",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debtors"]
-            }
-          }
-        },
-        {
-          "name": "Get All Debtors",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debtors",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debtors"]
-            }
-          }
-        },
-        {
-          "name": "Get Debtor by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debtors/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debtors", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Debtor",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"full_name\": \"Updated Test Debtor\",\n    \"phone_number\": \"+998901234567\",\n    \"address\": \"Updated Test Address\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debtors/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debtors", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Debtor",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:3100/api/v1/debtors/:id",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "3100",
-              "path": ["api", "v1", "debtors", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Authentication",
-      "item": [
-        {
-          "name": "Login",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"your_username\",\n    \"password\": \"your_password\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/login",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "login"]
-            }
-          }
-        },
-        {
-          "name": "Register",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"username\": \"new_user\",\n    \"password\": \"password123\",\n    \"full_name\": \"Full Name\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/register",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "register"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Debtors",
-      "item": [
-        {
-          "name": "Create Debtor",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"full_name\": \"John Doe\",\n    \"phone_number\": \"+998901234567\",\n    \"address\": \"Test Address\",\n    \"note\": \"Test Note\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/debtors",
-              "host": ["{{base_url}}"],
-              "path": ["debtors"]
-            }
-          }
-        },
-        {
-          "name": "Get All Debtors",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/debtors",
-              "host": ["{{base_url}}"],
-              "path": ["debtors"]
-            }
-          }
-        },
-        {
-          "name": "Get Active Debtors",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/debtors/active/all",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", "active", "all"]
-            }
-          }
-        },
-        {
-          "name": "Get Debtor by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/debtors/:id",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Debtor",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"full_name\": \"Updated Name\",\n    \"phone_number\": \"+998901234567\",\n    \"address\": \"Updated Address\",\n    \"note\": \"Updated Note\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/debtors/:id",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Upload Image",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": []
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/debtors/upload/:id",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", "upload", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Add Phone Number",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"debtor_id\": \"debtor_id_here\",\n    \"phone_number\": \"+998901234567\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/debtors/phone",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", "phone"]
-            }
-          }
-        },
-        {
-          "name": "Remove Phone Number",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/debtors/phone/:id",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", "phone", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "phone_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Images",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/debtors/:id/images",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", ":id", "images"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "debtor_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Remove Image",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/debtors/image/:id",
-              "host": ["{{base_url}}"],
-              "path": ["debtors", "image", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "image_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Messages",
-      "item": [
-        {
-          "name": "Create Message",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"debtor_id\": \"debtor_id_here\",\n    \"message\": \"Test message\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/messages",
-              "host": ["{{base_url}}"],
-              "path": ["messages"]
-            }
-          }
-        },
-        {
-          "name": "Get All Messages",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/messages",
-              "host": ["{{base_url}}"],
-              "path": ["messages"]
-            }
-          }
-        },
-        {
-          "name": "Get Message by ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/messages/:id",
-              "host": ["{{base_url}}"],
-              "path": ["messages", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "message_id_here"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Message",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/messages/:id",
-              "host": ["{{base_url}}"],
-              "path": ["messages", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "message_id_here"
-                }
-              ]
-            }
-          }
-        }
-      ]
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
     }
   ]
 }
