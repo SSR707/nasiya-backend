@@ -118,7 +118,7 @@ export class SampleMessageController {
   @ApiOperation({ summary: 'Update One Sample Message' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: '',
+    description: 'The sample message was successfully updated.',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -129,7 +129,7 @@ export class SampleMessageController {
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: '',
+    description: 'The sample message was successfully updated.',
     schema: {
       example: {
         status_code: HttpStatus.NOT_FOUND,
@@ -151,7 +151,7 @@ export class SampleMessageController {
   @ApiOperation({ summary: 'Delete One Sample Message' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: '',
+    description: 'The sample message was successfully deleted.',
     schema: {
       example: {
         status_code: HttpStatus.OK,
@@ -162,7 +162,7 @@ export class SampleMessageController {
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: '',
+    description: 'The sample message with the given ID was not found.',
     schema: {
       example: {
         status_code: HttpStatus.NOT_FOUND,

@@ -4,6 +4,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { JwtGuard } from '../../common/guard/jwt-auth.guard';
 import { StoreStatisticsService } from './store-statistics.service';
@@ -26,11 +27,11 @@ export class StoreStatisticsController {
         status_code: HttpStatus.OK,
         message: 'success',
         data: {
-          totalAmount: 5500000,
+          totalAmount: 7833333,
           duePayments: [
             {
               debtorName: 'Zufarbek',
-              amount: '2000000.00',
+              amount: '3333333.00',
             },
             {
               debtorName: 'Zufarbek',
@@ -51,6 +52,12 @@ export class StoreStatisticsController {
       },
     },
   })
+  @ApiQuery({
+    name: 'date',
+    description: 'date (YYYY-MM-DD)',
+    required: true,
+    example: '2025-02-01',
+  })
   async getDailyStatistics(
     @UserID() storeId: string,
     @Query('date') dateStr: string,
@@ -58,7 +65,6 @@ export class StoreStatisticsController {
     const selectedDate = new Date(dateStr);
     return this.statisticsService.getDuePayments(storeId, selectedDate);
   }
-  // get onde monthly all payments sum
 
   @Get('main')
   @ApiOperation({ summary: 'Get all debtors debt sum and all debtors count' })
@@ -90,7 +96,7 @@ export class StoreStatisticsController {
       example: {
         status_code: HttpStatus.OK,
         message: 'success',
-        data: {},
+        lateDebts: 2,
       },
     },
   })

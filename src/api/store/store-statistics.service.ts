@@ -48,28 +48,39 @@ export class StoreStatisticsService {
 
     const selectedYear = selectedDate.getFullYear();
     const selectedMonth = selectedDate.getMonth();
-
+    const selectedDay = selectedDate.getDate();
+    
     for (const debtor of allStoreData.debtors) {
       for (const debt of debtor.debts) {
-        const startDate = new Date(debt.debt_date);
-        const debtYear = startDate.getFullYear();
-        const debtMonth = startDate.getMonth();
+        let currentPaymentDate = new Date(debt.debt_date);
 
-        const monthsDifference =
-          (selectedYear - debtYear) * 12 + selectedMonth - debtMonth;
+        for (let i = 0; i < debt.debt_period; i++) {
+          const paymentYear = currentPaymentDate.getFullYear();
+          const paymentMonth = currentPaymentDate.getMonth();
+          const paymentDay = currentPaymentDate.getDate();
 
-        if (monthsDifference >= 0 && monthsDifference < debt.debt_period) {
-          duePayments.push({
-            debtorName: debtor.full_name,
-            amount: debt.month_sum,
-          });
-
-          totalAmount += +debt.month_sum;
+          if (paymentYear === selectedYear && paymentMonth === selectedMonth) {
+            totalAmount += +debt.month_sum;
+          }
+          if (
+            paymentYear === selectedYear &&
+            paymentMonth === selectedMonth &&
+            paymentDay === selectedDay
+          ) {
+            duePayments.push({
+              debtorName: debtor.full_name,
+              amount: debt.month_sum,
+            });
+          }
+          currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 1);
         }
       }
     }
-
-    return { totalAmount, duePayments };
+    return {
+      status_code: HttpStatus.OK,
+      message: 'success',
+      data: { totalAmount, duePayments },
+    };
   }
 
   async mainMenuStatistics(id: string) {
