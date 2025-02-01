@@ -27,6 +27,7 @@ export class DebtorService extends BaseService<
   CreateDebtorDto,
   DeepPartial<DebtorEntity>
 > {
+  service: any;
   constructor(
     @InjectRepository(DebtorEntity)
     private readonly debtorRepository: DebtorRepository,

@@ -11,6 +11,7 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -40,30 +41,38 @@ export class DebtorController {
   constructor(private readonly debtorService: DebtorService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new debtor' })
+  @ApiOperation({ summary: 'Create new debtors' })
   @ApiResponse({
-    status: 201,
-    description: 'The debtor has been successfully created.',
-  })
-  @ApiOperation({
-    summary: 'Create a new debtor',
-    description: 'Creates a new debtor record in the system',
+    status: HttpStatus.CREATED,
+    description: 'Debtors created successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.CREATED,
+        message: 'success',
+        data: {
+          id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+          fullname: 'John Doe',
+          phone_number: '+998995564733',
+          address: '123 Main St',
+          is_active: true,
+          created_at: '1723900952341',
+          updated_at: '1728794668799',
+        },
+      },
+    },
   })
   @ApiResponse({
-    status: 201,
-    description: 'The debtor has been successfully created.',
-    type: DebtorEntity,
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to create debtors',
+    schema: {
+      example: {
+        status_code: HttpStatus.BAD_REQUEST,
+        message: 'Error creating debtors',
+      },
+    },
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request - Invalid input data.',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  create(@UserID() id: string, @Body() createDebtorDto: CreateDebtorDto) {
-    return this.debtorService.create({ store_id: id, ...createDebtorDto });
+  create(@UserID() id: string, @Body() createDebtorsDto: CreateDebtorDto) {
+    return this.debtorService.create({ store_id: id, ...createDebtorsDto });
   }
 
   @Get()
@@ -72,16 +81,29 @@ export class DebtorController {
     name: 'include',
     required: false,
     type: String,
-    description: 'Comma-separated relations to include (e.g., "images,phones")',
+    description: 'Comma-separated relations to include',
   })
   @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved all debtors',
-    type: [DebtorEntity],
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
+    status: HttpStatus.OK,
+    description: 'All debtors fetched successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: [
+          {
+            id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+            fullname: 'John Doe',
+            phone_number: '+998995564733',
+            address: '123 Main St',
+            is_active: true,
+            total_debt: 1000.00,
+            created_at: '1723900952341',
+            updated_at: '1728794668799',
+          },
+        ],
+      },
+    },
   })
   async findAll(
     @Query('page') page?: number,
@@ -96,141 +118,164 @@ export class DebtorController {
     return this.debtorService.getAllMessages(options, relations);
   }
 
-  @Get('active/all')
-  @ApiOperation({ summary: 'Get all active debtors' })
-  @ApiQuery({
-    name: 'include',
-    required: false,
-    type: String,
-    description: 'Comma-separated relations to include (e.g., "images,phones")',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved all active debtors',
-    type: [DebtorEntity],
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  async findAllActive(
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-    @Query('include') include?: string,
-  ) {
-    const options = {
-      skip: page ? (page - 1) * (limit || 10) : 0,
-      take: limit || 10,
-      where: { is_active: true },
-    };
-    const relations = include?.split(',').filter(Boolean) || [];
-    return this.debtorService.findAllActive(options, relations);
-  }
-
   @Get(':id')
-  @ApiOperation({ summary: 'Get debtor by id' })
-  @ApiParam({ name: 'id', description: 'Debtor ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved debtor',
-    type: DebtorEntity,
+  @ApiOperation({ summary: 'Get debtors by ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
   @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
+    status: HttpStatus.OK,
+    description: 'Debtors fetched successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+          fullname: 'John Doe',
+          phone_number: '+998995564733',
+          address: '123 Main St',
+          is_active: true,
+          total_debt: 1000.00,
+          created_at: '1723900952341',
+          updated_at: '1728794668799',
+        },
+      },
+    },
   })
   @ApiResponse({
-    status: 404,
-    description: 'Debtor not found',
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debtors not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
   })
   async findOne(@Param('id') id: string) {
     return this.debtorService.findOne(id, ['debts']);
   }
 
   @Get(':id/total-debt')
-  @ApiOperation({
-    summary: 'Get total debt for a debtor',
-    description:
-      'Calculates and returns the total debt amount for a specific debtor',
-  })
+  @ApiOperation({ summary: 'Get total debt for debtors' })
   @ApiParam({
     name: 'id',
-    description: 'The ID of the debtor',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
   @ApiResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Total debt calculated successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          total_debt: 1000.00,
+        },
+      },
+    },
   })
   @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Debtor with the specified ID was not found',
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debtors not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
   })
   getTotalDebt(@Param('id') id: string) {
     return this.debtorService.getTotalDebt(id);
   }
 
   @Patch(':id')
-  @ApiOperation({
-    summary: 'Update a debtor',
-    description: 'Updates the information of an existing debtor',
-  })
+  @ApiOperation({ summary: 'Update debtors profile' })
   @ApiParam({
     name: 'id',
-    description: 'The ID of the debtor to update',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
   @ApiResponse({
-    status: 200,
-    description: 'Debtor updated successfully',
-    type: DebtorEntity,
+    status: HttpStatus.OK,
+    description: 'Debtors updated successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+          fullname: 'John Doe',
+          phone_number: '+998995564733',
+          address: '123 Main St',
+          is_active: true,
+          updated_at: '1728794668799',
+        },
+      },
+    },
   })
-  @ApiResponse({ status: 400, description: 'Bad Request - Invalid input data' })
   @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debtors not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Debtor with the specified ID was not found',
-  })
-  update(@Param('id') id: string, @Body() updateDebtorDto: UpdateDebtorDto) {
-    return this.debtorService.updateProfile(id, updateDebtorDto);
+  update(@Param('id') id: string, @Body() updateDebtorsDto: UpdateDebtorDto) {
+    return this.debtorService.updateProfile(id, updateDebtorsDto);
   }
 
   @Delete(':id')
-  @ApiOperation({
-    summary: 'Delete a debtor',
-    description: 'Soft deletes a debtor from the system (marks as deleted)',
-  })
+  @ApiOperation({ summary: 'Delete debtors' })
   @ApiParam({
     name: 'id',
-    description: 'The ID of the debtor to delete',
-    example: '123e4567-e89b-12d3-a456-426614174000',
-  })
-  @ApiResponse({ status: 200, description: 'Debtor deleted successfully' })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
   @ApiResponse({
-    status: 404,
-    description: 'Debtor with the specified ID was not found',
+    status: HttpStatus.OK,
+    description: 'Debtors deleted successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debtors not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
   })
   remove(@Param('id') id: string) {
     return this.debtorService.deleteSoft(id);
   }
 
   @Post(':id/images')
-  @ApiOperation({
-    summary: 'Upload debtor image',
-    description: 'Upload an image file for a specific debtor',
+  @ApiOperation({ summary: 'Upload debtors image' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
-  @ApiParam({ name: 'id', description: 'Debtor ID' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -239,26 +284,24 @@ export class DebtorController {
         file: {
           type: 'string',
           format: 'binary',
-          description: 'Image file to upload',
         },
       },
     },
   })
   @ApiResponse({
-    status: 201,
+    status: HttpStatus.OK,
     description: 'Image uploaded successfully',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request - No file uploaded or invalid file format',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Debtor not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+          url: './image.png',
+          created_at: '1723900952341',
+        },
+      },
+    },
   })
   @UseInterceptors(FileInterceptor('file'))
   uploadImage(
@@ -271,142 +314,62 @@ export class DebtorController {
     return this.debtorService.uploadDebtorImage(id, file);
   }
 
-  @Delete('images/:id')
-  @ApiOperation({
-    summary: 'Remove debtor image',
-    description: 'Remove an image from a debtor',
-  })
-  @ApiParam({ name: 'id', description: 'Image ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Image removed successfully',
+  @Post(':id/phones')
+  @ApiOperation({ summary: 'Add debtors phone number' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
   @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Image not found',
-  })
-  removeImage(@Param('id') id: string) {
-    return this.debtorService.removeDebtorImage(id);
-  }
-
-  @Get(':id/images')
-  @ApiOperation({
-    summary: 'Get debtor images',
-    description: 'Get all images for a specific debtor',
-  })
-  @ApiParam({ name: 'id', description: 'Debtor ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved debtor images',
+    status: HttpStatus.CREATED,
+    description: 'Phone number added successfully',
     schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          url: { type: 'string' },
-          created_at: { type: 'string', format: 'date-time' },
+      example: {
+        status_code: HttpStatus.CREATED,
+        message: 'success',
+        data: {
+          id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+          phone_number: '+998995564733',
+          is_primary: true,
+          created_at: '1723900952341',
         },
       },
     },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Debtor not found',
-  })
-  getImages(@Param('id') id: string) {
-    return this.debtorService.getDebtorImages(id);
-  }
-
-  @Post(':id/phones')
-  @ApiOperation({
-    summary: 'Add debtor phone number',
-    description: 'Add a new phone number for a specific debtor',
-  })
-  @ApiParam({ name: 'id', description: 'Debtor ID' })
-  @ApiBody({ type: CreateDebtorPhoneDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Phone number added successfully',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request - Invalid phone number format',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Debtor not found',
   })
   addPhone(
     @Param('id') id: string,
-    @Body() createDebtorPhoneDto: CreateDebtorPhoneDto,
+    @Body() createDebtorsPhoneDto: CreateDebtorPhoneDto,
   ) {
-    return this.debtorService.addDebtorPhone(createDebtorPhoneDto);
-  }
-
-  @Delete('phones/:id')
-  @ApiOperation({
-    summary: 'Remove debtor phone number',
-    description: 'Remove a phone number from a debtor',
-  })
-  @ApiParam({ name: 'id', description: 'Phone number ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Phone number removed successfully',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Phone number not found',
-  })
-  removePhone(@Param('id') id: string) {
-    return this.debtorService.removeDebtorPhone(id);
+    return this.debtorService.service.addDebtorsPhone(createDebtorsPhoneDto);
   }
 
   @Get(':id/phones')
-  @ApiOperation({
-    summary: 'Get debtor phone numbers',
-    description: 'Get all phone numbers for a specific debtor',
+  @ApiOperation({ summary: 'Get debtors phone numbers' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
   })
-  @ApiParam({ name: 'id', description: 'Debtor ID' })
   @ApiResponse({
-    status: 200,
-    description: 'Successfully retrieved debtor phone numbers',
+    status: HttpStatus.OK,
+    description: 'Phone numbers fetched successfully',
     schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          phone_number: { type: 'string' },
-          is_primary: { type: 'boolean' },
-          created_at: { type: 'string', format: 'date-time' },
-        },
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: [
+          {
+            id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+            phone_number: '+998995564733',
+            is_primary: true,
+            created_at: '1723900952341',
+          },
+        ],
       },
     },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized - JWT token is missing or invalid',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Debtor not found',
   })
   getPhones(@Param('id') id: string) {
     return this.debtorService.getDebtorPhones(id);
