@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeepPartial } from 'typeorm';
@@ -84,7 +85,9 @@ export class DebtService extends BaseService<
       take: limit,
       relations: ['payments'],
     });
-
+    if (data.length == 0) {
+      throw new HttpException('not found', 404);
+    }
     return {
       status_code: HttpStatus.OK,
       message: `${limit} debts fetched.`,
@@ -229,7 +232,9 @@ export class DebtService extends BaseService<
         created_at: { direction: 'DESC' },
       },
     });
-
+    if (debtImages.length == 0) {
+      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+    }
     return {
       status_code: HttpStatus.OK,
       message: 'Debt images retrieved successfully.',
