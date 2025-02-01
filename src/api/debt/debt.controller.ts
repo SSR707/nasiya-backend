@@ -115,6 +115,39 @@ export class DebtController {
     type: String,
     description: 'Comma-separated relations to include (e.g., "images,phones")',
   })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Debt not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: `Debts fetched.`,
+        data: [
+          {
+            id: '1c2c57c8-cd1e-4fd0-ba22-7eb4545ee942',
+            debtor_id: '7aeadab4-1b9c-4d6a-ae8d-e95ea1929282',
+            debt_date: '2025-01-12',
+            debt_period: 12,
+            debt_sum: 12000000,
+            month_sum: 1000000,
+            description: 'Test debt',
+            created_at: 1738010850469,
+            updated_at: 1738010843136,
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debt not found',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
+  })
   @Get('find-pagination')
   findAllWithPaginations(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
@@ -161,7 +194,7 @@ export class DebtController {
   calculateNextPayment(@Param('id', ParseUUIDPipe) id: string) {
     return this.debtService.calculateNextPayment(id);
   }
-  
+
   @ApiOperation({
     summary: 'Get debt by ID',
   })
@@ -298,6 +331,34 @@ export class DebtController {
       },
     },
   })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'image added successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.CREATED,
+        message: 'Debt image successfully created.',
+        data: {
+          image: 'uploads/debts/fe9a467d-44fe-4bb1-9864-ff31f4ed4847.png',
+          debt_id: '47105a8b-439b-4d0d-b7d4-a345706e1229',
+          id: '566d3199-0186-40da-948a-92d370d01658',
+          created_at: '1738425625763',
+          updated_at: '1738425610753',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Uuid Id cannot be parsed',
+    schema: {
+      example: {
+        message: 'Validation failed (uuid is expected)',
+        error: 'Bad Request',
+        statusCode: HttpStatus.BAD_REQUEST,
+      },
+    },
+  })
   @UseInterceptors(FileInterceptor('file'))
   @Post('image/:id')
   createDebtImage(
@@ -312,6 +373,35 @@ export class DebtController {
     description: 'Get all images for a specific debt',
   })
   @ApiParam({ name: 'id', description: 'Debt ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Image fetched',
+    schema: {
+      example: {
+        status_code: 200,
+        message: 'Debt images retrieved successfully.',
+        data: [
+          {
+            id: '566d3199-0186-40da-948a-92d370d01658',
+            created_at: '1738425625763',
+            updated_at: '1738425610753',
+            image: 'uploads/debts/fe9a467d-44fe-4bb1-9864-ff31f4ed4847.png',
+            debt_id: '47105a8b-439b-4d0d-b7d4-a345706e1229',
+          },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Image not found on debt',
+    schema: {
+      example: {
+        statusCode: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
+  })
   @Get('images/:id')
   findImagesById(@Param('id', ParseUUIDPipe) id: string) {
     return this.debtService.findDebtImages(id);
@@ -322,6 +412,27 @@ export class DebtController {
     description: 'Remove an image from a debtor',
   })
   @ApiParam({ name: 'id', description: 'Image ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Deleted Successfully',
+    schema: {
+      example: {
+        status_code: 200,
+        message: 'Image deleted successfully.',
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Not Found',
+    schema: {
+      example: {
+        message: 'Error deleting image: Image not found!',
+        error: 'Bad Request',
+        statusCode: HttpStatus.BAD_REQUEST,
+      },
+    },
+  })
   @Delete('image/:id')
   deleteImageById(@Param('id', ParseUUIDPipe) id: string) {
     return this.debtService.deleteDebtImage(id);
