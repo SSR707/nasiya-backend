@@ -1,9 +1,23 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { resolve } from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { config } from '../config';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { resolve } from 'path';
+import { config } from '../config';
+import { AdminModule } from './admin/admin.module';
+import { StoreModule } from './store/store.module';
+import { PaymentModule } from './payment/payment.module';
+import { DebtorModule } from './debtors/debtor.module';
+import { DebtModule } from './debt/debt.module';
+import { AuthModule } from './auth/auth.module';
+import { LikesModule } from './likes/likes.module';
+import { CustomJwtModule } from '../infrastructure';
+import { MessagesModule } from './messages/messages.module';
+import { SampleMessageModule } from './sample-message/sample-message.module';
+import { JwtGuard } from 'src/common';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -13,6 +27,13 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      },
+    ]),
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, '..', '..', '..', 'base'),
       serveRoot: '/base',
@@ -20,6 +41,26 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    AdminModule,
+    CustomJwtModule,
+    PaymentModule,
+    StoreModule,
+    DebtModule,
+    DebtorModule,
+    AuthModule,
+    LikesModule,
+    MessagesModule,
+    SampleMessageModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

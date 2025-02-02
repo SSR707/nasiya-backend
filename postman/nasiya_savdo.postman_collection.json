@@ -1,0 +1,144 @@
+{
+  "info": {
+    "_postman_id": "52dda023-007a-4574-b432-b36a909decc5",
+    "name": "NASIYA SAVDO API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41354872"
+  },
+  "item": [
+    {
+      "name": "ADMIN",
+      "item": [
+        {
+          "name": "AUTH LOGIN",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/createAdmin",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "createAdmin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ADMIN CREATE",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/signin",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "signin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SUPER ADMIN CREATE",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/refresh-token",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "refresh-token"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ADMIN LOGOUT",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/logout",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "logout"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ALL ADMINS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin",
+              "host": ["{{base_url}}"],
+              "path": ["admin"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ONE ADMIN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/asdfsdfsadfas",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "asdfsdfsadfas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE ONE ADMIN",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/asdfasdfa",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "asdfasdfa"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE ONE ADMIN",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin",
+              "host": ["{{base_url}}"],
+              "path": ["admin"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    }
+  ]
+}
