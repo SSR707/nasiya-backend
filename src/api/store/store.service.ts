@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial } from 'typeorm';
+import { DeepPartial, ILike } from 'typeorm';
 import {
   ResetPasscodeStoreDto,
   UpdateStoreDto,
@@ -65,6 +65,27 @@ export class StoreService extends BaseService<
     return await this.findOneBy({
       where: { id },
       select: {
+        image: true,
+        fullname: true,
+        phone_number: true,
+        email: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+  }
+
+  async getStoreById(id: string, searchQuery: string) {
+    return await this.findOneBy({
+      where: {
+        id,
+        debtors: {
+          full_name: searchQuery ? ILike(`%${searchQuery}%`) : undefined,
+        },
+      },
+      relations: ['debtors'],
+      select: {
+        id: true,
         image: true,
         fullname: true,
         phone_number: true,
