@@ -10,6 +10,7 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -101,6 +102,31 @@ export class StoreController {
   @Get('profile')
   getProfile(@UserID() id: string) {
     return this.storeService.getProfile(id);
+  }
+
+  @ApiOperation({ summary: 'Fetch store StoreById' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'StoreById of store owner',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          image: './logo.png',
+          fullname: 'John Doe',
+          phone_number: '+998995564733',
+          email: 'johndoe@example.com',
+          created_at: '1723900952341',
+          updated_at: '1728794668799',
+        },
+      },
+    },
+  })
+  @ApiBearerAuth()
+  @Get('store-debtors')
+  getStoreById(@UserID() id: string, @Query('fullname') searchQuary?: string) {
+    return this.storeService.getStoreById(id, searchQuary);
   }
 
   @ApiOperation({ summary: 'Update store profile' })
