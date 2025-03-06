@@ -49,7 +49,7 @@ export class StoreStatisticsService {
     const selectedYear = selectedDate.getFullYear();
     const selectedMonth = selectedDate.getMonth();
     const selectedDay = selectedDate.getDate();
-    
+
     for (const debtor of allStoreData.debtors) {
       for (const debt of debtor.debts) {
         let currentPaymentDate = new Date(debt.debt_date);
@@ -84,7 +84,7 @@ export class StoreStatisticsService {
   }
 
   async mainMenuStatistics(id: string) {
-    const [debtorsCount, totalDebt] = await Promise.all([
+    const [debtorsCount, totalDebt, walletCash] = await Promise.all([
       this.debtorRepository.count({
         where: { store: { id } },
       }),
@@ -95,6 +95,7 @@ export class StoreStatisticsService {
         .where('store.id = :id', { id })
         .select('COALESCE(SUM(debt.debt_sum), 0)', 'total')
         .getRawOne(),
+      this.storeRepository.findOne({ where: { id }, select: { wallet: true } }),
     ]);
     return {
       status_code: HttpStatus.OK,
@@ -102,6 +103,7 @@ export class StoreStatisticsService {
       data: {
         total_debts: Number(totalDebt.total) || 0,
         debtors_count: debtorsCount,
+        ...walletCash,
       },
     };
   }
