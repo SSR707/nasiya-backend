@@ -334,6 +334,58 @@ export class DebtorService extends BaseService<
     }
   }
 
+  async uploadCreateDebtorImage(file: Express.Multer.File) {
+    try {
+      const queryRunner = this.dataSource.createQueryRunner();
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+
+      try {
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+          throw new BadRequestException(
+            'Only JPG, PNG and GIF files are allowed',
+          );
+        }
+        file.originalname = Date.now() + file.originalname;
+
+        const uploadedFile = await this.fileService.uploadFile(file, 'debtors');
+
+        if (!uploadedFile || !uploadedFile.path) {
+          throw new BadRequestException('Failed to upload image');
+        }
+
+        await queryRunner.commitTransaction();
+
+        return {
+          status_code: 201,
+          message: 'Image uploaded successfully',
+          data: {
+            image_url: uploadedFile.path,
+          },
+        };
+      } catch (error) {
+        await queryRunner.rollbackTransaction();
+        if (error instanceof BadRequestException) {
+          throw error;
+        }
+        throw new BadRequestException(
+          `Failed to process image: ${error.message}`,
+        );
+      } finally {
+        await queryRunner.release();
+      }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException(`Error uploading image: ${error.message}`);
+    }
+  }
+
   async getDebtorImages(id: string) {
     try {
       // First check if debtor exists

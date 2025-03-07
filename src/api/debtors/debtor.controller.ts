@@ -314,6 +314,41 @@ export class DebtorController {
     return this.debtorService.uploadDebtorImage(id, file);
   }
 
+  @Post('/images')
+  @ApiOperation({ summary: 'Upload debtors image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Image uploaded successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          url: './image.png',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  uploadCreateImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    return this.debtorService.uploadCreateDebtorImage(file);
+  }
+
   @Post(':id/phones')
   @ApiOperation({ summary: 'Add debtors phone number' })
   @ApiParam({
