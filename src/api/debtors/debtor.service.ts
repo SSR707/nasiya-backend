@@ -356,12 +356,12 @@ export class DebtorService extends BaseService<
         }
 
         await queryRunner.commitTransaction();
-
+        const pathImg = 'http://localhost:3133' + '/' + uploadedFile.path;
         return {
           status_code: 201,
           message: 'Image uploaded successfully',
           data: {
-            image_url: uploadedFile.path,
+            image_url: pathImg,
           },
         };
       } catch (error) {
