@@ -180,3 +180,4 @@ pnpm run test:e2e
 # test qamrovini tekshirish
 pnpm run test:cov
 ```
+
