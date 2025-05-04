@@ -16,6 +16,7 @@ export class BcryptEncryption {
     try {
       return await bcrypt.compare(password, hash);
     } catch (error) {
+      
       throw new BadRequestException(`Error on decrypt: ${error}`);
     }
   }

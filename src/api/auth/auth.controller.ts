@@ -6,6 +6,8 @@ import {
   Res,
   UseGuards,
   Get,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -20,6 +22,7 @@ import { CookieGetter, UserID } from '../../common';
 import { PasscodeStoreDto, ResetPasscodeStoreDto } from '../store/dto';
 import { StoreService } from '../store/store.service';
 import { Public } from 'src/common/decorator/auth.decorator';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @ApiTags('Auth Api')
 @Controller('auth')
@@ -186,6 +189,17 @@ export class AuthController {
   ) {
     return this.authService.loginWithPasscode(id, passcodeDto);
   }
+
+  @ApiOperation({ summary: 'Update password store profile' })
+  @ApiBearerAuth()
+  @Patch('update-password/:id')
+  updatePassword(
+    @Param('id') id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    return this.authService.updatePassword(id, updatePasswordDto);
+  }
+
 
   @ApiOperation({ summary: 'Logout store' })
   @ApiResponse({

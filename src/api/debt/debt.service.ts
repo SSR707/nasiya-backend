@@ -50,7 +50,11 @@ export class DebtService extends BaseService<
       createDebtDto.debt_sum / createDebtDto.debt_period,
     );
     // create debt
-    const data = this.debtRepository.create({ ...createDebtDto, month_sum });
+    const data = this.debtRepository.create({
+      ...createDebtDto,
+      initial_debt_period: createDebtDto.debt_period,
+      month_sum,
+    });
     await this.debtRepository.save(data);
 
     return {
@@ -98,22 +102,46 @@ export class DebtService extends BaseService<
   async calculateNextPayment(DebtId: string) {
     const debt = await this.findOneById(DebtId);
     const count = Math.floor(debt.data.debt_sum / debt.data.month_sum);
+    let debtDate: Date;
+    if (debt.data.debt_date instanceof Date) {
+      debtDate = new Date(debt.data.debt_date);
+    } else if (typeof debt.data.debt_date === 'string') {
+      debtDate = new Date(Date.parse(debt.data.debt_date));
+    } else if (typeof debt.data.debt_date === 'number') {
+      debtDate = new Date(debt.data.debt_date);
+    } else {
+      throw new Error('Invalid date format');
+    }
+
+    const totalMonths = debt.data.initial_debt_period;
+
+    const paidMonths = totalMonths - debt.data.debt_period;
+    const paidPercentage = ((paidMonths / totalMonths) * 100).toFixed(2);
+    console.log(paidPercentage);
+
+    debtDate.setMonth(debtDate.getMonth() + 1);
+
     return {
+      debtId: DebtId,
       nextMonth:
         debt.data.debt_sum - debt.data.month_sum * count || debt.data.month_sum,
       nextMonths: debt.data.month_sum,
       debt_period: debt.data.debt_period,
+      next_pay_date: debtDate,
+      paidPercentage,
     };
   }
 
   async findOneDebtById(id: string) {
     const debtData = await this.debtRepository.findOne({
       where: { id },
+      relations: ['images'],
     });
     if (!debtData) {
       throw new NotFoundException('Debt not found!');
     }
 
+    debtData.debt_sum = +debtData.debt_sum;
     return {
       status_code: HttpStatus.OK,
       message: 'Debt found.',
@@ -200,8 +228,9 @@ export class DebtService extends BaseService<
         throw new BadRequestException('Failed to upload image');
       }
 
+      const pathImg = 'http://localhost:3133' + '/' + uploadFile.path;
       const newImage = queryRunner.manager.create(DebtImageEntity, {
-        image: uploadFile.path,
+        image: pathImg,
         debt_id: id,
       });
 
@@ -225,6 +254,67 @@ export class DebtService extends BaseService<
     }
   }
 
+  async uploadDebtImage(file: Express.Multer.File) {
+    if (!file) {
+      throw new NotFoundException('Debt ID and file are required!');
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/gif'];
+      if (!allowedMimeTypes.includes(file.mimetype)) {
+        throw new BadRequestException(
+          'Only JPG, PNG and GIF files are allowed',
+        );
+      }
+
+      const uploadFile = await this.fileService.uploadFile(file, 'debts');
+
+      if (!uploadFile || !uploadFile.path) {
+        throw new BadRequestException('Failed to upload image');
+      }
+
+      const pathImg = 'http://localhost:3133' + '/' + uploadFile.path;
+
+      return {
+        status_code: HttpStatus.CREATED,
+        message: 'Debt image successfully created.',
+        data: {
+          image_url: pathImg,
+        },
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      throw new BadRequestException(
+        `Failed to process image: ${error.message}`,
+      );
+    } finally {
+      // End transaction
+      await queryRunner.release();
+    }
+  }
+
+  async createImgDebt(id: string, url: string) {
+    try {
+      const newImage = this.debtImageRepository.create({
+        image: url,
+        debt_id: id,
+      });
+      await this.debtImageRepository.save(newImage);
+      return {
+        status_code: HttpStatus.OK,
+        message: 'Image Add successfully.',
+      };
+    } catch (error) {
+      throw new BadRequestException(
+        `Failed to process image: ${error.message}`,
+      );
+    }
+  }
   async findDebtImages(id: string) {
     const debtImages = await this.debtImageRepository.find({
       where: { debt_id: id },

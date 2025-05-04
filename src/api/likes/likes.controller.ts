@@ -5,6 +5,7 @@ import {
   ParseUUIDPipe,
   HttpStatus,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 
 import {
@@ -43,7 +44,7 @@ export class LikesController {
     type: String,
     example: 'b2d4aa27-0768-4456-947f-f8930c294394',
   })
-  @Get('toggleLike/:id')
+  @Post('toggleLike/:id')
   handleLikeOrUnlike(
     @UserID() id: string,
     @Param('id', ParseUUIDPipe) debtorId: string,

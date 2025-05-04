@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEnum,
   IsISO8601,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUUID,
@@ -19,6 +21,15 @@ export class CreateDebtDto {
   @IsNotEmpty()
   @IsUUID()
   debtor_id: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Debt Name',
+    example: 'Iphone',
+  })
+  @IsNotEmpty()
+  @IsString()
+  debt_name: string;
 
   @ApiProperty({
     type: Date,
@@ -49,7 +60,15 @@ export class CreateDebtDto {
     description: 'Debt description',
     example: 'you must pay for this device for 6 months',
   })
-  @IsNotEmpty()
   @IsString()
   description: string;
+
+  @ApiProperty({
+    type: Boolean,
+    description: 'Debt is active',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  is_active: boolean;
 }

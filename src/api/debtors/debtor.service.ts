@@ -86,7 +86,7 @@ export class DebtorService extends BaseService<
         where: { id },
         relations: relations,
       });
-
+      debtor.debts = debtor.debts.filter((debt) => debt.is_active);
       if (!debtor) {
         throw new NotFoundException(`Debtor with ID ${id} not found`);
       }
@@ -227,20 +227,18 @@ export class DebtorService extends BaseService<
   }
 
   async getTotalDebt(id: string) {
-    const debtor = await this.findOne(id);
+    const debtor = await this.findOne(id, ['debts']);
 
     try {
-      const debts = debtor.data?.debts || [];
+      const debts = debtor?.debts || [];
       const totalDebt = debts
-        .map((debt) => Number(debt.amount))
+        .map((debt) => Number(debt.debt_sum))
         .reduce((sum, amount) => {
           if (isNaN(amount)) {
             throw new Error(`Invalid debt amount found: ${amount}`);
           }
           return sum + amount;
         }, 0);
-
-      console.log(`Total Debt: ${totalDebt}`);
 
       return {
         status_code: 200,
@@ -287,17 +285,19 @@ export class DebtorService extends BaseService<
         if (!uploadedFile || !uploadedFile.path) {
           throw new BadRequestException('Failed to upload image');
         }
+        const pathImg = 'http://localhost:3133' + '/' + uploadedFile.path;
 
         // Update DebtorEntity with new image path
         await queryRunner.manager.update(DebtorEntity, id, {
-          image: uploadedFile.path,
+          image: pathImg,
           updated_at: Date.now(),
         });
 
         // Add new image to DebtorImageEntity
+
         const newImage = this.debtorImageRepository.create({
           debtor_id: id,
-          image: uploadedFile.path,
+          image: pathImg,
           debtor: debtor,
         });
 
@@ -331,6 +331,21 @@ export class DebtorService extends BaseService<
         throw error;
       }
       throw new BadRequestException(`Error uploading image: ${error.message}`);
+    }
+  }
+
+  async uploadImage(id: string, url: string) {
+    try {
+      const newImg = this.debtorImageRepository.create({
+        debtor_id: id,
+        image: url,
+      });
+      return await this.debtorImageRepository.save(newImg);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(`Error: ${error.message}`);
     }
   }
 
@@ -478,6 +493,15 @@ export class DebtorService extends BaseService<
     };
   }
 
+  async deleteDebtorImage(id: string) {
+    await this.debtorImageRepository.delete(id);
+
+    return {
+      status_code: 201,
+      message: 'Debtor image delete successfully'
+    };
+  }
+
   async addDebtorPhone(createDebtorPhoneDto: CreateDebtorPhoneDto) {
     try {
       // Check if phone number already exists
@@ -571,7 +595,7 @@ export class DebtorService extends BaseService<
   }
 
   async deleteSoft(id: string) {
-    const debtor = await this.findOne(id);
+    const debtor = await this.debtorRepository.findOne({where: {id}});
 
     try {
       const queryRunner = this.dataSource.createQueryRunner();

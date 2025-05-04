@@ -369,6 +369,90 @@ export class DebtController {
   }
 
   @ApiOperation({
+    summary: 'Upload debt image',
+    description: 'Upload an image file for a specific debt',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Image file to upload',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'image added successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.CREATED,
+        message: 'Debt image successfully created.',
+        data: {
+          image_url: '.png or jpg',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Uuid Id cannot be parsed',
+    schema: {
+      example: {
+        message: 'Validation failed (uuid is expected)',
+        error: 'Bad Request',
+        statusCode: HttpStatus.BAD_REQUEST,
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  @Post('upload-imag')
+  uploadDebtImage(@UploadedFile() file: Express.Multer.File) {
+    return this.debtService.uploadDebtImage(file);
+  }
+
+  @ApiOperation({
+    summary: 'Upload debt image',
+    description: 'Upload an image file for a specific debt',
+  })
+  @ApiParam({ name: 'id', description: 'Debt ID' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'image added successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.CREATED,
+        message: 'Debt image successfully created.',
+        data: {
+          url:'svg , jpg'
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Uuid Id cannot be parsed',
+    schema: {
+      example: {
+        message: 'Validation failed (uuid is expected)',
+        error: 'Bad Request',
+        statusCode: HttpStatus.BAD_REQUEST,
+      },
+    },
+  })
+  @Post('image-upload/:id')
+  createDebtImg(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('url') url: string,
+  ) {
+    return this.debtService.createImgDebt(id, url);
+  }
+
+  @ApiOperation({
     summary: 'Get debt images',
     description: 'Get all images for a specific debt',
   })

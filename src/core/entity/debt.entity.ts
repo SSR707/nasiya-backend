@@ -10,8 +10,14 @@ export class DebtEntity extends BaseEntity {
   @Column({ type: 'timestamp' })
   debt_date: Date;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  debt_name: string;
+
   @Column({ type: 'int' })
   debt_period: number;
+
+  @Column({ type: 'int' })
+  initial_debt_period: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   debt_sum: number;
@@ -34,4 +40,7 @@ export class DebtEntity extends BaseEntity {
 
   @OneToMany(() => DebtImageEntity, (image) => image.debt)
   images: DebtImageEntity[];
+
+  @Column({ type: 'boolean', name: 'is_active', default: true })
+  is_active: boolean;
 }

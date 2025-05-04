@@ -28,7 +28,14 @@ export class PaymentService extends BaseService<
 
   async createPayments(createPaymentDto: CreatePaymentDto) {
     const debt = await this.debtService.findOneById(createPaymentDto.debt_id);
-    if (debt.data.debt_sum < createPaymentDto.sum) {
+    if (debt.data.debt_sum <= 10) {
+      this.debtService.updateDebtById(debt.data.id, { is_active: false });
+      throw new BadRequestException('The Debt is inactive');
+    }
+    if (
+      debt.data.debt_sum < createPaymentDto.sum &&
+      createPaymentDto.type !== 'one_month'
+    ) {
       throw new BadRequestException(
         'Payment amount exceeds the remaining debt.',
       );
@@ -40,20 +47,30 @@ export class PaymentService extends BaseService<
     } else if (createPaymentDto.type === 'multi_month') {
       count = Math.floor(createPaymentDto.sum / debt.data.month_sum);
     } else if (createPaymentDto.type === 'any_payment') {
-      const debt_month_pay = await this.debtService.calculateNextPayment(debt.data.id)
-      if(debt_month_pay.nextMonth <= createPaymentDto.sum &&  createPaymentDto.sum < debt.data.month_sum ){ 
-        count += 1
-      }else{
-
+      const debt_month_pay = await this.debtService.calculateNextPayment(
+        debt.data.id,
+      );
+      if (
+        debt_month_pay.nextMonth <= createPaymentDto.sum &&
+        createPaymentDto.sum < debt.data.month_sum
+      ) {
+        count += 1;
+      } else {
         count += Math.floor(createPaymentDto.sum / debt.data.month_sum);
       }
     }
     const payment = await this.create(createPaymentDto);
     await this.debtService.updateDebtById(debt.data.id, {
       debt_sum: debt.data.debt_sum - createPaymentDto.sum,
-      debt_period: debt.data.debt_period - count
+      debt_period: debt.data.debt_period - count,
     });
-    return payment
+    const newDebt = await this.debtService.findOneById(
+      createPaymentDto.debt_id,
+    );
+    if (debt.data.debt_sum <= 0) {
+      this.debtService.updateDebtById(newDebt.data.id, { is_active: false });
+    }
+    return payment;
   }
 
   async findPaymentsForDebtorsHistory(page: number, limit: number, id: string) {

@@ -16,6 +16,7 @@ import {
 } from '../../infrastructure';
 import { SigninStoreDto } from './dto';
 import { CreateStoreDto, PasscodeStoreDto } from '../store/dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Injectable()
 export class AuthService extends BaseService<
@@ -65,6 +66,7 @@ export class AuthService extends BaseService<
       },
     };
   }
+
   async loginWithPasscode(id: string, passcodeDto: PasscodeStoreDto) {
     const getStore = await this.getRepository.findOne({
       where: { id },
@@ -96,6 +98,27 @@ export class AuthService extends BaseService<
         token: accessToken,
         expire: this.configService.get<string>('ACCESS_TOKEN_TIME'),
       },
+    };
+  }
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const { old_password, password } = updatePasswordDto;
+    const storeData = await this.getRepository.findOne({ where: { id } });
+    const is_match_pass = await BcryptEncryption.compare(
+      old_password,
+      storeData.hashed_password,
+    );
+    if (!is_match_pass) {
+      throw new BadRequestException('old password invalid');
+    }
+    const newPassword = await BcryptEncryption.encrypt(password);
+    const store = await this.getRepository.update(
+      { id: id },
+      { hashed_password: newPassword },
+    );
+    return {
+      status_code: 200,
+      message: 'OK',
+      data: 'Password updated successfully',
     };
   }
 

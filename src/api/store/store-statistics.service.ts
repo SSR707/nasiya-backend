@@ -68,6 +68,7 @@ export class StoreStatisticsService {
             paymentDay === selectedDay
           ) {
             duePayments.push({
+              id: debtor.id,
               debtorName: debtor.full_name,
               amount: debt.month_sum,
             });

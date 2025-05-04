@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, ILike } from 'typeorm';
 import {
@@ -65,8 +70,10 @@ export class StoreService extends BaseService<
     return await this.findOneBy({
       where: { id },
       select: {
+        id: true,
         image: true,
         fullname: true,
+        login: true,
         phone_number: true,
         email: true,
         created_at: true,
@@ -83,15 +90,9 @@ export class StoreService extends BaseService<
           full_name: searchQuery ? ILike(`%${searchQuery}%`) : undefined,
         },
       },
-      relations: ['debtors'],
+      relations: ['debtors', 'debtors.images'],
       select: {
         id: true,
-        image: true,
-        fullname: true,
-        phone_number: true,
-        email: true,
-        created_at: true,
-        updated_at: true,
       },
     });
   }
@@ -122,10 +123,12 @@ export class StoreService extends BaseService<
       await this.fileService.deleteFile(storeData.image);
     }
     const fileUrl = await this.fileService.uploadFile(image, 'profileImage');
-    await this.getRepository.update(id, { image: fileUrl.path });
+    const imgPath = 'http://localhost:3133/' + fileUrl.path;
+    await this.getRepository.update(id, { image: imgPath });
     const updatedStoreData = await this.getProfile(id);
     return updatedStoreData;
   }
+
   async addPasscode(store_id: string, addPasscode: PasscodeStoreDto) {
     const hash = await BcryptEncryption.encrypt(addPasscode.passcode);
     const getUser = await this.findOneBy({ where: { id: store_id } });

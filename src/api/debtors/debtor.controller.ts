@@ -29,6 +29,7 @@ import { DebtorService } from './debtor.service';
 import { UserID } from '../../common';
 import { DebtorEntity } from '../../core';
 import { CreateDebtorDto, UpdateDebtorDto, CreateDebtorPhoneDto } from './dto';
+import { url } from 'inspector';
 
 @ApiTags('Debtor API')
 @ApiBearerAuth()
@@ -157,7 +158,7 @@ export class DebtorController {
     },
   })
   async findOne(@Param('id') id: string) {
-    return this.debtorService.findOne(id, ['debts']);
+    return this.debtorService.findOne(id, ['debts', 'likes', 'images']);
   }
 
   @Get(':id/total-debt')
@@ -268,6 +269,39 @@ export class DebtorController {
     return this.debtorService.deleteSoft(id);
   }
 
+  @Delete('delete_img/:id')
+  @ApiOperation({ summary: 'Delete img debtor' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Debtors img deleted successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Debtors not found',
+    schema: {
+      example: {
+        status_code: HttpStatus.NOT_FOUND,
+        message: 'not found',
+      },
+    },
+  })
+  removeImg(@Param('id') id: string) {
+    return this.debtorService.deleteDebtorImage(id);
+  }
+
   @Post(':id/images')
   @ApiOperation({ summary: 'Upload debtors image' })
   @ApiParam({
@@ -312,6 +346,33 @@ export class DebtorController {
       throw new BadRequestException('No file uploaded');
     }
     return this.debtorService.uploadDebtorImage(id, file);
+  }
+
+  @Post(':id/upload-images')
+  @ApiOperation({ summary: 'Upload debtors images' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the debtors',
+    type: String,
+    example: '1412ahrqw-e351ad34-12g41934s-asr',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Image uploaded successfully',
+    schema: {
+      example: {
+        status_code: HttpStatus.OK,
+        message: 'success',
+        data: {
+          id: 'qwe41ifj1-2341gs-41asd-12fasgashqawerq',
+          url: './image.png',
+          created_at: '1723900952341',
+        },
+      },
+    },
+  })
+  uploadImageDb(@Param('id') id: string, @Body('url') url: string) {
+    return this.debtorService.uploadImage(id, url);
   }
 
   @Post('/images')
